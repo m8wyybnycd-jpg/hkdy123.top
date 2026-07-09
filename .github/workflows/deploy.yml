@@ -35,10 +35,14 @@ jobs:
       - name: Install Chrome for Puppeteer (react-snap)
         run: npx puppeteer browsers install chrome
 
-      - name: Build & prerender
-        run: npm run build
+      - name: Build
+        run: npx vite build
         env:
           NODE_ENV: production
+
+      - name: Prerender (react-snap)
+        run: npx react-snap
+        continue-on-error: true
 
       - name: Deploy to Cloudflare Pages (Production)
         if: github.ref == 'refs/heads/main'
