@@ -16,7 +16,7 @@
     "deploy": "vite build && wrangler pages deploy dist --project-name=cloudgame-hub"
   },
   "dependencies": {
-    "@sentry/react": "^8.0.0",
+    "@sentry/react": "^10.0.0",
     "lucide-react": "^0.460.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
