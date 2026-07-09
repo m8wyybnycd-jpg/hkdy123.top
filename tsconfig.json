@@ -17,6 +17,5 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "functions", "worker-configuration.d.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src", "functions", "vite.config.ts", "worker-configuration.d.ts"]
 }
