@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and user-specific pages
+Disallow: /admin/
+Disallow: /profile
+Disallow: /messages
+Disallow: /search
+Disallow: /api/
+
+Sitemap: https://www.hkdy123.top/sitemap.xml

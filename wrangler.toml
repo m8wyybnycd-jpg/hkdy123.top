@@ -1,0 +1,13 @@
+name = "cloudgame-hub"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "dist"
+
+# D1 database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "cloudgame-hub-db"
+database_id = "1e65f62f-e7a3-4a89-88eb-f34c95f4969c"
+
+# V3.1: Brevo API v3 used for email (API key managed as Cloudflare Pages Secret)
+# JWT_SECRET and BREVO_API_KEY are managed as Cloudflare Pages Secrets (not plaintext variables)
+# Set them via: wrangler pages secret put BREVO_API_KEY

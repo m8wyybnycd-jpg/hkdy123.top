@@ -1,0 +1,128 @@
+sequenceDiagram
+    %% ── 图 1: 前台轮播加载流程 ──
+
+    actor User as 用户
+    participant HomePage as HomePage
+    participant Carousel as BannerCarousel
+    participant Skeleton as BannerSkeleton
+    participant API as /api/banners
+    participant DB as Cloudflare D1
+
+    Note over User,DB: === 图1: 前台轮播加载流程 ===
+
+    User->>HomePage: 访问首页
+    HomePage->>Carousel: 渲染 BannerCarousel
+    Carousel->>Carousel: useState(banners=[], loading=true)
+    Carousel->>Skeleton: 渲染骨架屏占位
+    Skeleton-->>User: 显示加载态（全宽灰条 + animate-pulse）
+
+    Carousel->>API: GET /api/banners
+    API->>DB: SELECT * FROM banners<br/>WHERE is_active=1<br/>AND (start_time IS NULL OR start_time <= now)<br/>AND (end_time IS NULL OR end_time >= now)<br/>ORDER BY sort_order ASC<br/>LIMIT 10
+    DB-->>API: Banner[]
+    API->>API: 构建 {code:0, data:{banners}}
+    API-->>Carousel: Response JSON
+
+    Carousel->>Carousel: setState(banners=data, loading=false)
+
+    alt banners.length === 0
+        Carousel->>HomePage: return null
+        HomePage-->>User: 无轮播区域（不占 DOM 空间）
+    else banners.length > 0
+        Carousel->>Carousel: 初始化 Swiper<br/>autoplay:4000ms<br/>navigation:true<br/>pagination:clickable<br/>loop:true<br/>pauseOnMouseEnter:true
+        Carousel-->>User: 渲染轮播图（全宽横版图片）
+
+        Note over User,Carousel: 交互阶段
+        User->>Carousel: hover → Swiper 自动暂停
+        User->>Carousel: mouseLeave → Swiper 恢复播放
+        User->>Carousel: 点击箭头/圆点 → Swiper 切换 Slide
+        User->>Carousel: 移动端 swipe → Swiper touch 切换
+
+        alt banner.link_url 非空
+            User->>Carousel: 点击轮播项
+            Carousel-->>User: <a> 标签跳转到 link_url
+        else banner.link_url 为空
+            User->>Carousel: 点击轮播项
+            Carousel-->>User: 仅展示图片，无跳转
+        end
+    end
+
+---
+
+sequenceDiagram
+    %% ── 图 2: 后台创建轮播图流程（含图片上传） ──
+
+    actor Admin as 管理员
+    participant Page as BannersPage
+    participant Dialog as BannerFormDialog
+    participant Upload as /admin/banners/upload-image
+    participant CF as Cloudflare Images API
+    participant Create as /admin/banners (POST)
+    participant DB as Cloudflare D1
+
+    Note over Admin,DB: === 图2: 后台创建轮播图流程 ===
+
+    Admin->>Page: 打开轮播图管理页
+    Page->>Page: GET /admin/banners?page=1&page_size=10
+    Page-->>Admin: 显示列表表格
+
+    Admin->>Page: 点击"新建轮播图"按钮
+    Page->>Dialog: openCreateDialog()<br/>mode=create, banner=null
+
+    Dialog-->>Admin: 显示空表单 Dialog
+    Admin->>Dialog: 选择图片文件
+    Dialog->>Dialog: validateForm() 检查文件类型和大小(≤5MB)
+    Dialog->>Dialog: setState(isUploading=true)
+
+    Dialog->>Upload: POST /admin/banners/upload-image<br/>multipart/form-data (file=...)
+    Upload->>Upload: 解析 multipart → 提取 file
+    Upload->>CF: POST https://api.cloudflare.com/client/v4/images/v1<br/>Authorization: Bearer CF_IMAGES_API_TOKEN<br/>multipart (file=...)
+    CF-->>Upload: {success:true, result:{id, variants:[...]}}
+    Upload->>Upload: 提取 CDN URL<br/>https://imagedelivery.net/<hash>/<id>/public
+    Upload-->>Dialog: {code:0, data:{image_url, image_id}}
+
+    Dialog->>Dialog: setState(imageUrl=image_url, isUploading=false)
+    Dialog-->>Admin: 显示图片预览
+
+    Admin->>Dialog: 填写标题/链接/排序值/时段/描述 + 点击"保存"
+    Dialog->>Dialog: validateForm() → title和image_url必填
+    Dialog->>Dialog: 构建 BannerFormData
+
+    Dialog->>Create: POST /admin/banners<br/>body: BannerFormData
+    Create->>Create: checkPermission(banner:write)
+    Create->>DB: INSERT INTO banners<br/>(title, image_url, link_url, sort_order, is_active, start_time, end_time, description)<br/>VALUES (...)
+    DB-->>Create: 新记录 {id: N}
+    Create-->>Dialog: {code:0, data: Banner}
+
+    Dialog->>Dialog: setState(open=false)
+    Dialog-->>Page: onSave() callback
+    Page->>Page: 刷新列表 fetchBanners()
+    Page-->>Admin: 列表更新，显示新轮播图
+
+---
+
+sequenceDiagram
+    %% ── 图 3: 后台切换启用/禁用流程 ──
+
+    actor Admin as 管理员
+    participant Page as BannersPage
+    participant Toggle as /admin/banners/:id/toggle
+    participant DB as Cloudflare D1
+
+    Note over Admin,DB: === 图3: 后台切换启用/禁用流程 ===
+
+    Admin->>Page: 点击某条轮播的 Switch 开关
+    Page->>Page: 获取该条 banner.id
+
+    Page->>Toggle: PATCH /admin/banners/:id/toggle
+    Toggle->>Toggle: checkPermission(banner:write)
+
+    Toggle->>DB: SELECT is_active FROM banners WHERE id=:id
+    DB-->>Toggle: {is_active: 1}
+
+    Toggle->>DB: UPDATE banners<br/>SET is_active = 0, updated_at = datetime('now')<br/>WHERE id = :id
+    DB-->>Toggle: 更新成功
+
+    Toggle-->>Page: {code:0, data: {id, is_active:0, ...}}
+
+    Page->>Page: 更新列表中该条记录的 is_active 状态
+    Page-->>Admin: Switch 开关从 ON → OFF（视觉切换完成）

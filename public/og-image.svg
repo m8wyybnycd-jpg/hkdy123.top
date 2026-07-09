@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e131c"/>
+      <stop offset="100%" stop-color="#171e2b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b9eff"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+    <linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b9eff"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Glow effects -->
+  <circle cx="200" cy="150" r="180" fill="#3b9eff" opacity="0.08"/>
+  <circle cx="1000" cy="480" r="200" fill="#a78bfa" opacity="0.06"/>
+  <!-- Logo -->
+  <rect x="100" y="120" width="80" height="80" rx="20" fill="url(#logoBg)"/>
+  <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" transform="translate(100,120)">
+    <path d="M28 32 L28 48 M20 40 L36 40"/>
+    <circle cx="52" cy="36" r="3.5" fill="#fff" stroke="none"/>
+    <circle cx="60" cy="44" r="3.5" fill="#fff" stroke="none"/>
+  </g>
+  <!-- Title -->
+  <text x="100" y="290" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="800" fill="#f1f5f9">
+    云游戏平台哪个好？
+  </text>
+  <text x="100" y="370" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="800" fill="url(#accent)">
+    2026年免费云游戏平台大全
+  </text>
+  <!-- Subtitle -->
+  <text x="100" y="440" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="#94a3b8">
+    10+ 云游戏平台 · 5+ 云电脑入口 · 26款免费游戏资源
+  </text>
+  <text x="100" y="485" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="400" fill="#94a3b8">
+    一页看全，一键直达
+  </text>
+  <!-- Brand -->
+  <rect x="100" y="530" width="280" height="3" rx="1.5" fill="url(#accent)"/>
+  <text x="100" y="575" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="#cbd5e1">
+    云玩汇 · hkdy123.top
+  </text>
+</svg>

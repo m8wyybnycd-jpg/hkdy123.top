@@ -1,0 +1,76 @@
+sequenceDiagram
+    %% ── 图 1: 用户登录后看到公告 + 铃铛角标 ──
+    actor User as 用户
+    participant Auth as AuthContext
+    participant PL as ProtectedLayout
+    participant AB as AnnouncementBar
+    participant UC as UnreadContext
+    participant MB as MessageBell
+    participant API as apiClient
+    participant Backend as Cloudflare API
+
+    Note over User,Backend: === 图1: 登录后公告 + 铃铛角标初始化 ===
+
+    User->>Auth: login(email, password)
+    Auth->>Backend: POST /api/login
+    Backend-->>Auth: { token, user }
+    Auth->>Auth: setState(isAuthenticated=true)
+
+    Auth-->>PL: 渲染 ProtectedLayout
+
+    par AnnouncementBar 初始化
+        PL->>AB: 挂载
+        AB->>API: getPublishedAnnouncements()
+        API->>Backend: GET /api/announcements
+        Backend-->>API: Announcement[]
+        API-->>AB: [公告1, 公告2, ...]
+        AB->>AB: setState(announcements)
+        AB-->>User: 渲染公告横幅（第一条）
+    and UnreadContext 初始化
+        PL->>UC: 挂载 UnreadProvider
+        UC->>API: getUnreadCount()
+        API->>Backend: GET /api/messages/unread-count
+        Backend-->>API: { count: 3 }
+        API-->>UC: 3
+        UC->>UC: setState(unreadCount=3)
+    and MessageBell 渲染
+        PL->>MB: 挂载（Header 内）
+        MB->>UC: 消费 unreadCount
+        UC-->>MB: unreadCount=3
+        MB-->>User: 渲染铃铛 + 红色角标 "3"
+    end
+
+    UC->>UC: 启动 60s 轮询定时器
+
+    Note over UC: 页面隐藏时暂停轮询<br/>document.visibilitychange
+
+    %% ── 图 2: 用户点击铃铛 → 查看消息 → 标记已读 ──
+
+    Note over User,Backend: === 图2: 铃铛 → 消息列表 → 标记已读 ===
+
+    User->>MB: 点击铃铛
+    MB->>MB: navigate('/messages')
+
+    User->>MP: MessagesPage 挂载
+    MP->>API: getMyMessages()
+    API->>Backend: GET /api/messages
+    Backend-->>API: Message[]
+    API-->>MP: [msg1(unread), msg2(read), ...]
+    MP->>MP: setState(messages, loading=false)
+    MP-->>User: 渲染消息列表<br/>未读加粗+蓝点，已读灰色
+
+    User->>MP: 点击未读消息 msg1
+    MP->>MP: setState(expandedId=msg1.id)
+    MP->>API: markMessageRead(msg1.id)
+    API->>Backend: PUT /api/messages/1/read
+    Backend-->>API: { code: 0 }
+
+    par 更新消息状态
+        MP->>MP: setState(messages: msg1.isRead=1)
+        MP-->>User: 消息变灰，移除加粗
+    and 更新未读计数
+        MP->>UC: setUnreadCount(prev => prev - 1)
+        UC->>UC: unreadCount: 3 → 2
+        UC-->>MB: 重新渲染
+        MB-->>User: 角标 "3" → "2"
+    end

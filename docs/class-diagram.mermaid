@@ -1,0 +1,215 @@
+classDiagram
+    %% ── 已有模块（不变） ──
+
+    class AuthContext {
+        <<context>>
+        +authState: AuthState
+        +login(email, password) Promise~void~
+        +register(email, code, password) Promise~void~
+        +smsLogin(phone, code) Promise~void~
+        +logout() void
+    }
+
+    class AuthState {
+        +user: User | null
+        +token: string | null
+        +isAuthenticated: boolean
+        +loading: boolean
+    }
+
+    class User {
+        +id: number
+        +email: string
+        +username: string
+        +isAdmin: boolean
+        +roles: string[]
+        +permissions: string[]
+        +createdAt: string
+        +phone?: string
+    }
+
+    class ApiClient {
+        <<singleton>>
+        +getPublishedAnnouncements() Promise~Announcement[]~
+        +getMyMessages() Promise~Message[]~
+        +getUnreadCount() Promise~number~
+        +markMessageRead(id) Promise~void~
+        +getPlatforms() Promise~Platform[]~
+        +search(query) Promise~SearchResult~
+        +logout() void
+    }
+
+    class Announcement {
+        +id: number
+        +title: string
+        +content: string
+        +type: "notice" | "announcement" | "maintenance"
+        +status: 0 | 1 | 2
+        +createdAt: string
+    }
+
+    class Message {
+        +id: number
+        +senderId: number
+        +recipientId: number
+        +title: string
+        +content: string
+        +isRead: number
+        +readAt: string | null
+        +createdAt: string
+    }
+
+    class ProtectedLayout {
+        <<layout route>>
+        +render() JSX
+    }
+
+    class ProtectedRoute {
+        <<guard>>
+        +children: ReactNode
+        +render() JSX
+    }
+
+    class Header {
+        <<component>>
+        -TABS: NavTab[]
+        -searchQuery: string
+        -menuOpen: boolean
+        +render() JSX
+    }
+
+    %% ── V5 新增模块 ──
+
+    class UnreadContext {
+        <<context>>
+        +unreadCount: number
+        +setUnreadCount(n) void
+        +refreshUnreadCount() Promise~void~
+        -pollTimer: number
+        -startPolling() void
+        -stopPolling() void
+    }
+
+    class AnnouncementBar {
+        <<component P0-1>>
+        -announcements: Announcement[]
+        -expandedId: number | null
+        -loading: boolean
+        -error: string | null
+        +fetchAnnouncements() Promise~void~
+        +render() JSX | null
+    }
+
+    class MessageBell {
+        <<component P0-3>>
+        -navigate: NavigateFunction
+        +render() JSX
+    }
+
+    class MessagesPage {
+        <<page P0-2>>
+        -messages: Message[]
+        -expandedId: number | null
+        -filterTab: "all" | "unread" | "read"
+        -loading: boolean
+        -error: string | null
+        +fetchMessages() Promise~void~
+        +handleMarkRead(id) Promise~void~
+        +render() JSX
+    }
+
+    class ProfilePage {
+        <<page P1-1>>
+        -user: User
+        +handleLogout() void
+        +render() JSX
+    }
+
+    class AnnouncementsListPage {
+        <<page P1-6>>
+        -announcements: Announcement[]
+        -typeFilter: "all" | AnnouncementType
+        -loading: boolean
+        -error: string | null
+        +fetchAnnouncements() Promise~void~
+        +render() JSX
+    }
+
+    class NotFoundPage {
+        <<page P1-3>>
+        +render() JSX
+    }
+
+    class StateView {
+        <<shared components P1-4>>
+    }
+
+    class LoadingState {
+        +lines: number
+        +className?: string
+        +render() JSX
+    }
+
+    class ErrorState {
+        +message?: string
+        +onRetry() void
+        +render() JSX
+    }
+
+    class EmptyState {
+        +message?: string
+        +icon?: ReactNode
+        +render() JSX
+    }
+
+    class SearchPage {
+        <<page MODIFY P2>>
+        -results: SearchResult
+        -visibleCount: number
+        +loadMore() void
+        +render() JSX
+    }
+
+    %% ── 关系 ──
+
+    AuthContext --> AuthState : provides
+    AuthState --> User : contains
+    ProtectedLayout --> ProtectedRoute : wraps
+    ProtectedLayout --> Header : renders
+    ProtectedLayout --> UnreadContext : wraps provider
+    ProtectedLayout --> AnnouncementBar : renders above Outlet
+
+    AnnouncementBar ..> ApiClient : calls getPublishedAnnouncements()
+    AnnouncementBar --> Announcement : consumes
+
+    UnreadContext ..> ApiClient : calls getUnreadCount()
+
+    Header --> MessageBell : renders (desktop + mobile)
+    MessageBell --> UnreadContext : consumes unreadCount
+    MessageBell ..> ApiClient : calls getUnreadCount()
+
+    MessagesPage ..> ApiClient : calls getMyMessages() + markMessageRead()
+    MessagesPage --> Message : consumes
+    MessagesPage --> UnreadContext : setUnreadCount on mark read
+    MessagesPage --> LoadingState : uses
+    MessagesPage --> ErrorState : uses
+    MessagesPage --> EmptyState : uses
+
+    ProfilePage --> AuthContext : reads authState.user
+    ProfilePage --> User : renders
+
+    AnnouncementsListPage ..> ApiClient : calls getPublishedAnnouncements()
+    AnnouncementsListPage --> Announcement : consumes
+    AnnouncementsListPage --> LoadingState : uses
+    AnnouncementsListPage --> ErrorState : uses
+    AnnouncementsListPage --> EmptyState : uses
+
+    NotFoundPage ..> AuthContext : no dependency (public)
+
+    StateView <|-- LoadingState : exports
+    StateView <|-- ErrorState : exports
+    StateView <|-- EmptyState : exports
+
+    SearchPage ..> ApiClient : calls search()
+    SearchPage --> LoadingState : uses
+    SearchPage --> EmptyState : uses

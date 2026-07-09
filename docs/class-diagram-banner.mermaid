@@ -1,0 +1,183 @@
+classDiagram
+    %% ── 数据模型 ──
+
+    class Banner {
+        +number id
+        +string title
+        +string image_url
+        +string link_url
+        +number sort_order
+        +number is_active
+        +string|null start_time
+        +string|null end_time
+        +string description
+        +string created_at
+        +string updated_at
+    }
+
+    class BannerFormData {
+        +string title
+        +string image_url
+        +string link_url
+        +number sort_order
+        +number is_active
+        +string|null start_time
+        +string|null end_time
+        +string description
+    }
+
+    class ApiResponse~T~ {
+        +number code
+        +T data
+        +string message
+    }
+
+    class BannersPublicResponse {
+        +Banner[] banners
+    }
+
+    class BannersListResponse {
+        +Banner[] banners
+        +number total
+        +number page
+        +number page_size
+    }
+
+    class SortUpdateItem {
+        +number id
+        +number sort_order
+    }
+
+    class ImageUploadResponse {
+        +string image_url
+        +string image_id
+    }
+
+    %% ── API 处理器 ──
+
+    class BannersPublicAPI {
+        +onRequest(Request, Env) ApiResponse~BannersPublicResponse~
+        -fetchActiveBanners(Env) Banner[]
+        -filterByTimePeriod(Banner[]) Banner[]
+    }
+
+    class BannersAdminAPI {
+        +onRequest(Request, Env) ApiResponse~BannersListResponse~ or ApiResponse~Banner~
+        -listBanners(Env, page, pageSize, search, status) Banner[]
+        -createBanner(Env, BannerFormData) Banner
+        -validateBannerForm(BannerFormData) boolean
+    }
+
+    class BannersDetailAPI {
+        +onRequest(Request, Env, id) ApiResponse~Banner~ or ApiResponse~null~
+        -getBanner(Env, number) Banner
+        -updateBanner(Env, number, BannerFormData) Banner
+        -deleteBanner(Env, number) void
+    }
+
+    class BannersToggleAPI {
+        +onRequest(Request, Env, id) ApiResponse~Banner~
+        -toggleActive(Env, number) Banner
+    }
+
+    class BannersSortAPI {
+        +onRequest(Request, Env) ApiResponse~null~
+        -batchUpdateSort(Env, SortUpdateItem[]) void
+    }
+
+    class ImageUploadAPI {
+        +onRequest(Request, Env) ApiResponse~ImageUploadResponse~
+        -parseMultipartFormData(Request) File
+        -uploadToCloudflareImages(Env, File) ImageUploadResponse
+        -buildCdnUrl(Env, string) string
+    }
+
+    %% ── 前台 React 组件 ──
+
+    class BannerCarousel {
+        +Banner[] banners
+        +boolean loading
+        +onSlideChange() void
+        -fetchBanners() Promise~Banner[]~
+        -renderSlides() JSX.Element[]
+        -renderSkeleton() JSX.Element
+        -handleHover() void
+        -handleMouseLeave() void
+    }
+
+    class BannerSkeleton {
+        +string width
+        +string height
+        -renderPlaceholder() JSX.Element
+    }
+
+    %% ── 后台 React 组件 ──
+
+    class BannersPage {
+        +Banner[] banners
+        +number total
+        +number page
+        +number pageSize
+        +string search
+        +string statusFilter
+        +boolean dialogOpen
+        +Banner|null editingBanner
+        -fetchBanners() Promise~void~
+        -handleToggle(number) Promise~void~
+        -handleDelete(number) Promise~void~
+        -handleSort(SortUpdateItem[]) Promise~void~
+        -openCreateDialog() void
+        -openEditDialog(Banner) void
+        -closeDialog() void
+    }
+
+    class BannerFormDialog {
+        +boolean open
+        +Banner|null banner
+        +string mode create|edit
+        +string imageUrl
+        +boolean isUploading
+        +onSave(BannerFormData) Promise~void~
+        +onClose() void
+        -handleImageUpload(File) Promise~void~
+        -validateForm() boolean
+        -submitForm() Promise~void~
+    }
+
+    %% ── 关系 ──
+
+    BannerFormData --> Banner : 表单映射为数据模型
+    ApiResponse --> Banner : data 字段包含
+    ApiResponse --> BannersPublicResponse : data 字段包含
+    ApiResponse --> BannersListResponse : data 字段包含
+    ApiResponse --> ImageUploadResponse : data 字段包含
+
+    BannersPublicAPI --> Banner : 返回列表
+    BannersPublicAPI --> BannersPublicResponse : 构建响应
+
+    BannersAdminAPI --> Banner : CRUD 操作
+    BannersAdminAPI --> BannersListResponse : 构建列表响应
+    BannersAdminAPI --> BannerFormData : 接收创建数据
+
+    BannersDetailAPI --> Banner : 单条操作
+    BannersDetailAPI --> BannerFormData : 接收编辑数据
+
+    BannersToggleAPI --> Banner : toggle 操作
+    BannersSortAPI --> SortUpdateItem : 接收排序数据
+
+    ImageUploadAPI --> ImageUploadResponse : 返回上传结果
+    ImageUploadAPI --> BannerFormData : 提供 image_url 字段
+
+    BannerCarousel --> Banner : 渲染轮播数据
+    BannerCarousel --> BannerSkeleton : 加载态占位
+    BannerCarousel --> BannersPublicAPI : 请求前台 API
+
+    BannersPage --> Banner : 列表展示
+    BannersPage --> BannerFormDialog : 弹窗交互
+    BannersPage --> BannersAdminAPI : 请求后台 API
+    BannersPage --> BannersToggleAPI : 切换启用
+    BannersPage --> BannersSortAPI : 批量排序
+    BannersPage --> BannersDetailAPI : 删除操作
+
+    BannerFormDialog --> BannerFormData : 表单提交
+    BannerFormDialog --> ImageUploadAPI : 图片上传
