@@ -137,7 +137,7 @@ export default function SettingsPage() {
           value={settings[field.key] ?? ""}
           onChange={(e) => handleFieldChange(field.key, e.target.value)}
           placeholder={field.placeholder}
-          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue"
         />
       </div>
     );
@@ -157,7 +157,7 @@ export default function SettingsPage() {
           value={settings[field.key] ?? ""}
           onChange={(e) => handleFieldChange(field.key, e.target.value)}
           placeholder={field.placeholder}
-          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue"
         />
       </div>
     );
@@ -175,7 +175,7 @@ export default function SettingsPage() {
           type="button"
           onClick={() => handleFieldChange(field.key, enabled ? "false" : "true")}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            enabled ? "bg-[#3b9eff]" : "bg-slate-300"
+            enabled ? "bg-neon-blue" : "bg-slate-300"
           }`}
         >
           <span
@@ -226,7 +226,7 @@ export default function SettingsPage() {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-[#3b9eff]" />
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-neon-blue" />
           <span className="text-sm text-slate-400">加载中…</span>
         </div>
       </div>
@@ -241,7 +241,7 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 rounded-lg bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8ae6] disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-lg bg-neon-blue px-4 py-2 text-sm font-medium text-white hover:bg-neon-blue/80 disabled:opacity-50"
         >
           <Save className="h-4 w-4" />
           {saving ? "保存中…" : "保存当前页设置"}
@@ -285,7 +285,7 @@ export default function SettingsPage() {
               onClick={() => handleTabChange(tab.id)}
               className={`border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? "border-[#3b9eff] text-[#3b9eff]"
+                  ? "border-neon-blue text-neon-blue"
                   : "border-transparent text-slate-500 hover:text-slate-700"
               }`}
             >

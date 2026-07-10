@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Mail } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import { apiClient } from "../services/api";
 import { useUnread } from "../contexts/UnreadContext";
 import { LoadingState, ErrorState, EmptyState } from "../components/StateView";
@@ -111,7 +112,13 @@ export default function MessagesPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-        <h1 className="mb-6 text-2xl font-bold text-slate-100">📬 我的消息</h1>
+        <Helmet>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <h1 className="mb-6 flex items-center gap-2 text-2xl font-bold text-slate-100">
+          <Mail className="h-6 w-6 text-neon-blue" />
+          我的消息
+        </h1>
         <LoadingState lines={5} />
       </div>
     );
@@ -121,7 +128,13 @@ export default function MessagesPage() {
   if (error) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-        <h1 className="mb-6 text-2xl font-bold text-slate-100">📬 我的消息</h1>
+        <Helmet>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
+        <h1 className="mb-6 flex items-center gap-2 text-2xl font-bold text-slate-100">
+          <Mail className="h-6 w-6 text-neon-blue" />
+          我的消息
+        </h1>
         <ErrorState message={error} onRetry={fetchMessages} />
       </div>
     );
@@ -129,8 +142,14 @@ export default function MessagesPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {/* Page header */}
-      <h1 className="mb-6 text-2xl font-bold text-slate-100">📬 我的消息</h1>
+      <h1 className="mb-6 flex items-center gap-2 text-2xl font-bold text-slate-100">
+        <Mail className="h-6 w-6 text-neon-blue" />
+        我的消息
+      </h1>
 
       {/* Filter tabs */}
       <div className="mb-4 flex gap-1 rounded-xl bg-game-card/60 p-1">

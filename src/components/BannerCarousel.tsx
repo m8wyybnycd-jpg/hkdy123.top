@@ -82,7 +82,7 @@ export default function BannerCarousel() {
           transition: all 0.2s;
         }
         .banner-carousel .swiper-pagination-bullet-active {
-          background: #38bdf8;
+          background: #3b9eff;
           width: 20px;
           border-radius: 4px;
         }

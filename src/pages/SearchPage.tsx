@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Search, Gamepad2, Monitor, Gift } from "lucide-react";
 import { apiClient } from "../services/api";
 import type { SearchResult as SearchResultType, Game, Platform, Deal } from "../types";
@@ -99,6 +100,9 @@ export default function SearchPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {/* Search bar */}
       <div className="mb-8">
         <SearchBar initialValue={initialQuery} onSearch={performSearch} autoFocus={!initialQuery} />

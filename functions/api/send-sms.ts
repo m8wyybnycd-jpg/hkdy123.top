@@ -4,6 +4,7 @@ import {
   serverError,
   errorResponse,
 } from "../lib/response";
+import { getClientIP } from "../lib/logger";
 
 /** Regular expression for Chinese mobile phone numbers. */
 const PHONE_REGEX = /^1[3-9]\d{9}$/;
@@ -11,7 +12,7 @@ const PHONE_REGEX = /^1[3-9]\d{9}$/;
 /** Verification code validity period in milliseconds (5 minutes). */
 const CODE_EXPIRY_MS = 5 * 60 * 1000;
 
-/** Rate-limit window in milliseconds (60 seconds between requests). */
+/** Rate-limit window in milliseconds (60 seconds between requests per phone). */
 const RATE_LIMIT_MS = 60 * 1000;
 
 /** SMS sending API endpoint (smsbao.com). */
@@ -122,7 +123,7 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
     return badRequest("手机号格式不正确");
   }
 
-  // Rate limit: check if a code was sent within the last 60 seconds
+  // Rate limit: check if a code was sent within the last 60 seconds per phone
   const now = new Date();
   const rateLimitCutoff = new Date(now.getTime() - RATE_LIMIT_MS).toISOString();
 
@@ -142,6 +143,24 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
     }
   } catch {
     return serverError("数据库查询失败");
+  }
+
+  // IP rate limit: prevent SMS bombing from a single IP
+  const clientIP = getClientIP(context.request);
+  if (clientIP) {
+    try {
+      const ipCutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      const ipCount = await DB.prepare(
+        "SELECT COUNT(*) as count FROM login_logs WHERE ip = ? AND created_at > ?"
+      )
+        .bind(clientIP, ipCutoff)
+        .first();
+      if ((ipCount?.count as number) >= 20) {
+        return errorResponse(429, "请求过于频繁，请稍后再试", 429);
+      }
+    } catch {
+      // Fail-open for IP rate limit (non-critical)
+    }
   }
 
   // Generate verification code

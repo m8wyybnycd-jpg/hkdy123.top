@@ -2,11 +2,22 @@ name = "cloudgame-hub"
 compatibility_date = "2025-01-01"
 pages_build_output_dir = "dist"
 
+# Enable structured logging via Workers Logs
+# JSON console.log output is auto-indexed and queryable
+[observability]
+enabled = true
+
 # D1 database binding
 [[d1_databases]]
 binding = "DB"
 database_name = "cloudgame-hub-db"
 database_id = "1e65f62f-e7a3-4a89-88eb-f34c95f4969c"
+
+# KV namespace for JWT token revocation blacklist
+# Create with: wrangler kv namespace create TOKEN_BLACKLIST
+[[kv_namespaces]]
+binding = "TOKEN_BLACKLIST"
+id = "cbb5f82c0b8c4e14ac871303ead6a1e4"
 
 # V3.1: Brevo API v3 used for email (API key managed as Cloudflare Pages Secret)
 # JWT_SECRET and BREVO_API_KEY are managed as Cloudflare Pages Secrets (not plaintext variables)

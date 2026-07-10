@@ -1,0 +1,301 @@
+﻿2026-07-10T02:44:51.9753519Z Current runner version: '2.335.1'
+2026-07-10T02:44:51.9781257Z ##[group]Runner Image Provisioner
+2026-07-10T02:44:51.9782179Z Hosted Compute Agent
+2026-07-10T02:44:51.9782816Z Version: 20260624.560
+2026-07-10T02:44:51.9783576Z Commit: 925d229a51159bc391ae97e54a2dd1fe20af789d
+2026-07-10T02:44:51.9784323Z Build Date: 2026-06-24T18:26:47Z
+2026-07-10T02:44:51.9785041Z Worker ID: {2594ae6c-db12-4b84-a0d6-05ec34c42827}
+2026-07-10T02:44:51.9786132Z Azure Region: westus
+2026-07-10T02:44:51.9786945Z ##[endgroup]
+2026-07-10T02:44:51.9789081Z ##[group]Operating System
+2026-07-10T02:44:51.9789762Z Ubuntu
+2026-07-10T02:44:51.9790290Z 24.04.4
+2026-07-10T02:44:51.9790930Z LTS
+2026-07-10T02:44:51.9791513Z ##[endgroup]
+2026-07-10T02:44:51.9792204Z ##[group]Runner Image
+2026-07-10T02:44:51.9792827Z Image: ubuntu-24.04
+2026-07-10T02:44:51.9793403Z Version: 20260705.232.1
+2026-07-10T02:44:51.9794784Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260705.232/images/ubuntu/Ubuntu2404-Readme.md
+2026-07-10T02:44:51.9796968Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260705.232
+2026-07-10T02:44:51.9798195Z ##[endgroup]
+2026-07-10T02:44:51.9799431Z ##[group]GITHUB_TOKEN Permissions
+2026-07-10T02:44:51.9801632Z Contents: read
+2026-07-10T02:44:51.9802279Z Metadata: read
+2026-07-10T02:44:51.9803000Z ##[endgroup]
+2026-07-10T02:44:51.9805195Z Secret source: Actions
+2026-07-10T02:44:51.9806329Z Prepare workflow directory
+2026-07-10T02:44:52.0162351Z Prepare all required actions
+2026-07-10T02:44:52.0203524Z Getting action download info
+2026-07-10T02:44:52.3969507Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-07-10T02:44:52.4825589Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-07-10T02:44:52.6757845Z Complete job name: build-and-deploy
+2026-07-10T02:44:52.7540746Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-10T02:44:52.7550091Z ##[group]Run actions/checkout@v4
+2026-07-10T02:44:52.7550874Z with:
+2026-07-10T02:44:52.7551357Z   repository: m8wyybnycd-jpg/hkdy123.top
+2026-07-10T02:44:52.7555230Z   token: ***
+2026-07-10T02:44:52.7555694Z   ssh-strict: true
+2026-07-10T02:44:52.7556610Z   ssh-user: git
+2026-07-10T02:44:52.7557112Z   persist-credentials: true
+2026-07-10T02:44:52.7557626Z   clean: true
+2026-07-10T02:44:52.7558097Z   sparse-checkout-cone-mode: true
+2026-07-10T02:44:52.7558694Z   fetch-depth: 1
+2026-07-10T02:44:52.7559149Z   fetch-tags: false
+2026-07-10T02:44:52.7559613Z   show-progress: true
+2026-07-10T02:44:52.7560089Z   lfs: false
+2026-07-10T02:44:52.7560579Z   submodules: false
+2026-07-10T02:44:52.7561045Z   set-safe-directory: true
+2026-07-10T02:44:52.7561871Z ##[endgroup]
+2026-07-10T02:44:52.8641914Z Syncing repository: m8wyybnycd-jpg/hkdy123.top
+2026-07-10T02:44:52.8643979Z ##[group]Getting Git version info
+2026-07-10T02:44:52.8644775Z Working directory is '/home/runner/work/hkdy123.top/hkdy123.top'
+2026-07-10T02:44:52.8645857Z [command]/usr/bin/git version
+2026-07-10T02:44:52.8751241Z git version 2.54.0
+2026-07-10T02:44:52.8794876Z ##[endgroup]
+2026-07-10T02:44:52.8804500Z Temporarily overriding HOME='/home/runner/work/_temp/addd5f24-1b76-42c0-994b-37f1484ec660' before making global git config changes
+2026-07-10T02:44:52.8806880Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-10T02:44:52.8809189Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/hkdy123.top/hkdy123.top
+2026-07-10T02:44:52.8883861Z Deleting the contents of '/home/runner/work/hkdy123.top/hkdy123.top'
+2026-07-10T02:44:52.8888399Z ##[group]Initializing the repository
+2026-07-10T02:44:52.8894798Z [command]/usr/bin/git init /home/runner/work/hkdy123.top/hkdy123.top
+2026-07-10T02:44:52.9030922Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-07-10T02:44:52.9033125Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-07-10T02:44:52.9034624Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-07-10T02:44:52.9035472Z hint: call:
+2026-07-10T02:44:52.9036292Z hint:
+2026-07-10T02:44:52.9036890Z hint: 	git config --global init.defaultBranch <name>
+2026-07-10T02:44:52.9037923Z hint:
+2026-07-10T02:44:52.9039064Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-07-10T02:44:52.9041220Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-07-10T02:44:52.9043468Z hint:
+2026-07-10T02:44:52.9044881Z hint: 	git branch -m <name>
+2026-07-10T02:44:52.9045882Z hint:
+2026-07-10T02:44:52.9047339Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-07-10T02:44:52.9049238Z Initialized empty Git repository in /home/runner/work/hkdy123.top/hkdy123.top/.git/
+2026-07-10T02:44:52.9057923Z [command]/usr/bin/git remote add origin https://github.com/m8wyybnycd-jpg/hkdy123.top
+2026-07-10T02:44:52.9154858Z ##[endgroup]
+2026-07-10T02:44:52.9156422Z ##[group]Disabling automatic garbage collection
+2026-07-10T02:44:52.9159523Z [command]/usr/bin/git config --local gc.auto 0
+2026-07-10T02:44:52.9204057Z ##[endgroup]
+2026-07-10T02:44:52.9206296Z ##[group]Setting up auth
+2026-07-10T02:44:52.9209667Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-10T02:44:52.9248723Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-10T02:44:52.9693903Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-10T02:44:52.9733857Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-10T02:44:52.9964573Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-10T02:44:53.0012015Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-10T02:44:53.0255430Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-07-10T02:44:53.0296829Z ##[endgroup]
+2026-07-10T02:44:53.0297733Z ##[group]Fetching the repository
+2026-07-10T02:44:53.0306435Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +7c377b359b81e376a0728479359a7b5e375e3031:refs/remotes/origin/develop
+2026-07-10T02:44:53.5777052Z From https://github.com/m8wyybnycd-jpg/hkdy123.top
+2026-07-10T02:44:53.5778100Z  * [new ref]         7c377b359b81e376a0728479359a7b5e375e3031 -> origin/develop
+2026-07-10T02:44:53.5814175Z ##[endgroup]
+2026-07-10T02:44:53.5815445Z ##[group]Determining the checkout info
+2026-07-10T02:44:53.5817093Z ##[endgroup]
+2026-07-10T02:44:53.5823283Z [command]/usr/bin/git sparse-checkout disable
+2026-07-10T02:44:53.5910471Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-07-10T02:44:53.5943846Z ##[group]Checking out the ref
+2026-07-10T02:44:53.5950990Z [command]/usr/bin/git checkout --progress --force -B develop refs/remotes/origin/develop
+2026-07-10T02:44:53.6178056Z Switched to a new branch 'develop'
+2026-07-10T02:44:53.6179250Z branch 'develop' set up to track 'origin/develop'.
+2026-07-10T02:44:53.6188726Z ##[endgroup]
+2026-07-10T02:44:53.6252810Z [command]/usr/bin/git log -1 --format=%H
+2026-07-10T02:44:53.6281484Z 7c377b359b81e376a0728479359a7b5e375e3031
+2026-07-10T02:44:53.6572149Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-10T02:44:53.6575411Z ##[group]Run actions/setup-node@v4
+2026-07-10T02:44:53.6576204Z with:
+2026-07-10T02:44:53.6576648Z   node-version: 22
+2026-07-10T02:44:53.6577102Z   cache: npm
+2026-07-10T02:44:53.6577538Z   always-auth: false
+2026-07-10T02:44:53.6578008Z   check-latest: false
+2026-07-10T02:44:53.6581714Z   token: ***
+2026-07-10T02:44:53.6582146Z ##[endgroup]
+2026-07-10T02:44:53.8122489Z Found in cache @ /opt/hostedtoolcache/node/22.23.1/x64
+2026-07-10T02:44:53.8124867Z (node:2329) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-07-10T02:44:53.8126599Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-07-10T02:44:53.8128393Z ##[group]Environment details
+2026-07-10T02:44:54.2149734Z node: v22.23.1
+2026-07-10T02:44:54.2150711Z npm: 10.9.8
+2026-07-10T02:44:54.2151332Z yarn: 1.22.22
+2026-07-10T02:44:54.2152525Z ##[endgroup]
+2026-07-10T02:44:54.2179745Z [command]/opt/hostedtoolcache/node/22.23.1/x64/bin/npm config get cache
+2026-07-10T02:44:54.3362282Z /home/runner/.npm
+2026-07-10T02:44:54.6165332Z npm cache is not found
+2026-07-10T02:44:54.6398863Z ##[group]Run npm ci
+2026-07-10T02:44:54.6399981Z [36;1mnpm ci[0m
+2026-07-10T02:44:54.6588315Z shell: /usr/bin/bash -e {0}
+2026-07-10T02:44:54.6589510Z env:
+2026-07-10T02:44:54.6590415Z   PUPPETEER_SKIP_DOWNLOAD: true
+2026-07-10T02:44:54.6591571Z ##[endgroup]
+2026-07-10T02:44:56.7612448Z npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+2026-07-10T02:44:57.2842879Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2026-07-10T02:44:57.3759756Z npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-07-10T02:44:58.3071000Z npm warn deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please update to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)
+2026-07-10T02:44:58.4470501Z npm warn deprecated critters@0.0.25: Ownership of Critters has moved to the Nuxt team, who will be maintaining the project going forward. If you'd like to keep using Critters, please switch to the actively-maintained fork at https://github.com/danielroe/beasties
+2026-07-10T02:44:59.8593179Z npm warn deprecated puppeteer@1.20.0: < 24.15.0 is no longer supported
+2026-07-10T02:45:08.4133125Z 
+2026-07-10T02:45:08.4134267Z added 469 packages, and audited 470 packages in 14s
+2026-07-10T02:45:08.4134873Z 
+2026-07-10T02:45:08.4135301Z 81 packages are looking for funding
+2026-07-10T02:45:08.4136237Z   run `npm fund` for details
+2026-07-10T02:45:08.4501324Z 
+2026-07-10T02:45:08.4502292Z 24 vulnerabilities (3 low, 3 moderate, 13 high, 5 critical)
+2026-07-10T02:45:08.4502727Z 
+2026-07-10T02:45:08.4503089Z To address issues that do not require attention, run:
+2026-07-10T02:45:08.4503490Z   npm audit fix
+2026-07-10T02:45:08.4503690Z 
+2026-07-10T02:45:08.4503993Z To address all issues (including breaking changes), run:
+2026-07-10T02:45:08.4504430Z   npm audit fix --force
+2026-07-10T02:45:08.4504620Z 
+2026-07-10T02:45:08.4504824Z Run `npm audit` for details.
+2026-07-10T02:45:08.5152857Z ##[group]Run npx tsc --noEmit
+2026-07-10T02:45:08.5153206Z [36;1mnpx tsc --noEmit[0m
+2026-07-10T02:45:08.5189106Z shell: /usr/bin/bash -e {0}
+2026-07-10T02:45:08.5189393Z ##[endgroup]
+2026-07-10T02:45:14.9980524Z ##[error]src/pages/CloudDesktopsPage.tsx(57,7): error TS2367: This comparison appears to be unintentional because the types 'boolean | undefined' and 'number' have no overlap.
+2026-07-10T02:45:14.9992177Z ##[error]src/pages/CloudGamesPage.tsx(59,7): error TS2367: This comparison appears to be unintentional because the types 'boolean | undefined' and 'number' have no overlap.
+2026-07-10T02:45:14.9995820Z ##[error]src/pages/DealsPage.tsx(74,7): error TS2367: This comparison appears to be unintentional because the types 'boolean | undefined' and 'number' have no overlap.
+2026-07-10T02:45:14.9999750Z ##[error]src/pages/FreeGamesPage.tsx(34,7): error TS2367: This comparison appears to be unintentional because the types 'boolean | undefined' and 'number' have no overlap.
+2026-07-10T02:45:15.0003425Z ##[error]src/pages/LibraryPage.tsx(72,7): error TS2367: This comparison appears to be unintentional because the types 'boolean | undefined' and 'number' have no overlap.
+2026-07-10T02:45:15.0007456Z ##[error]src/pages/SmsPlatformsPage.tsx(80,7): error TS2367: This comparison appears to be unintentional because the types 'boolean | undefined' and 'number' have no overlap.
+2026-07-10T02:45:15.0010860Z ##[error]src/pages/admin/content/PlatformsPage.tsx(16,3): error TS2322: Type '""' is not assignable to type 'PlatformId | undefined'.
+2026-07-10T02:45:15.0013831Z ##[error]src/pages/admin/content/PlatformsPage.tsx(262,55): error TS2322: Type 'string' is not assignable to type 'PlatformId | undefined'.
+2026-07-10T02:45:15.0422706Z ##[error]Process completed with exit code 2.
+2026-07-10T02:45:15.0469296Z ##[group]Run npx vite build
+2026-07-10T02:45:15.0469605Z [36;1mnpx vite build[0m
+2026-07-10T02:45:15.0502212Z shell: /usr/bin/bash -e {0}
+2026-07-10T02:45:15.0502475Z env:
+2026-07-10T02:45:15.0502675Z   NODE_ENV: production
+2026-07-10T02:45:15.0502910Z ##[endgroup]
+2026-07-10T02:45:15.5872483Z [36mvite v5.4.21 [32mbuilding for production...[36m[39m
+2026-07-10T02:45:15.6441967Z transforming...
+2026-07-10T02:45:19.8923271Z [32m✓[39m 2049 modules transformed.
+2026-07-10T02:45:20.1302160Z rendering chunks...
+2026-07-10T02:45:22.1249850Z computing gzip size...
+2026-07-10T02:45:22.1430680Z [2mdist/[22m[32mindex.html                                [39m[1m[2m  2.81 kB[22m[1m[22m[2m │ gzip:   1.18 kB[22m
+2026-07-10T02:45:22.1433293Z [2mdist/[22m[2massets/[22m[35mindex-DuZABatY.css                 [39m[1m[2m 76.44 kB[22m[1m[22m[2m │ gzip:  14.07 kB[22m
+2026-07-10T02:45:22.1435880Z [2mdist/[22m[2massets/[22m[36mreact-vendor-C_hSAxtr.js           [39m[1m[2m  0.03 kB[22m[1m[22m[2m │ gzip:   0.05 kB[22m
+2026-07-10T02:45:22.1438516Z [2mdist/[22m[2massets/[22m[36mHasPermission-BUr4KTaM.js          [39m[1m[2m  0.21 kB[22m[1m[22m[2m │ gzip:   0.18 kB[22m
+2026-07-10T02:45:22.1440847Z [2mdist/[22m[2massets/[22m[36mcheck-D3vGdsEC.js                  [39m[1m[2m  0.29 kB[22m[1m[22m[2m │ gzip:   0.24 kB[22m
+2026-07-10T02:45:22.1444852Z [2mdist/[22m[2massets/[22m[36mplus-BeyRN9VZ.js                   [39m[1m[2m  0.32 kB[22m[1m[22m[2m │ gzip:   0.25 kB[22m
+2026-07-10T02:45:22.1447520Z [2mdist/[22m[2massets/[22m[36mfilter-DxgK4DGV.js                 [39m[1m[2m  0.33 kB[22m[1m[22m[2m │ gzip:   0.26 kB[22m
+2026-07-10T02:45:22.1450817Z [2mdist/[22m[2massets/[22m[36marrow-left-CcgdPEmx.js             [39m[1m[2m  0.33 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2026-07-10T02:45:22.1452681Z [2mdist/[22m[2massets/[22m[36mclock-grMjzIm2.js                  [39m[1m[2m  0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2026-07-10T02:45:22.1455306Z [2mdist/[22m[2massets/[22m[36museExternalLink-D96rXgCa.js        [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+2026-07-10T02:45:22.1468140Z [2mdist/[22m[2massets/[22m[36mlock-ClsIH14P.js                   [39m[1m[2m  0.38 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2026-07-10T02:45:22.1470741Z [2mdist/[22m[2massets/[22m[36mlibrary-DT1Zeq-Q.js                [39m[1m[2m  0.40 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+2026-07-10T02:45:22.1472979Z [2mdist/[22m[2massets/[22m[36mactivity-BWvxDovh.js               [39m[1m[2m  0.40 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-07-10T02:45:22.1476546Z [2mdist/[22m[2massets/[22m[36mindex-C046dCn7.js                  [39m[1m[2m  0.41 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+2026-07-10T02:45:22.1478957Z [2mdist/[22m[2massets/[22m[36mcircle-alert-BchpXBlM.js           [39m[1m[2m  0.42 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+2026-07-10T02:45:22.1481684Z [2mdist/[22m[2massets/[22m[36mexternal-link-Bwas6TWL.js          [39m[1m[2m  0.42 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-07-10T02:45:22.1483932Z [2mdist/[22m[2massets/[22m[36mcalendar-CVYOaBbH.js               [39m[1m[2m  0.43 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-07-10T02:45:22.1487204Z [2mdist/[22m[2massets/[22m[36mmonitor-lhj1sVIO.js                [39m[1m[2m  0.43 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+2026-07-10T02:45:22.1489268Z [2mdist/[22m[2massets/[22m[36mdownload-C3s8ABKe.js               [39m[1m[2m  0.43 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-07-10T02:45:22.1491758Z [2mdist/[22m[2massets/[22m[36mpencil-DWVbQzre.js                 [39m[1m[2m  0.45 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-07-10T02:45:22.1493768Z [2mdist/[22m[2massets/[22m[36mcoins-DChZhEgC.js                  [39m[1m[2m  0.45 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-07-10T02:45:22.1496372Z [2mdist/[22m[2massets/[22m[36mlayout-template-BOhA_Sse.js        [39m[1m[2m  0.45 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+2026-07-10T02:45:22.1498423Z [2mdist/[22m[2massets/[22m[36mlightbulb-eU_wgJ0J.js              [39m[1m[2m  0.46 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-07-10T02:45:22.1500353Z [2mdist/[22m[2massets/[22m[36musers-CxkeZggr.js                  [39m[1m[2m  0.47 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+2026-07-10T02:45:22.1502313Z [2mdist/[22m[2massets/[22m[36mtag-BMDqNr-4.js                    [39m[1m[2m  0.50 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+2026-07-10T02:45:22.1504192Z [2mdist/[22m[2massets/[22m[36msave-BXD-c1Pc.js                   [39m[1m[2m  0.50 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+2026-07-10T02:45:22.1506339Z [2mdist/[22m[2massets/[22m[36mgift-CNUD0x-2.js                   [39m[1m[2m  0.53 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+2026-07-10T02:45:22.1508259Z [2mdist/[22m[2massets/[22m[36mtrash-2-bxiBKkZg.js                [39m[1m[2m  0.53 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+2026-07-10T02:45:22.1510196Z [2mdist/[22m[2massets/[22m[36mrefresh-cw-Bbh0rMqe.js             [39m[1m[2m  0.84 kB[22m[1m[22m[2m │ gzip:   0.42 kB[22m
+2026-07-10T02:45:22.1512169Z [2mdist/[22m[2massets/[22m[36mdesktops-ByzaBt3F.js               [39m[1m[2m  1.08 kB[22m[1m[22m[2m │ gzip:   0.94 kB[22m
+2026-07-10T02:45:22.1514142Z [2mdist/[22m[2massets/[22m[36mPageDisabledNotice-D6lmCf-F.js     [39m[1m[2m  1.39 kB[22m[1m[22m[2m │ gzip:   0.91 kB[22m
+2026-07-10T02:45:22.1516466Z [2mdist/[22m[2massets/[22m[36mForbiddenPage-D9po4Ppv.js          [39m[1m[2m  1.68 kB[22m[1m[22m[2m │ gzip:   0.99 kB[22m
+2026-07-10T02:45:22.1518881Z [2mdist/[22m[2massets/[22m[36mStateView-DQHt7Hqq.js              [39m[1m[2m  1.75 kB[22m[1m[22m[2m │ gzip:   0.92 kB[22m
+2026-07-10T02:45:22.1520870Z [2mdist/[22m[2massets/[22m[36mpermissions-DAwq5zZk.js            [39m[1m[2m  1.89 kB[22m[1m[22m[2m │ gzip:   0.67 kB[22m
+2026-07-10T02:45:22.1522768Z [2mdist/[22m[2massets/[22m[36mplatforms-DVQ5bK13.js              [39m[1m[2m  2.25 kB[22m[1m[22m[2m │ gzip:   1.55 kB[22m
+2026-07-10T02:45:22.1524672Z [2mdist/[22m[2massets/[22m[36mPlatformCard-D7JbI9sV.js           [39m[1m[2m  2.58 kB[22m[1m[22m[2m │ gzip:   1.02 kB[22m
+2026-07-10T02:45:22.1526887Z [2mdist/[22m[2massets/[22m[36mDealCard-CXCThAR0.js               [39m[1m[2m  2.66 kB[22m[1m[22m[2m │ gzip:   1.14 kB[22m
+2026-07-10T02:45:22.1528937Z [2mdist/[22m[2massets/[22m[36mAnnouncementsListPage-_Bj4WDOw.js  [39m[1m[2m  3.01 kB[22m[1m[22m[2m │ gzip:   1.35 kB[22m
+2026-07-10T02:45:22.1531217Z [2mdist/[22m[2massets/[22m[36mProfilePage-DJ7Y3H-y.js            [39m[1m[2m  3.99 kB[22m[1m[22m[2m │ gzip:   1.49 kB[22m
+2026-07-10T02:45:22.1533132Z [2mdist/[22m[2massets/[22m[36mMessagesPage-DY4_SbkH.js           [39m[1m[2m  4.09 kB[22m[1m[22m[2m │ gzip:   1.70 kB[22m
+2026-07-10T02:45:22.1535026Z [2mdist/[22m[2massets/[22m[36mdeals-BjhN0dds.js                  [39m[1m[2m  4.18 kB[22m[1m[22m[2m │ gzip:   2.34 kB[22m
+2026-07-10T02:45:22.1537134Z [2mdist/[22m[2massets/[22m[36mDealsPage-D3-BzCkE.js              [39m[1m[2m  4.41 kB[22m[1m[22m[2m │ gzip:   1.90 kB[22m
+2026-07-10T02:45:22.1539088Z [2mdist/[22m[2massets/[22m[36mDashboardPage-D9486Bhs.js          [39m[1m[2m  4.54 kB[22m[1m[22m[2m │ gzip:   1.80 kB[22m
+2026-07-10T02:45:22.1542351Z [2mdist/[22m[2massets/[22m[36mCloudDesktopsPage-bUnm6Hgh.js      [39m[1m[2m  5.43 kB[22m[1m[22m[2m │ gzip:   2.03 kB[22m
+2026-07-10T02:45:22.1548129Z [2mdist/[22m[2massets/[22m[36mSettingsPage-BcJ6lLZA.js           [39m[1m[2m  5.68 kB[22m[1m[22m[2m │ gzip:   2.21 kB[22m
+2026-07-10T02:45:22.1552466Z [2mdist/[22m[2massets/[22m[36mLibraryPage-CFKD_MgD.js            [39m[1m[2m  6.13 kB[22m[1m[22m[2m │ gzip:   2.29 kB[22m
+2026-07-10T02:45:22.1556479Z [2mdist/[22m[2massets/[22m[36mRelatedLinks-CDRJRLGa.js           [39m[1m[2m  6.13 kB[22m[1m[22m[2m │ gzip:   2.99 kB[22m
+2026-07-10T02:45:22.1558448Z [2mdist/[22m[2massets/[22m[36mSearchPage-y8HcWf4K.js             [39m[1m[2m  7.54 kB[22m[1m[22m[2m │ gzip:   2.39 kB[22m
+2026-07-10T02:45:22.1560261Z [2mdist/[22m[2massets/[22m[36mCloudGamesPage-DePuU4yL.js         [39m[1m[2m  8.41 kB[22m[1m[22m[2m │ gzip:   3.63 kB[22m
+2026-07-10T02:45:22.1562080Z [2mdist/[22m[2massets/[22m[36mAdminLayout-CCoOse7D.js            [39m[1m[2m  8.77 kB[22m[1m[22m[2m │ gzip:   2.86 kB[22m
+2026-07-10T02:45:22.1563820Z [2mdist/[22m[2massets/[22m[36mMessagesPage-DP-K6bOD.js           [39m[1m[2m  9.07 kB[22m[1m[22m[2m │ gzip:   2.82 kB[22m
+2026-07-10T02:45:22.1565702Z [2mdist/[22m[2massets/[22m[36mDesktopsPage-Cf3CYdCy.js           [39m[1m[2m  9.29 kB[22m[1m[22m[2m │ gzip:   2.63 kB[22m
+2026-07-10T02:45:22.1567836Z [2mdist/[22m[2massets/[22m[36mDealsPage-DL_TH5ld.js              [39m[1m[2m  9.32 kB[22m[1m[22m[2m │ gzip:   2.94 kB[22m
+2026-07-10T02:45:22.1569741Z [2mdist/[22m[2massets/[22m[36mGameModal-C9Fnht-7.js              [39m[1m[2m  9.77 kB[22m[1m[22m[2m │ gzip:   3.08 kB[22m
+2026-07-10T02:45:22.1571623Z [2mdist/[22m[2massets/[22m[36mGamesPage-giw6Y-vc.js              [39m[1m[2m 10.12 kB[22m[1m[22m[2m │ gzip:   3.05 kB[22m
+2026-07-10T02:45:22.1573505Z [2mdist/[22m[2massets/[22m[36mPlatformsPage-DYfP_sbL.js          [39m[1m[2m 10.20 kB[22m[1m[22m[2m │ gzip:   2.71 kB[22m
+2026-07-10T02:45:22.1575391Z [2mdist/[22m[2massets/[22m[36mPageConfigsPage-fBOMWAgw.js        [39m[1m[2m 10.78 kB[22m[1m[22m[2m │ gzip:   3.14 kB[22m
+2026-07-10T02:45:22.1577609Z [2mdist/[22m[2massets/[22m[36mHomePage-aMLkoZDL.js               [39m[1m[2m 10.83 kB[22m[1m[22m[2m │ gzip:   3.34 kB[22m
+2026-07-10T02:45:22.1579469Z [2mdist/[22m[2massets/[22m[36mFreeGamesPage-B77L92nA.js          [39m[1m[2m 11.02 kB[22m[1m[22m[2m │ gzip:   4.44 kB[22m
+2026-07-10T02:45:22.1581317Z [2mdist/[22m[2massets/[22m[36mLogsPage-6no1fDYb.js               [39m[1m[2m 11.36 kB[22m[1m[22m[2m │ gzip:   2.85 kB[22m
+2026-07-10T02:45:22.1583161Z [2mdist/[22m[2massets/[22m[36mAnnouncementsPage-BtC6dkjF.js      [39m[1m[2m 12.06 kB[22m[1m[22m[2m │ gzip:   3.41 kB[22m
+2026-07-10T02:45:22.1585178Z [2mdist/[22m[2massets/[22m[36mUsersPage-BhRI2exB.js              [39m[1m[2m 13.03 kB[22m[1m[22m[2m │ gzip:   4.12 kB[22m
+2026-07-10T02:45:22.1587673Z [2mdist/[22m[2massets/[22m[36mseo-BJeiExQS.js                    [39m[1m[2m 14.45 kB[22m[1m[22m[2m │ gzip:   5.56 kB[22m
+2026-07-10T02:45:22.1590391Z [2mdist/[22m[2massets/[22m[36mSmsPlatformsPage-CsAO5PQP.js       [39m[1m[2m 15.36 kB[22m[1m[22m[2m │ gzip:   4.74 kB[22m
+2026-07-10T02:45:22.1592830Z [2mdist/[22m[2massets/[22m[36mRolesPage-Be7CBCf2.js              [39m[1m[2m 15.37 kB[22m[1m[22m[2m │ gzip:   4.03 kB[22m
+2026-07-10T02:45:22.1595285Z [2mdist/[22m[2massets/[22m[36mBannersPage-0c6fxAzQ.js            [39m[1m[2m 19.01 kB[22m[1m[22m[2m │ gzip:   5.17 kB[22m
+2026-07-10T02:45:22.1597969Z [2mdist/[22m[2massets/[22m[36mgames-rNmGIc2L.js                  [39m[1m[2m 34.16 kB[22m[1m[22m[2m │ gzip:  16.14 kB[22m
+2026-07-10T02:45:22.1600469Z [2mdist/[22m[2massets/[22m[36mrouter-CR77VLFk.js                 [39m[1m[2m164.57 kB[22m[1m[22m[2m │ gzip:  53.72 kB[22m
+2026-07-10T02:45:22.1602909Z [2mdist/[22m[2massets/[22m[36mindex-BJvClS76.js                  [39m[1m[2m332.04 kB[22m[1m[22m[2m │ gzip: 101.34 kB[22m
+2026-07-10T02:45:22.1604589Z [32m✓ built in 6.53s[39m
+2026-07-10T02:45:22.2021964Z [32mInlined 2.02 kB (2% of original 74.64 kB) of assets/index-DuZABatY.css.[39m
+2026-07-10T02:45:22.2030758Z Time 57ms
+2026-07-10T02:45:22.2802540Z ##[group]Run npx puppeteer browsers install chrome && npx react-snap
+2026-07-10T02:45:22.2803084Z [36;1mnpx puppeteer browsers install chrome && npx react-snap[0m
+2026-07-10T02:45:22.2837752Z shell: /usr/bin/bash -e {0}
+2026-07-10T02:45:22.2838069Z ##[endgroup]
+2026-07-10T02:45:22.6464633Z npm error could not determine executable to run
+2026-07-10T02:45:22.6475539Z npm error A complete log of this run can be found in: /home/runner/.npm/_logs/2026-07-10T02_45_22_339Z-debug-0.log
+2026-07-10T02:45:22.6568286Z ##[error]Process completed with exit code 1.
+2026-07-10T02:45:22.6648430Z ##[group]Run npx wrangler pages deploy dist --project-name=cloudgame-hub --branch=develop
+2026-07-10T02:45:22.6649097Z [36;1mnpx wrangler pages deploy dist --project-name=cloudgame-hub --branch=develop[0m
+2026-07-10T02:45:22.6682090Z shell: /usr/bin/bash -e {0}
+2026-07-10T02:45:22.6682365Z env:
+2026-07-10T02:45:22.6683215Z   CLOUDFLARE_API_TOKEN: ***
+2026-07-10T02:45:22.6683550Z   CLOUDFLARE_ACCOUNT_ID: ***
+2026-07-10T02:45:22.6683785Z ##[endgroup]
+2026-07-10T02:45:23.8746690Z 
+2026-07-10T02:45:24.1315667Z  ⛅️ wrangler 4.110.0
+2026-07-10T02:45:24.1316788Z ────────────────────
+2026-07-10T02:45:24.1317030Z 
+2026-07-10T02:45:24.2016064Z [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mA request to the Cloudflare API (/accounts/***/pages/projects/cloudgame-hub) failed.[0m
+2026-07-10T02:45:24.2018013Z 📎 It looks like you are authenticating Wrangler via a custom API token set in an environment variable.
+2026-07-10T02:45:24.2019260Z Please ensure it has the correct permissions for this operation.
+2026-07-10T02:45:24.2019740Z 
+2026-07-10T02:45:24.2020340Z 
+2026-07-10T02:45:24.2020937Z   Authentication error [code: 10000]
+2026-07-10T02:45:24.2021306Z 
+2026-07-10T02:45:24.2021316Z 
+2026-07-10T02:45:24.2057274Z Getting User settings...
+2026-07-10T02:45:24.5870228Z 👋 You are logged in with an User API Token. Unable to retrieve email for this user. Are you missing the `User->User Details->Read` permission?
+2026-07-10T02:45:24.5871934Z ℹ️  The API Token is read from the CLOUDFLARE_API_TOKEN environment variable.
+2026-07-10T02:45:24.5928800Z ┌───────────────────────────────────────────────┬──────────────────────────────────┐
+2026-07-10T02:45:24.5929657Z │ Account Name                                  │ Account ID                       │
+2026-07-10T02:45:24.5930490Z ├───────────────────────────────────────────────┼──────────────────────────────────┤
+2026-07-10T02:45:24.5931513Z │ J6s77khz5z@privaterelay.appleid.com's Account │ a680aa5b251a58759a519e415f5bde24 │
+2026-07-10T02:45:24.5932442Z └───────────────────────────────────────────────┴──────────────────────────────────┘
+2026-07-10T02:45:24.5933286Z 🔓 To see token permissions visit https://dash.cloudflare.com/profile/api-tokens
+2026-07-10T02:45:24.5957921Z 🪵  Logs were written to "/home/runner/.config/.wrangler/logs/wrangler-2026-07-10_02-45-23_476.log"
+2026-07-10T02:45:24.6295634Z ##[error]Process completed with exit code 1.
+2026-07-10T02:45:24.6437275Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-07-10T02:45:24.6438553Z Post job cleanup.
+2026-07-10T02:45:24.7312881Z [command]/usr/bin/git version
+2026-07-10T02:45:24.7362399Z git version 2.54.0
+2026-07-10T02:45:24.7436489Z Temporarily overriding HOME='/home/runner/work/_temp/ff8591ec-c5a2-4871-a828-42d79ab8b429' before making global git config changes
+2026-07-10T02:45:24.7438178Z Adding repository directory to the temporary git global config as a safe directory
+2026-07-10T02:45:24.7442188Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/hkdy123.top/hkdy123.top
+2026-07-10T02:45:24.7490659Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-07-10T02:45:24.7533473Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-07-10T02:45:24.7794135Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-07-10T02:45:24.7838287Z http.https://github.com/.extraheader
+2026-07-10T02:45:24.7852654Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-07-10T02:45:24.7899721Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-07-10T02:45:24.8155687Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-07-10T02:45:24.8195785Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-07-10T02:45:24.8591326Z Cleaning up orphan processes
+2026-07-10T02:45:24.8896173Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

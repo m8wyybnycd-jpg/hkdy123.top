@@ -268,7 +268,7 @@ function SmsPlatformCard({
   return (
     <div
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-game-border bg-game-card shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-game-border-hover hover:shadow-card-hover animate-slide-up"
-      style={{ animationDelay: `${index * 30}ms` }}
+      style={{ animationDelay: `${Math.min(index * 30, 600)}ms` }}
     >
       {/* Left-side category color bar */}
       <div

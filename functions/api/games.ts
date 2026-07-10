@@ -43,5 +43,8 @@ export const onRequestGet = async (context: PageContext): Promise<Response> => {
     mapGameRow
   );
 
-  return jsonResponse(games);
+  const response = jsonResponse(games);
+  // Cache game list for 60 seconds at CDN level (stale-while-revalidate)
+  response.headers.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+  return response;
 };

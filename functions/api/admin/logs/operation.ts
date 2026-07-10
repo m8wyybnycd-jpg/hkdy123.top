@@ -97,7 +97,7 @@ export const onRequestGet = async (
           String(row.target ?? ""),
           String(row.ip ?? ""),
           String(row.detail ?? ""),
-          String(row.created_at ?? ""),
+          formatCsvDate(row.created_at),
         ];
         csvLines.push(fields.map(escapeCsvField).join(","));
       }
@@ -155,4 +155,22 @@ function escapeCsvField(value: string): string {
     return `"${value.replace(/"/g, '""')}"`;
   }
   return value;
+}
+
+/**
+ * Format a D1 datetime string for CSV export (e.g. "2026-07-10 08:17:08" -> "2026-07-10 08:17:08").
+ * Handles both ISO format and SQLite datetime format.
+ */
+function formatCsvDate(raw: unknown): string {
+  if (!raw) return "";
+  const str = String(raw);
+  const d = new Date(str.includes("T") ? str : str.replace(" ", "T") + "Z");
+  if (isNaN(d.getTime())) return str;
+  const yyyy = d.getUTCFullYear();
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+  const hh = String(d.getUTCHours()).padStart(2, "0");
+  const mi = String(d.getUTCMinutes()).padStart(2, "0");
+  const ss = String(d.getUTCSeconds()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
 }

@@ -1,4 +1,5 @@
 import { verifyJWT } from "./lib/auth";
+import { isTokenRevoked } from "./lib/revocation";
 
 /**
  * Allowed origins for CORS. Only these domains can make authenticated
@@ -25,12 +26,23 @@ function getAllowedOrigin(request: Request): string | null {
 /**
  * Extract the JWT token from the request.
  * Priority: HttpOnly Cookie (primary) → Authorization header (backward compat).
+ *
+ * Supports both __Host-auth_token (new) and auth_token (legacy) cookie names
+ * for smooth migration.
  */
 function extractToken(request: Request): string | null {
   // 1. Try Cookie header (HttpOnly cookie — primary auth method)
   const cookieHeader = request.headers.get("Cookie");
   if (cookieHeader) {
     const cookies = cookieHeader.split(";").map((c) => c.trim());
+    // Check new __Host- prefixed cookie first
+    for (const cookie of cookies) {
+      const [name, ...valueParts] = cookie.split("=");
+      if (name.trim() === "__Host-auth_token" && valueParts.length > 0) {
+        return valueParts.join("=");
+      }
+    }
+    // Fallback to legacy cookie name
     for (const cookie of cookies) {
       const [name, ...valueParts] = cookie.split("=");
       if (name.trim() === "auth_token" && valueParts.length > 0) {
@@ -54,7 +66,8 @@ function extractToken(request: Request): string | null {
  * Responsibilities:
  * 1. Handle CORS preflight (OPTIONS) requests with strict origin whitelist.
  * 2. Parse JWT from HttpOnly Cookie (or Authorization header fallback) and inject user info into context.data.
- * 3. Add CORS headers (including Allow-Credentials) to all responses.
+ * 3. Check JWT revocation blacklist (KV) to reject logged-out tokens.
+ * 4. Add CORS headers (including Allow-Credentials) to all responses.
  */
 export const onRequest = async (context: PageContext): Promise<Response> => {
   const allowedOrigin = getAllowedOrigin(context.request);
@@ -86,7 +99,20 @@ export const onRequest = async (context: PageContext): Promise<Response> => {
         throw new Error("JWT_SECRET is not configured");
       }
       const user = await verifyJWT(token, secret);
-      context.data.user = user;
+
+      // Check revocation blacklist (if KV is configured)
+      if (user.jti && context.env.TOKEN_BLACKLIST) {
+        const revoked = await isTokenRevoked(context.env.TOKEN_BLACKLIST, user.jti);
+        if (revoked) {
+          // Token has been revoked — treat as unauthenticated
+          // Don't set context.data.user, let handlers return 401
+        } else {
+          context.data.user = user;
+        }
+      } else {
+        // KV not configured or no jti (legacy token) — allow through
+        context.data.user = user;
+      }
     } catch {
       // Token invalid or expired — continue without user; individual handlers
       // will return 401 if auth is required.

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 /**
  * 404 Not Found page (public route: *).
@@ -11,6 +12,9 @@ export default function NotFoundPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-game-dark px-4 py-20 text-center">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {/* Large 404 */}
       <h1 className="text-8xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
         404

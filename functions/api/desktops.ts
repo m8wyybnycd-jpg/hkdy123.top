@@ -39,5 +39,8 @@ export const onRequestGet = async (context: PageContext): Promise<Response> => {
     mapDesktopRow
   );
 
-  return jsonResponse(desktops);
+  const response = jsonResponse(desktops);
+  // Cache desktop list for 60 seconds at CDN level
+  response.headers.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+  return response;
 };

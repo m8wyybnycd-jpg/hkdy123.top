@@ -102,7 +102,7 @@ export async function verifyPassword(
     const hashBuffer = await crypto.subtle.deriveBits(
       {
         name: "PBKDF2",
-        salt: saltBytes.buffer as ArrayBuffer,
+        salt: saltBytes,
         iterations: PBKDF2_ITERATIONS,
         hash: PBKDF2_HASH,
       },
@@ -111,16 +111,7 @@ export async function verifyPassword(
     );
 
     const computedHash = bufferToBase64(hashBuffer);
-
-    // Constant-time comparison to prevent timing attacks
-    const a = new TextEncoder().encode(computedHash);
-    const b = new TextEncoder().encode(hash);
-    if (a.length !== b.length) return false;
-    let diff = 0;
-    for (let i = 0; i < a.length; i++) {
-      diff |= a[i] ^ b[i];
-    }
-    return diff === 0;
+    return computedHash === hash;
   } catch {
     return false;
   }
@@ -128,21 +119,20 @@ export async function verifyPassword(
 
 // ── Base64url Helpers ─────────────────────────────────────
 
-function toBase64url(buf: ArrayBuffer | Uint8Array): string {
-  const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
-  return btoa(String.fromCharCode(...bytes))
+function toBase64url(buf: ArrayBuffer): string {
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 }
 
-function fromBase64url(str: string): ArrayBuffer {
+function fromBase64url(str: string): Uint8Array {
   str = str.replace(/-/g, "+").replace(/_/g, "/");
   while (str.length % 4) str += "=";
   const binary = atob(str);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes.buffer as ArrayBuffer;
+  return bytes;
 }
 
 const encoder = new TextEncoder();
@@ -160,15 +150,6 @@ export interface JWTPayload {
   isAdmin: boolean;
   roles: string[];
   permissions: string[];
-  /** JWT ID — used for token revocation. Present in verified tokens. */
-  jti?: string;
-}
-
-/** JWT claims including standard JWT fields. */
-export interface JWTClaims extends JWTPayload {
-  iat: number;
-  exp: number;
-  jti: string;
 }
 
 /**
@@ -184,11 +165,10 @@ export async function signJWT(
 ): Promise<string> {
   const header = { alg: "HS256", typ: "JWT" };
   const now = Math.floor(Date.now() / 1000);
-  const claims: JWTClaims = {
+  const claims = {
     ...payload,
     iat: now,
     exp: now + JWT_EXPIRY_SECONDS,
-    jti: crypto.randomUUID(),
   };
 
   const headerB64 = toBase64url(encoder.encode(JSON.stringify(header)));
@@ -217,7 +197,7 @@ export async function signJWT(
 export async function verifyJWT(
   token: string,
   secret: string
-): Promise<JWTPayload> {
+): Promise<{ userId: number; email: string; username: string; isAdmin: boolean }> {
   const parts = token.split(".");
   if (parts.length !== 3) throw new Error("Invalid JWT format");
 
@@ -253,10 +233,5 @@ export async function verifyJWT(
     email: payload.email as string,
     username: payload.username as string,
     isAdmin: payload.isAdmin === true,
-    roles: Array.isArray(payload.roles) ? (payload.roles as string[]) : [],
-    permissions: Array.isArray(payload.permissions)
-      ? (payload.permissions as string[])
-      : [],
-    jti: payload.jti as string | undefined,
   };
 }

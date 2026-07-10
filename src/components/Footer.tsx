@@ -5,6 +5,10 @@ import { Link } from "react-router-dom";
  * Includes internal links for SEO (every page links to all main sections).
  */
 export default function Footer() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+
   return (
     <footer className="border-t border-game-border bg-game-darker/60">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -40,14 +44,14 @@ export default function Footer() {
             <div className="h-1 w-8 rounded-full bg-gradient-to-r from-neon-purple to-neon-blue" />
           </div>
           <p className="text-sm text-slate-400">
-            云游戏 × 云电脑 × 薅羊毛聚合站 | 数据更新于 2026 年 7 月
+            云游戏 × 云电脑 × 薅羊毛聚合站 | 数据更新于 {year} 年 {month} 月
           </p>
           <p className="max-w-2xl text-xs leading-relaxed text-slate-500">
             免责声明：本站仅作信息聚合参考，不提供云游戏/云电脑服务。各平台价格、免费额度、支持游戏列表等信息以各平台官网实时公布为准。
             游戏版权归各开发商/发行商所有。薅羊毛信息具有时效性，请以实际为准。
           </p>
           <p className="text-xs text-slate-600">
-            © 2026 云玩汇 · 由 Cloudflare Pages + Workers + D1 驱动
+            © {year} 云玩汇 · 由 Cloudflare Pages + Workers + D1 驱动
           </p>
         </div>
       </div>

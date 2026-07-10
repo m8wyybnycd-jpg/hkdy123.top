@@ -321,9 +321,6 @@ export default function AuthPage() {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-game-dark px-4 py-8">
-      <Helmet>
-        <meta name="robots" content="noindex, nofollow" />
-      </Helmet>
       {/* Ambient glow decorations */}
       <div className="pointer-events-none absolute -top-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-neon-blue/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-40 right-0 h-80 w-80 rounded-full bg-neon-purple/10 blur-3xl" />

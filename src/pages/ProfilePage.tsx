@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Mail, Phone, Calendar, Tag, Shield, LogOut } from "lucide-react";
 import { useAuthContext } from "../contexts/AuthContext";
 
@@ -35,7 +36,7 @@ export default function ProfilePage() {
 
   /** Distinguish role chip colors. */
   const roleColor = (role: string): string => {
-    if (role === "admin") return "bg-red-500/15 text-red-400";
+    if (role === "super_admin") return "bg-red-500/15 text-red-400";
     if (role === "editor") return "bg-neon-blue/15 text-neon-blue";
     if (role === "viewer") return "bg-slate-500/15 text-slate-400";
     return "bg-neon-purple/15 text-neon-purple";
@@ -48,6 +49,9 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-10 sm:px-6">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="rounded-2xl border border-game-border bg-game-card p-6 sm:p-8">
         {/* Avatar */}
         <div className="flex flex-col items-center">

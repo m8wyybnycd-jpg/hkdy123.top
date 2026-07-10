@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import * as Sentry from "@sentry/react";
+import { AlertCircle } from "lucide-react";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -49,7 +50,7 @@ export default class ErrorBoundary extends Component<
       return (
         <div className="flex min-h-[60vh] items-center justify-center px-4">
           <div className="flex flex-col items-center gap-4 text-center">
-            <div className="text-5xl">😵</div>
+            <AlertCircle className="h-12 w-12 text-red-400" />
             <h2 className="text-xl font-bold text-slate-200">
               页面出了点问题
             </h2>

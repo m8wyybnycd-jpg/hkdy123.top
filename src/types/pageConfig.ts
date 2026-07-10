@@ -17,7 +17,7 @@ export interface PageConfig {
   subtitle: string;
   /** 页面描述文案。 */
   description: string;
-  /** 是否启用（前台可见）。 */
+  /** 是否启用（前台可见）。API 返回 boolean（D1 INTEGER 0/1 → boolean）。 */
   is_enabled: boolean;
   /** JSON 字符串，自定义参数（预留扩展）。 */
   params: string;
@@ -39,7 +39,7 @@ export interface SavePageConfigRequest {
   subtitle: string;
   /** 页面描述文案。 */
   description: string;
-  /** 是否启用。 */
+  /** 是否启用。API 接受 boolean（内部转 D1 INTEGER 0/1）。 */
   is_enabled: boolean;
   /** JSON 字符串，自定义参数。 */
   params: string;

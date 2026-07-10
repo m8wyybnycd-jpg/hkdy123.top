@@ -18,6 +18,8 @@ interface Env {
   CF_ACCOUNT_ID?: string;
   /** Cloudflare Images API token (optional, for banner image upload). */
   CF_IMAGES_TOKEN?: string;
+  /** KV namespace for JWT token revocation blacklist. */
+  TOKEN_BLACKLIST?: KVNamespace;
 }
 
 /**
@@ -31,6 +33,7 @@ interface PageData {
     isAdmin: boolean;
     roles: string[];
     permissions: string[];
+    jti?: string;
   };
 }
 

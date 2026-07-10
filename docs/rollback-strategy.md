@@ -1,69 +1,66 @@
-# 回滚策略 (Rollback Strategy)
+# 回滚策略
 
-## 前端回滚 (Cloudflare Pages)
+## 方案 1: Cloudflare Pages 原生回滚（推荐）
 
-### 方法 1：通过 Cloudflare Dashboard 回滚
-1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com)
-2. 进入 Pages → cloudgame-hub → Deployments
-3. 找到上一个稳定版本 (V12.0) 的 deployment
-4. 点击 "Rollback to this deployment" 按钮
-5. 等待 1-2 分钟，DNS 缓存刷新后生效
+Cloudflare Pages 保留每次部署的历史记录，可通过 Dashboard 或 API 一键回滚。
 
-### 方法 2：通过 Wrangler CLI 回滚
+### 通过 Dashboard 回滚
+1. 访问 Cloudflare Dashboard → Pages → cloudgame-hub
+2. 在 Deployments 列表中找到上一个稳定版本
+3. 点击 "Rollback to this deployment"
+
+### 通过 API 回滚
 ```bash
 # 列出最近的部署
-wrangler pages deployment list --project-name=cloudgame-hub
+curl -X GET "https://api.cloudflare.com/client/v4/accounts/{account_id}/pages/projects/cloudgame-hub/deployments" \
+  -H "Authorization: Bearer {api_token}"
 
-# 重新部署指定版本的 dist 目录
-wrangler pages deploy dist --project-name=cloudgame-hub
+# 回滚到指定部署
+curl -X POST "https://api.cloudflare.com/client/v4/accounts/{account_id}/pages/projects/cloudgame-hub/deployments/{deployment_id}/rollback" \
+  -H "Authorization: Bearer {api_token}"
 ```
 
-### 方法 3：Git Revert + 重新部署
+## 方案 2: Git revert 回滚
+
 ```bash
-# 查看最近的提交
+# 查看最近的部署提交
 git log --oneline -10
 
-# 回退到 V12.0 的提交
-git revert <v12-commit-hash>
-git push origin main
-
-# CI/CD 会自动触发重新部署（如已配置）
-# 或手动部署：
-npm run deploy
+# 回滚到指定提交
+git revert <commit_hash>
+git push origin main  # 触发 CI/CD 自动重新部署
 ```
 
-## 数据库回滚 (D1)
+## 方案 3: D1 数据库回滚
 
-### SC-04: 索引回滚
+D1 支持时间点恢复（Point-in-Time Recovery）：
+
 ```bash
-# 恢复已删除的索引（如需要）
-npx wrangler d1 execute cloudgame-hub-db --remote \
-  --command="CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)"
+# 列出可用的备份
+wrangler d1 backups list cloudgame-hub-db
+
+# 恢复到指定时间点
+wrangler d1 backups restore cloudgame-hub-db --timestamp "2026-07-10T10:00:00Z"
 ```
-
-### 数据回滚
-```bash
-# 从备份恢复（备份文件在 backups/ 目录）
-npx wrangler d1 execute cloudgame-hub-db --remote \
-  --file=backups/backup-YYYY-MM-DDTHH-MM-SS.sql
-```
-
-## Functions 回滚
-
-Cloudflare Pages Functions 随前端一起部署，回滚前端部署即可同时回滚 Functions。
-
-## 紧急回滚步骤
-
-1. **确认问题**：在生产环境复现问题，确认需要回滚
-2. **通知用户**：通过公告系统或社交媒体通知用户维护中
-3. **执行回滚**：通过 Cloudflare Dashboard 一键回滚到 V12.0
-4. **验证**：访问关键页面确认功能正常
-5. **排查**：在本地环境复现问题，修复后重新部署
 
 ## 回滚检查清单
 
-- [ ] 前端页面正常加载
-- [ ] 登录/注册功能正常
-- [ ] API 接口响应正常
-- [ ] 管理后台可访问
-- [ ] 数据库查询无异常
+- [ ] 确认回滚目标版本（哪个部署是稳定的）
+- [ ] 通知团队成员回滚操作
+- [ ] 执行回滚
+- [ ] 验证核心功能：首页加载、登录、注册、API 响应
+- [ ] 检查错误率是否恢复正常
+- [ ] 记录回滚原因和时间
+
+## 触发回滚的条件
+
+- P0 缺陷导致核心功能不可用（登录、注册、首页）
+- 错误率超过 5%
+- 响应时间超过 3 秒
+- 安全漏洞被利用
+
+## 注意事项
+
+- Cloudflare Pages 回滚是即时的，不需要重新构建
+- D1 回滚需要谨慎，可能导致数据不一致
+- 回滚后应尽快修复问题并重新部署

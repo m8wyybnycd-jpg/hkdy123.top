@@ -3,6 +3,9 @@
  *
  * 提供操作日志和登录日志的写入函数。
  * 日志记录使用 await 但包裹在 try-catch 中，失败不阻塞主请求。
+ *
+ * 结构化日志：所有 console.log 输出为 JSON 格式，兼容 Cloudflare Workers Logs
+ * 自动索引和查询。格式：{ level, message, timestamp, ...context }
  */
 
 /** 操作日志记录参数。 */
@@ -40,9 +43,30 @@ export interface LogLoginParams {
 }
 
 /**
+ * 输出结构化 JSON 日志到 Workers Logs。
+ *
+ * @param level   - 日志级别 (info/warn/error)
+ * @param message - 事件标识 (e.g. "user_login", "code_sent")
+ * @param context - 额外上下文字段
+ */
+export function structuredLog(
+  level: "info" | "warn" | "error",
+  message: string,
+  context: Record<string, unknown> = {}
+): void {
+  console.log(JSON.stringify({
+    level,
+    message,
+    timestamp: new Date().toISOString(),
+    ...context,
+  }));
+}
+
+/**
  * 记录一条操作日志。
  *
- * 写入 operation_logs 表。如果写入失败，仅打印日志，不抛出异常，
+ * 写入 operation_logs 表 + 输出结构化日志。
+ * 如果写入失败，仅打印日志，不抛出异常，
  * 确保日志记录不会阻塞主业务流程。
  *
  * @param db    - D1 数据库绑定
@@ -72,15 +96,30 @@ export async function logOperation(
         detailStr
       )
       .run();
+
+    // Also emit structured log for Workers Logs indexing
+    structuredLog("info", "operation_log", {
+      userId: params.userId,
+      username: params.username,
+      action: params.action,
+      module: params.module,
+      target: params.target,
+      ip: params.ip,
+    });
   } catch (err) {
-    console.error("记录操作日志失败:", err);
+    structuredLog("error", "operation_log_failed", {
+      userId: params.userId,
+      action: params.action,
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }
 
 /**
  * 记录一条登录日志。
  *
- * 写入 login_logs 表。如果写入失败，仅打印日志，不抛出异常，
+ * 写入 login_logs 表 + 输出结构化日志。
+ * 如果写入失败，仅打印日志，不抛出异常，
  * 确保日志记录不会阻塞主业务流程。
  *
  * @param db    - D1 数据库绑定
@@ -105,8 +144,21 @@ export async function logLogin(
         params.method ?? null
       )
       .run();
+
+    // Also emit structured log for Workers Logs indexing
+    structuredLog(params.status === "success" ? "info" : "warn", "login_attempt", {
+      userId: params.userId,
+      username: params.username,
+      ip: params.ip,
+      status: params.status,
+      method: params.method,
+    });
   } catch (err) {
-    console.error("记录登录日志失败:", err);
+    structuredLog("error", "login_log_failed", {
+      userId: params.userId,
+      status: params.status,
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }
 

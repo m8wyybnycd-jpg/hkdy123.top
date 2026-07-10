@@ -5,7 +5,16 @@
  * (does NOT trust JWT permissions for authorization decisions).
  *
  * Used by all admin API endpoints via `requirePermission()`.
+ *
+ * Performance: In-request cache via context.data._permCache prevents
+ * redundant D1 queries when multiple permission checks occur in the
+ * same request (e.g. checking both 'role:manage' and 'page:manage').
  */
+
+/** Cache key for storing permissions in context.data. */
+const PERM_CACHE_KEY = "_permCache";
+/** Cache key for storing role codes in context.data. */
+const ROLE_CACHE_KEY = "_roleCache";
 
 /**
  * Query all permission codes for a user (real-time D1 query).
@@ -93,6 +102,10 @@ export async function hasPermission(
  * Checks authentication first (returns 401 if not logged in),
  * then checks permission via real-time D1 query (returns 403 if denied).
  *
+ * Uses in-request caching: the first permission check in a request
+ * queries D1 and caches the result; subsequent checks in the same
+ * request use the cache, avoiding redundant queries.
+ *
  * Usage pattern in endpoints:
  * ```typescript
  * const denied = await requirePermission(context, 'role:manage');
@@ -132,7 +145,12 @@ export async function requirePermission(
     );
   }
 
-  const permissions = await getUserPermissions(db, user.userId);
+  // In-request cache: avoid redundant D1 queries within the same request
+  if (!context.data[PERM_CACHE_KEY]) {
+    context.data[PERM_CACHE_KEY] = await getUserPermissions(db, user.userId);
+  }
+  const permissions = context.data[PERM_CACHE_KEY] as string[];
+
   if (!permissions.includes(code)) {
     return new Response(
       JSON.stringify({ code: 403, data: null, message: "无权访问该功能" }),

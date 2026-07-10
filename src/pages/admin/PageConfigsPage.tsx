@@ -166,6 +166,7 @@ export default function PageConfigsPage() {
       });
       clearPageConfigsCache();
       setSuccessMsg(`${config.page_name} 已${config.is_enabled ? "禁用" : "启用"}`);
+
       await fetchConfigs();
     } catch (err) {
       setError(err instanceof Error ? err.message : "操作失败");
@@ -178,7 +179,7 @@ export default function PageConfigsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-bold text-white">
-            <LayoutTemplate className="h-5 w-5 text-[#3b9eff]" />
+            <LayoutTemplate className="h-5 w-5 text-neon-blue" />
             页面配置管理
           </h1>
           <p className="mt-1 text-sm text-slate-400">
@@ -187,7 +188,7 @@ export default function PageConfigsPage() {
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-1.5 rounded-lg bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#2a8eef]"
+          className="flex items-center gap-1.5 rounded-lg bg-neon-blue px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neon-blue/80"
         >
           <Plus className="h-4 w-4" />
           新增配置
@@ -213,7 +214,7 @@ export default function PageConfigsPage() {
       {/* Loading state */}
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-600 border-t-[#3b9eff]" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-600 border-t-neon-blue" />
         </div>
       ) : (
         /* Config table */
@@ -276,7 +277,7 @@ export default function PageConfigsPage() {
                       <td className="px-4 py-3 text-right">
                         <button
                           onClick={() => handleEdit(config)}
-                          className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-[#3b9eff] transition-colors hover:bg-[#3b9eff]/10"
+                          className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-neon-blue transition-colors hover:bg-neon-blue/10"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                           编辑
@@ -343,7 +344,7 @@ export default function PageConfigsPage() {
                     }
                     disabled={!isNew}
                     placeholder="如 cloud-games"
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-[#3b9eff]/50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50 disabled:cursor-not-allowed disabled:opacity-50"
                   />
                 </div>
 
@@ -359,7 +360,7 @@ export default function PageConfigsPage() {
                       setEditing({ ...editing, page_name: e.target.value })
                     }
                     placeholder="如 云游戏"
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-[#3b9eff]/50"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
                   />
                 </div>
 
@@ -396,7 +397,7 @@ export default function PageConfigsPage() {
                           sort_order: parseInt(e.target.value) || 0,
                         })
                       }
-                      className="w-24 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-[#3b9eff]/50"
+                      className="w-24 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
                     />
                   </div>
                 </div>
@@ -417,7 +418,7 @@ export default function PageConfigsPage() {
                       setEditing({ ...editing, title: e.target.value })
                     }
                     placeholder="如 不用高配电脑，也能畅玩 3A 大作"
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-[#3b9eff]/50"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
                   />
                 </div>
 
@@ -432,7 +433,7 @@ export default function PageConfigsPage() {
                       setEditing({ ...editing, subtitle: e.target.value })
                     }
                     placeholder="如 汇聚各大云游戏平台"
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-[#3b9eff]/50"
+                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
                   />
                 </div>
 
@@ -447,7 +448,7 @@ export default function PageConfigsPage() {
                     }
                     rows={2}
                     placeholder="页面描述（可选）"
-                    className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-[#3b9eff]/50"
+                    className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
                   />
                 </div>
               </div>
@@ -464,7 +465,7 @@ export default function PageConfigsPage() {
                   }
                   rows={4}
                   placeholder='{"key": "value"}'
-                  className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs text-slate-200 outline-none transition-colors focus:border-[#3b9eff]/50"
+                  className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
                 />
                 <p className="text-xs text-slate-500">
                   JSON 格式的自定义参数，预留扩展用途
@@ -484,7 +485,7 @@ export default function PageConfigsPage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-1.5 rounded-lg bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#2a8eef] disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-neon-blue px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neon-blue/80 disabled:opacity-50"
               >
                 {saving ? (
                   <>

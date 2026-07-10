@@ -35,7 +35,6 @@ export const onRequestGet = async (context: PageContext): Promise<Response> => {
   return jsonResponse(
     {
       status: "ok",
-      uptime: process.uptime ? Math.floor(process.uptime()) : null,
       responseTimeMs: responseTime,
       database: {
         status: dbStatus,

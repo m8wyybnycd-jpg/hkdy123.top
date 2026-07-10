@@ -3,12 +3,21 @@ import { getUserRoleCodes, getUserPermissions } from "../lib/permission";
 import { jsonResponse, unauthorized, serverError } from "../lib/response";
 
 /**
- * Extract auth_token from Cookie header.
+ * Extract auth token from Cookie header.
+ * Supports __Host-auth_token (new) and auth_token (legacy) for migration.
  */
 function getTokenFromCookie(request: Request): string | null {
   const cookieHeader = request.headers.get("Cookie");
   if (!cookieHeader) return null;
   const cookies = cookieHeader.split(";").map((c) => c.trim());
+  // Check new __Host- prefixed cookie first
+  for (const cookie of cookies) {
+    const [name, ...valueParts] = cookie.split("=");
+    if (name.trim() === "__Host-auth_token" && valueParts.length > 0) {
+      return valueParts.join("=");
+    }
+  }
+  // Fallback to legacy cookie name
   for (const cookie of cookies) {
     const [name, ...valueParts] = cookie.split("=");
     if (name.trim() === "auth_token" && valueParts.length > 0) {
@@ -98,7 +107,9 @@ export const onRequestPost = async (
   );
 
   // Set the refreshed token as an HttpOnly cookie
-  const cookieValue = `auth_token=${newToken}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=604800`;
+  // __Host- prefix: forces Secure + Path=/ + no Domain (strongest origin-binding)
+  // SameSite=Strict: prevents CSRF
+  const cookieValue = `__Host-auth_token=${newToken}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800`;
 
   const response = jsonResponse({
     user: {

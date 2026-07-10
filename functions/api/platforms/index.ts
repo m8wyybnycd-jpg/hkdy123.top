@@ -41,5 +41,8 @@ export const onRequestGet = async (context: PageContext): Promise<Response> => {
     mapPlatformRow
   );
 
-  return jsonResponse(platforms);
+  const response = jsonResponse(platforms);
+  // Cache platform list for 60 seconds at CDN level
+  response.headers.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+  return response;
 };

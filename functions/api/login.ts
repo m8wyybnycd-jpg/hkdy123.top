@@ -25,8 +25,9 @@ async function isRateLimited(db: D1Database, ip: string): Promise<boolean> {
       .first();
     return (result?.count as number) >= MAX_ATTEMPTS;
   } catch {
-    // If the query fails, don't block login — fail open
-    return false;
+    // Fail-closed: if rate limit check fails, block the login attempt
+    // to prevent bypassing rate limiting via DB errors
+    return true;
   }
 }
 
@@ -144,7 +145,9 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   });
 
   // Set HttpOnly cookie with the JWT token
-  const cookieValue = `auth_token=${token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=604800`;
+  // __Host- prefix: forces Secure + Path=/ + no Domain (strongest origin-binding)
+  // SameSite=Strict: prevents CSRF (no third-party login flow needed)
+  const cookieValue = `__Host-auth_token=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800`;
 
   const response = jsonResponse(
     {
