@@ -50,7 +50,7 @@ export default function RoleEditModal({
   const [status, setStatus] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(containerRef, open, onClose);
 

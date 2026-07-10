@@ -20,6 +20,9 @@ const typeGradients: Record<GameType, string> = {
   独立: "from-teal-400/90 via-cyan-600/90 to-purple-800/90",
   模拟经营: "from-amber-400/90 via-yellow-600/90 to-lime-800/90",
   格斗: "from-red-600/90 via-rose-700/90 to-slate-900/90",
+  生存: "from-green-600/90 via-emerald-700/90 to-teal-900/90",
+  竞速: "from-blue-400/90 via-sky-600/90 to-cyan-900/90",
+  卡牌: "from-purple-400/90 via-violet-600/90 to-fuchsia-900/90",
 };
 
 /** Config badge styling. */

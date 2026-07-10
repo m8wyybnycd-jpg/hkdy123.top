@@ -46,7 +46,7 @@ export default function BannerFormDialog({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(containerRef, open, onClose);
 

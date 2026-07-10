@@ -91,7 +91,7 @@ const TYPE_ICONS: Record<AnnouncementType, typeof Megaphone> = {
 export default function AnnouncementModal() {
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [visible, setVisible] = useState(false);
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   /** Fetch announcements and determine which to show. */
   useEffect(() => {

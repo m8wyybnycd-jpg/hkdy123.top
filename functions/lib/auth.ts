@@ -102,7 +102,7 @@ export async function verifyPassword(
     const hashBuffer = await crypto.subtle.deriveBits(
       {
         name: "PBKDF2",
-        salt: saltBytes,
+        salt: saltBytes.buffer as ArrayBuffer,
         iterations: PBKDF2_ITERATIONS,
         hash: PBKDF2_HASH,
       },
@@ -128,20 +128,21 @@ export async function verifyPassword(
 
 // ── Base64url Helpers ─────────────────────────────────────
 
-function toBase64url(buf: ArrayBuffer): string {
-  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+function toBase64url(buf: ArrayBuffer | Uint8Array): string {
+  const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+  return btoa(String.fromCharCode(...bytes))
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 }
 
-function fromBase64url(str: string): Uint8Array {
+function fromBase64url(str: string): ArrayBuffer {
   str = str.replace(/-/g, "+").replace(/_/g, "/");
   while (str.length % 4) str += "=";
   const binary = atob(str);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes;
+  return bytes.buffer as ArrayBuffer;
 }
 
 const encoder = new TextEncoder();

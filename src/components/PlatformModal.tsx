@@ -23,7 +23,7 @@ interface PlatformModalProps {
  * Closes on ESC, backdrop click, or close button.
  */
 export default function PlatformModal({ platform, onClose }: PlatformModalProps) {
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(containerRef, true, onClose);
 

@@ -41,7 +41,7 @@ const configStyles: Record<Config, { label: string; className: string }> = {
 export default function GameModal({ game, platforms, onClose }: GameModalProps) {
   const [coverError, setCoverError] = useState(false);
   const showCover = Boolean(game.cover) && !coverError;
-  const containerRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useFocusTrap(containerRef, true, onClose);
 
