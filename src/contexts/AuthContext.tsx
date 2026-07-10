@@ -11,6 +11,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import type { AuthContextValue, AuthState, User } from "../types";
 import { apiClient } from "../services/api";
 
+/** Standard API envelope returned by the backend functions. */
+interface ApiResponse {
+  code: number;
+  message?: string;
+  data?: { user: User };
+}
+
 /** Initial auth state — unauthenticated, loading until /api/me resolves. */
 const initialAuthState: AuthState = {
   user: null,
@@ -113,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           headers: { "Content-Type": "application/json" },
           credentials: "include",
         });
-        const result = await response.json();
+        const result: ApiResponse = await response.json();
         if (result.code === 0 && result.data?.user) {
           setAuthState((prev) => ({
             ...prev,
@@ -136,7 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       credentials: "include",
       body: JSON.stringify({ email, password }),
     });
-    const result = await response.json();
+    const result: ApiResponse = await response.json();
     if (result.code !== 0) {
       throw new Error(result.message || "登录失败");
     }
@@ -158,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         credentials: "include",
         body: JSON.stringify({ email, code, password }),
       });
-      const result = await response.json();
+      const result: ApiResponse = await response.json();
       if (result.code !== 0) {
         throw new Error(result.message || "注册失败");
       }
@@ -181,7 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       credentials: "include",
       body: JSON.stringify({ phone, code }),
     });
-    const result = await response.json();
+    const result: ApiResponse = await response.json();
     if (result.code !== 0) {
       throw new Error(result.message || "登录失败");
     }
