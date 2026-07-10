@@ -10,6 +10,7 @@ import {
 import type { Config, Game, Platform } from "../types";
 import { platformMap } from "../data/platforms";
 import { useFocusTrap } from "../hooks/useFocusTrap";
+import { useExternalLink } from "../hooks/useExternalLink";
 
 interface GameModalProps {
   game: Game;
@@ -42,6 +43,7 @@ export default function GameModal({ game, platforms, onClose }: GameModalProps) 
   const [coverError, setCoverError] = useState(false);
   const showCover = Boolean(game.cover) && !coverError;
   const containerRef = useRef<HTMLDivElement>(null);
+  const { openExternal } = useExternalLink();
 
   useFocusTrap(containerRef, true, onClose);
 
@@ -175,10 +177,8 @@ export default function GameModal({ game, platforms, onClose }: GameModalProps) 
                     </div>
                     <p className="mt-0.5 pl-5 text-xs text-slate-500">{p.price}</p>
                   </div>
-                  <a
-                    href={p.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => openExternal(p.url)}
                     className="flex shrink-0 items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-white transition-all duration-200 hover:brightness-110"
                     style={{
                       backgroundColor: p.color,
@@ -187,7 +187,7 @@ export default function GameModal({ game, platforms, onClose }: GameModalProps) 
                   >
                     去玩
                     <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
+                  </button>
                 </div>
               ))}
             </div>

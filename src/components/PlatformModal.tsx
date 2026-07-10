@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import type { Platform } from "../types";
 import { useFocusTrap } from "../hooks/useFocusTrap";
+import { useExternalLink } from "../hooks/useExternalLink";
 
 interface PlatformModalProps {
   platform: Platform;
@@ -24,6 +25,7 @@ interface PlatformModalProps {
  */
 export default function PlatformModal({ platform, onClose }: PlatformModalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { openExternal } = useExternalLink();
 
   useFocusTrap(containerRef, true, onClose);
 
@@ -135,12 +137,10 @@ export default function PlatformModal({ platform, onClose }: PlatformModalProps)
             </div>
           )}
 
-          {/* Official link */}
-          <a
-            href={platform.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:brightness-110"
+          {/* Official link — requires authentication */}
+          <button
+            onClick={() => openExternal(platform.url)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:brightness-110"
             style={{
               backgroundColor: platform.color,
               boxShadow: `0 8px 20px -6px ${platform.color}55`,
@@ -148,7 +148,7 @@ export default function PlatformModal({ platform, onClose }: PlatformModalProps)
           >
             进入官网
             <ExternalLink className="h-4 w-4" />
-          </a>
+          </button>
 
           <p className="text-center text-xs text-slate-500">
             价格和免费额度信息以官网实时公布为准

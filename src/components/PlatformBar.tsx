@@ -1,5 +1,6 @@
 import { ExternalLink, Monitor } from "lucide-react";
 import type { Platform } from "../types";
+import { useExternalLink } from "../hooks/useExternalLink";
 
 interface PlatformBarProps {
   platforms: Platform[];
@@ -10,6 +11,8 @@ interface PlatformBarProps {
  * each with name, price, free-tier highlights, and official-site link.
  */
 export default function PlatformBar({ platforms }: PlatformBarProps) {
+  const { openExternal } = useExternalLink();
+
   return (
     <section className="mb-12">
       <div className="mb-5 flex items-center gap-2.5">
@@ -68,16 +71,14 @@ export default function PlatformBar({ platforms }: PlatformBarProps) {
               <p className="mt-0.5 text-sm text-slate-400">{p.freeInfo}</p>
             </div>
 
-            {/* Official link */}
-            <a
-              href={p.url}
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* Official link — requires authentication */}
+            <button
+              onClick={() => openExternal(p.url)}
               className="inline-flex items-center gap-1.5 text-sm font-medium text-neon-blue transition-colors duration-200 hover:text-neon-blue/80"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               官网
-            </a>
+            </button>
           </div>
         ))}
       </div>

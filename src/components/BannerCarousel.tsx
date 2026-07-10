@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -7,6 +8,7 @@ import "swiper/css/pagination";
 import { apiClient } from "../services/api";
 import type { Banner } from "../types";
 import BannerSkeleton from "./BannerSkeleton";
+import { useExternalLink } from "../hooks/useExternalLink";
 
 /**
  * 首页轮播图组件。
@@ -24,6 +26,8 @@ export default function BannerCarousel() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   let mounted = true;
+  const { openExternal } = useExternalLink();
+  const navigate = useNavigate();
 
   useEffect(() => {
     mounted = true;
@@ -106,14 +110,18 @@ export default function BannerCarousel() {
         {banners.map((banner) => (
           <SwiperSlide key={banner.id}>
             {banner.linkUrl ? (
-              <a
-                href={banner.linkUrl}
-                className="block w-full"
-                target={banner.linkUrl.startsWith("http") ? "_blank" : undefined}
-                rel={banner.linkUrl.startsWith("http") ? "noopener noreferrer" : undefined}
+              <div
+                className="block w-full cursor-pointer"
+                onClick={() => {
+                  if (banner.linkUrl.startsWith("http")) {
+                    openExternal(banner.linkUrl);
+                  } else {
+                    navigate(banner.linkUrl);
+                  }
+                }}
               >
                 <BannerImage banner={banner} />
-              </a>
+              </div>
             ) : (
               <BannerImage banner={banner} />
             )}

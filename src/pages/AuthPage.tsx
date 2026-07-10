@@ -103,7 +103,7 @@ export default function AuthPage() {
       const hash = from.hash || "";
       return `${from.pathname}${search}${hash}`;
     }
-    return "/cloud-games";
+    return "/";
   };
 
   /** Send a verification code to the entered email. */
