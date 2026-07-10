@@ -13,6 +13,13 @@ import {
 } from "lucide-react";
 import { useAuthContext } from "../contexts/AuthContext";
 
+/** Standard API envelope returned by the backend functions. */
+interface ApiResponse {
+  code: number;
+  message?: string;
+  data?: any;
+}
+
 type AuthTab = "login" | "register" | "sms";
 
 /** Regular expression for basic email format validation. */
@@ -120,7 +127,7 @@ export default function AuthPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: trimmedEmail }),
       });
-      const result = await response.json();
+      const result: ApiResponse = await response.json();
       if (result.code !== 0) {
         throw new Error(result.message || "验证码发送失败");
       }
@@ -155,7 +162,7 @@ export default function AuthPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: trimmedPhone }),
       });
-      const result = await response.json();
+      const result: ApiResponse = await response.json();
       if (result.code !== 0) {
         throw new Error(result.message || "验证码发送失败");
       }

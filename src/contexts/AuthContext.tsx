@@ -15,7 +15,7 @@ import { apiClient } from "../services/api";
 interface ApiResponse {
   code: number;
   message?: string;
-  data?: { user: User };
+  data?: any;
 }
 
 /** Initial auth state — unauthenticated, loading until /api/me resolves. */
