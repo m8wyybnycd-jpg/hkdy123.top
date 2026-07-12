@@ -11,7 +11,7 @@ const container = document.getElementById("root")!;
 const app = (
   <StrictMode>
     <HelmetProvider>
-      <BrowserRouter>
+      <BrowserRouter basename="/app">
         <App />
       </BrowserRouter>
     </HelmetProvider>

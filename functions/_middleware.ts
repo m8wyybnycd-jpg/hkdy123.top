@@ -1,4 +1,4 @@
-import { verifyJWT } from "./lib/auth";
+import { verifyJWTAny, getJWTSecrets } from "./lib/auth";
 import { isTokenRevoked } from "./lib/revocation";
 
 /**
@@ -94,11 +94,11 @@ export const onRequest = async (context: PageContext): Promise<Response> => {
   const token = extractToken(context.request);
   if (token) {
     try {
-      const secret = context.env.JWT_SECRET;
-      if (!secret) {
+      const secrets = getJWTSecrets(context.env);
+      if (secrets.length === 0) {
         throw new Error("JWT_SECRET is not configured");
       }
-      const user = await verifyJWT(token, secret);
+      const user = await verifyJWTAny(token, secrets);
 
       // Check revocation blacklist (if KV is configured)
       if (user.jti && context.env.TOKEN_BLACKLIST) {

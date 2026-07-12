@@ -1,5 +1,5 @@
 import { jsonResponse } from "../lib/response";
-import { verifyJWT } from "../lib/auth";
+import { verifyJWTAny, getJWTSecrets } from "../lib/auth";
 import { revokeToken } from "../lib/revocation";
 import { getClientIP } from "../lib/logger";
 
@@ -42,9 +42,9 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   // Attempt to revoke the token in KV (best-effort)
   if (token) {
     try {
-      const secret = context.env.JWT_SECRET;
-      if (secret) {
-        const payload = await verifyJWT(token, secret);
+      const secrets = getJWTSecrets(context.env);
+      if (secrets.length > 0) {
+        const payload = await verifyJWTAny(token, secrets);
         if (payload.jti && context.env.TOKEN_BLACKLIST) {
           const exp = Math.floor((payload as unknown as { exp: number }).exp);
           await revokeToken(

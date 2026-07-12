@@ -41,9 +41,13 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Install Chrome & Prerender (react-snap)
-        run: npx puppeteer browsers install chrome && npx react-snap
-        continue-on-error: true
+      - name: Rename SPA shell to spa-shell (prevents Cloudflare 308 loop)
+        # The React SPA is built to dist/app/index.html. Cloudflare Pages' clean-URL
+        # feature 308-redirects /app <-> /app.html, causing an infinite loop.
+        # Renaming to an extension-less file (dist/spa-shell) bypasses clean-URL and
+        # is served by functions/app/[[path]].ts via env.ASSETS.fetch (no static
+        # .html collision). This MUST run before deploy or the live site 308-loops.
+        run: mv dist/app/index.html dist/spa-shell && rm -rf dist/app
 
       - name: Deploy to Cloudflare Pages (Production)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

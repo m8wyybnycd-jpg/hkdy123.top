@@ -1,68 +1,604 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>云玩汇 · 一个入口，玩转所有云端世界</title>
+<meta name="description" content="3000+ 云游戏、100+ 云电脑、每日更新的羊毛优惠——一个账号极速开玩，告别卡顿与昂贵硬件。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@500;600&family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#030014;
+    --bg-2:#07021c;
+    --cyan:#2EA7FF;
+    --purple:#9381FF;
+    --teal:#13DDC4;
+    --white:#ffffff;
+    --txt:#ffffff;
+    --txt-dim:rgba(255,255,255,.62);
+    --txt-faint:rgba(255,255,255,.58);
+    --glass:rgba(255,255,255,.04);
+    --glass-stroke:rgba(255,255,255,.10);
+    --grad:linear-gradient(135deg,#2EA7FF 0%,#13DDC4 100%);
+    --grad-pp:linear-gradient(135deg,#2EA7FF 0%,#9381FF 100%);
+    --radius:20px;
+    --maxw:1200px;
+    --font-latin:'Inter','Inter Tight',system-ui,sans-serif;
+    --font-cjk:'Noto Sans SC',system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--font-cjk);
+    background:var(--bg);
+    color:var(--txt);
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  .container{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
 
-    <!-- Primary Meta Tags -->
-    <title>云游戏平台哪个好？2026年免费云游戏平台大全 - 云玩汇</title>
-    <meta name="title" content="云游戏平台哪个好？2026年免费云游戏平台大全 - 云玩汇" />
-    <meta name="description" content="云玩汇聚合全网10+云游戏平台入口、5+云电脑入口和26款免费游戏资源，一页看全、一键直达。不用买显卡，手机也能玩3A。找云游戏，先来这里。" />
-    <meta name="keywords" content="云游戏平台,免费云游戏,云游戏白嫖,云电脑,云玩汇,云游戏怎么玩,云游戏免排队" />
-    <meta name="author" content="云玩汇" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://www.hkdy123.top/" />
+  /* ---------- Aurora glow ---------- */
+  .aurora{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;pointer-events:none;z-index:0;}
+  .aurora.cyan{background:radial-gradient(circle,#2EA7FF 0%,rgba(46,167,255,0) 70%);}
+  .aurora.purple{background:radial-gradient(circle,#9381FF 0%,rgba(147,129,255,0) 70%);}
+  .aurora.teal{background:radial-gradient(circle,#13DDC4 0%,rgba(19,221,196,0) 70%);}
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="云玩汇" />
-    <meta property="og:url" content="https://www.hkdy123.top/" />
-    <meta property="og:title" content="云游戏平台哪个好？2026年免费云游戏平台大全 - 云玩汇" />
-    <meta property="og:description" content="云玩汇聚合全网10+云游戏平台入口、5+云电脑入口和26款免费游戏资源，一页看全、一键直达。不用买显卡，手机也能玩3A。" />
-    <meta property="og:image" content="https://www.hkdy123.top/og-image.svg" />
-    <meta property="og:locale" content="zh_CN" />
+  /* ---------- Generic section ---------- */
+  section{position:relative;overflow:hidden;}
+  .section-pad{padding:96px 0;}
+  .kicker{
+    font-family:var(--font-latin);
+    font-weight:500;
+    font-size:13px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    background:var(--grad);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    margin-bottom:14px;display:inline-block;
+  }
+  .sec-title{font-size:34px;font-weight:800;line-height:1.3;letter-spacing:-.5px;}
+  .sec-sub{color:var(--txt-dim);font-size:16px;margin-top:14px;max-width:520px;}
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="云游戏平台哪个好？2026年免费云游戏平台大全 - 云玩汇" />
-    <meta name="twitter:description" content="云玩汇聚合全网10+云游戏平台入口、5+云电脑入口和26款免费游戏资源，一页看全、一键直达。" />
-    <meta name="twitter:image" content="https://www.hkdy123.top/og-image.svg" />
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-family:var(--font-cjk);font-weight:600;font-size:16px;
+    border-radius:99px;padding:15px 30px;cursor:pointer;border:none;
+    transition:transform .25s ease, box-shadow .25s ease, opacity .25s ease;
+  }
+  .btn-primary{background:var(--grad);color:#02131f;box-shadow:0 8px 30px rgba(46,167,255,.45);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(46,167,255,.6);}
+  .btn-ghost{background:var(--glass);color:#fff;border:1px solid var(--glass-stroke);backdrop-filter:blur(6px);}
+  .btn-ghost:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.07);}
+  .btn-pp{background:var(--grad-pp);color:#fff;box-shadow:0 8px 30px rgba(147,129,255,.4);}
+  .btn-pp:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(147,129,255,.55);}
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  /* ---------- Glass card ---------- */
+  .glass{
+    background:var(--glass);
+    border:1px solid var(--glass-stroke);
+    border-radius:var(--radius);
+    box-shadow:0 10px 30px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,255,255,.18);
+  }
 
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://www.hkdy123.top" />
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(14px);
+    background:rgba(3,0,20,.55);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px;}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;}
+  .brand .logo{
+    width:30px;height:30px;border-radius:9px;background:var(--grad);
+    box-shadow:0 4px 14px rgba(46,167,255,.5);
+  }
+  .nav-links{display:flex;gap:32px;}
+  .nav-links a{font-size:15px;color:var(--txt-dim);transition:color .2s;}
+  .nav-links a:hover{color:#fff;}
+  .nav-right{display:flex;align-items:center;gap:12px;}
+  .search{
+    display:flex;align-items:center;gap:8px;background:var(--glass);
+    border:1px solid var(--glass-stroke);border-radius:99px;padding:8px 16px;
+    color:var(--txt-faint);font-size:14px;min-width:152px;
+  }
+  .search svg{width:14px;height:14px;opacity:.6;}
+  .btn-sm{padding:10px 20px;font-size:15px;border-radius:99px;}
+  .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:8px;}
+  .hamburger span{width:22px;height:2px;background:#fff;border-radius:2px;}
 
-    <!-- JSON-LD Structured Data: Organization -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "云玩汇",
-      "url": "https://www.hkdy123.top",
-      "description": "云游戏发现站，汇聚全网云游戏平台、云电脑入口和免费游戏资源",
-      "slogan": "一处发现，云上畅玩"
-    }
-    </script>
+  /* ---------- Hero ---------- */
+  .hero{padding:90px 0 110px;text-align:center;}
+  .hero-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:30px;}
+  .hero .aurora.a1{width:720px;height:720px;top:-160px;left:-120px;}
+  .hero .aurora.a2{width:680px;height:680px;top:-40px;right:-100px;}
+  .hero .aurora.a3{width:640px;height:640px;bottom:-200px;left:50%;transform:translateX(-50%);}
+  .hero-title{font-size:clamp(44px,8vw,88px);font-weight:800;line-height:1.18;letter-spacing:-1px;max-width:1000px;}
+  .hero-sub{font-size:20px;color:var(--txt-dim);max-width:760px;line-height:1.6;}
+  .hero-cta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+  .hero-mock{
+    margin-top:30px;width:960px;max-width:100%;border-radius:16px;overflow:hidden;
+    background:linear-gradient(160deg,rgba(46,167,255,.14),rgba(19,221,196,.10));
+    border:1px solid var(--glass-stroke);box-shadow:0 30px 80px rgba(0,0,0,.6), inset 0 1px 2px rgba(255,255,255,.2);
+  }
+  .mock-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);}
+  .mock-dots{display:flex;gap:7px;}
+  .mock-dots i{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.18);}
+  .mock-dots i:first-child{background:#ff5f57;}
+  .mock-dots i:nth-child(2){background:#febc2e;}
+  .mock-dots i:nth-child(3){background:#28c840;}
+  .mock-cap{font-size:13px;color:var(--txt-dim);font-family:var(--font-latin);}
+  .mock-body{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:24px;}
+  .mock-tile{aspect-ratio:16/10;border-radius:12px;background:linear-gradient(135deg,rgba(46,167,255,.5),rgba(147,129,255,.35));position:relative;overflow:hidden;}
+  .mock-tile:nth-child(2){background:linear-gradient(135deg,rgba(147,129,255,.5),rgba(255,99,200,.35));}
+  .mock-tile:nth-child(3){background:linear-gradient(135deg,rgba(19,221,196,.5),rgba(46,167,255,.35));}
+  .mock-tile:nth-child(4){background:linear-gradient(135deg,rgba(46,167,255,.35),rgba(19,221,196,.5));}
+  .mock-tile:nth-child(5){background:linear-gradient(135deg,rgba(255,99,200,.4),rgba(147,129,255,.5));}
+  .mock-tile:nth-child(6){background:linear-gradient(135deg,rgba(19,221,196,.45),rgba(46,167,255,.4));}
+  .mock-tile:nth-child(7){background:linear-gradient(135deg,rgba(46,167,255,.5),rgba(147,129,255,.35));}
+  .mock-tile:nth-child(8){background:linear-gradient(135deg,rgba(147,129,255,.4),rgba(19,221,196,.45));}
+  .mock-tile span{position:absolute;left:10px;bottom:8px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);}
 
-    <!-- JSON-LD Structured Data: WebSite -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "云玩汇",
-      "url": "https://www.hkdy123.top",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://www.hkdy123.top/search?q={query}",
-        "query-input": "required name=query"
-      }
-    }
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  /* ---------- Business Trio ---------- */
+  .trio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;}
+  .trio-card{padding:32px;border-radius:var(--radius);position:relative;overflow:hidden;transition:transform .3s ease, border-color .3s ease;}
+  .trio-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.22);}
+  .trio-icon{width:48px;height:48px;border-radius:13px;background:var(--grad);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 6px 20px rgba(46,167,255,.4);}
+  .trio-icon.purple{background:var(--grad-pp);box-shadow:0 6px 20px rgba(147,129,255,.4);}
+  .trio-icon.teal{background:linear-gradient(135deg,#13DDC4,#2EA7FF);box-shadow:0 6px 20px rgba(19,221,196,.4);}
+  .trio-icon svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2;}
+  .trio-card h3{font-size:22px;font-weight:700;margin-bottom:12px;}
+  .trio-card p{color:var(--txt-dim);font-size:15px;line-height:1.6;margin-bottom:18px;}
+  .trio-link{font-weight:600;font-size:15px;color:var(--cyan);display:inline-flex;align-items:center;gap:6px;}
+
+  /* ---------- Cloud Games ---------- */
+  .filter-bar{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap;}
+  .chip{font-size:14px;padding:9px 18px;border-radius:99px;background:var(--glass);border:1px solid var(--glass-stroke);color:var(--txt-dim);cursor:pointer;transition:.2s;}
+  .chip.active,.chip:hover{color:#fff;border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.08);}
+  .game-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:36px;}
+  .game-card{aspect-ratio:1/1;border-radius:16px;padding:16px;display:flex;align-items:flex-end;position:relative;overflow:hidden;transition:transform .3s ease, box-shadow .3s ease;cursor:pointer;}
+  .game-card:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 14px 34px rgba(0,0,0,.5);}
+  .game-card span{position:relative;z-index:2;font-weight:700;font-size:16px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.55);}
+  .game-card.g1{background:linear-gradient(135deg,#2EA7FF,#1033cc);}
+  .game-card.g2{background:linear-gradient(135deg,#9381FF,#d966cc);}
+  .game-card.g3{background:linear-gradient(135deg,#13DDC4,#106699);}
+  .game-card.g4{background:linear-gradient(135deg,#1033cc,#2EA7FF);}
+  .game-card.g5{background:linear-gradient(135deg,#4d33b3,#2EA7FF);}
+  .game-card.g6{background:linear-gradient(135deg,#1a9999,#13DDC4);}
+  .center-wrap{display:flex;justify-content:center;margin-top:40px;}
+
+  /* ---------- Cloud PC ---------- */
+  .pc-head{max-width:600px;}
+  .pc-main{display:grid;grid-template-columns:1.05fr .95fr;gap:32px;margin-top:48px;align-items:stretch;}
+  .pc-desktop{padding:18px;border-radius:var(--radius);min-height:360px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;background:
+     linear-gradient(160deg,rgba(46,167,255,.22),rgba(147,129,255,.16));}
+  .pc-screen{flex:1;border-radius:12px;background:linear-gradient(135deg,rgba(3,0,20,.6),rgba(46,167,255,.18));border:1px solid rgba(255,255,255,.1);margin-bottom:16px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+  .pc-screen .ring{width:120px;height:120px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:var(--cyan);animation:spin 4s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .pc-cap{font-size:14px;color:#fff;text-align:center;background:rgba(255,255,255,.06);border:1px solid var(--glass-stroke);border-radius:10px;padding:12px;}
+  .pc-benefit{padding:28px;border-radius:var(--radius);}
+  .pc-benefit h3{font-size:22px;font-weight:700;margin-bottom:18px;}
+  .pc-benefit li{list-style:none;font-size:15px;color:var(--txt-dim);line-height:1.5;margin-bottom:14px;padding-left:4px;}
+  .plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;}
+  .plan{padding:28px;border-radius:var(--radius);display:flex;flex-direction:column;gap:14px;position:relative;transition:transform .3s ease;}
+  .plan:hover{transform:translateY(-6px);}
+  .plan.popular{border-color:rgba(46,167,255,.5);background:linear-gradient(180deg,rgba(46,167,255,.10),rgba(255,255,255,.04));}
+  .tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--grad);color:#02131f;font-size:12px;font-weight:700;padding:5px 14px;border-radius:99px;white-space:nowrap;}
+  .plan h4{font-size:20px;font-weight:700;}
+  .plan .spec{font-size:14px;color:var(--txt-dim);}
+  .plan .price{font-family:var(--font-latin);font-weight:800;font-size:30px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
+  .plan .price small{font-size:14px;color:var(--txt-faint);-webkit-text-fill-color:var(--txt-faint);font-weight:500;}
+  .plan .btn{margin-top:auto;}
+
+  /* ---------- Deals ---------- */
+  .deal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;}
+  .deal{padding:24px;border-radius:var(--radius);transition:transform .3s ease, border-color .3s ease;}
+  .deal:hover{transform:translateY(-5px);border-color:rgba(255,255,255,.22);}
+  .deal .badge{display:inline-block;font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:10px;}
+  .deal h4{font-size:18px;font-weight:700;margin-bottom:8px;}
+  .deal p{font-size:14px;color:var(--txt-dim);margin-bottom:16px;min-height:40px;}
+  .deal .amt{font-family:var(--font-latin);font-weight:800;font-size:26px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
+  .deals-cta{margin-top:32px;padding:28px 36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(46,167,255,.10),rgba(147,129,255,.10));border:1px solid var(--glass-stroke);}
+  .deals-cta h4{font-size:18px;font-weight:700;}
+
+  /* ---------- Free Resources ---------- */
+  .res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;}
+  .res{padding:28px;border-radius:var(--radius);transition:transform .3s ease;}
+  .res:hover{transform:translateY(-6px);}
+  .res .ico{width:46px;height:46px;border-radius:13px;background:var(--grad);display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 6px 18px rgba(46,167,255,.4);}
+  .res .ico svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;}
+  .res h4{font-size:18px;font-weight:700;margin-bottom:10px;}
+  .res p{font-size:14px;color:var(--txt-dim);margin-bottom:16px;min-height:42px;}
+  .res .free{font-size:13px;font-weight:700;color:var(--teal);}
+
+  /* ---------- Social Proof ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:48px;padding:36px 0;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);}
+  .stat .num{font-family:var(--font-latin);font-weight:800;font-size:40px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;line-height:1.1;}
+  .stat .lbl{font-size:14px;color:var(--txt-dim);margin-top:6px;}
+  .testi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:40px;}
+  .testi{padding:28px;border-radius:var(--radius);}
+  .testi p{font-size:15px;line-height:1.7;color:rgba(255,255,255,.82);margin-bottom:18px;}
+  .testi .who{display:flex;align-items:center;gap:12px;}
+  .testi .avatar{width:40px;height:40px;border-radius:50%;background:var(--grad-pp);flex-shrink:0;}
+  .testi .who b{font-size:14px;font-weight:700;display:block;}
+  .testi .who span{font-size:12px;color:var(--txt-faint);}
+
+  /* ---------- Final CTA ---------- */
+  .cta-panel{position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center;gap:24px;padding:64px 24px;border-radius:28px;background:linear-gradient(160deg,rgba(46,167,255,.12),rgba(147,129,255,.10));border:1px solid var(--glass-stroke);overflow:hidden;}
+  .cta-panel .aurora{width:760px;height:760px;top:50%;left:50%;transform:translate(-50%,-50%);opacity:.4;}
+  .cta-panel h2{font-size:clamp(30px,5vw,44px);font-weight:800;max-width:1000px;line-height:1.25;}
+  .cta-panel .sub{color:var(--txt-dim);font-size:16px;}
+  .cta-form{display:flex;gap:12px;width:100%;max-width:560px;flex-wrap:wrap;justify-content:center;}
+  .cta-form input{flex:1;min-width:240px;border-radius:99px;padding:16px 24px;background:rgba(255,255,255,.05);border:1px solid var(--glass-stroke);color:#fff;font-size:15px;font-family:var(--font-cjk);outline:none;}
+  .cta-form input::placeholder{color:var(--txt-faint);}
+  .cta-form input:focus{border-color:rgba(46,167,255,.6);background:rgba(255,255,255,.08);}
+  .trust{font-size:13px;color:var(--txt-faint);}
+
+  /* ---------- Footer ---------- */
+  footer{padding:64px 0 40px;border-top:1px solid rgba(255,255,255,.06);}
+  .foot-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:40px;}
+  .foot-brand .brand{margin-bottom:14px;}
+  .foot-brand p{font-size:14px;color:var(--txt-dim);max-width:260px;}
+  .foot-col h5{font-size:15px;font-weight:700;margin-bottom:14px;}
+  .foot-col a{display:block;font-size:14px;color:var(--txt-dim);margin-bottom:10px;transition:color .2s;}
+  .foot-col a:hover{color:#fff;}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap;gap:12px;}
+  .foot-bottom span{font-size:13px;color:var(--txt-faint);}
+
+  /* ---------- Reveal animation ---------- */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in-view{opacity:1;transform:none;}
+
+  /* ---------- Toast ---------- */
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(20,10,40,.95);border:1px solid var(--glass-stroke);color:#fff;padding:14px 24px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;z-index:100;backdrop-filter:blur(10px);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* ---------- Responsive ---------- */
+  @media(max-width:1024px){
+    .game-grid{grid-template-columns:repeat(4,1fr);}
+    .trio-grid,.deal-grid,.res-grid,.plan-grid,.testi-grid{grid-template-columns:repeat(2,1fr);}
+    .pc-main{grid-template-columns:1fr;}
+    .stats{grid-template-columns:repeat(2,1fr);gap:32px 24px;}
+  }
+  @media(max-width:760px){
+    .nav-links,.search{display:none;}
+    .hamburger{display:flex;}
+    .nav-links.open{display:flex;position:absolute;top:72px;left:0;right:0;flex-direction:column;background:rgba(3,0,20,.97);padding:20px 24px;gap:18px;border-bottom:1px solid rgba(255,255,255,.08);}
+    .section-pad{padding:64px 0;}
+    .sec-title{font-size:27px;}
+    .hero-title{font-size:40px;}
+    .game-grid{grid-template-columns:repeat(3,1fr);}
+    .trio-grid,.deal-grid,.res-grid,.plan-grid,.testi-grid,.stats{grid-template-columns:1fr;}
+    .mock-body{grid-template-columns:repeat(2,1fr);}
+    .foot-top{grid-template-columns:1fr 1fr;gap:28px;}
+    .deals-cta{flex-direction:column;align-items:flex-start;}
+    .cta-form{flex-direction:column;}
+    .cta-form .btn{width:100%;}
+  }
+
+  /* ---------- Reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1 !important;transform:none !important;transition:none !important;}
+    .pc-screen .ring{animation:none !important;}
+    html{scroll-behavior:auto !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header>
+  <div class="container nav">
+    <a class="brand" href="/"><span class="logo"></span>云玩汇</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#games">云游戏</a>
+      <a href="#cloudpc">云电脑</a>
+      <a href="#deals">薅羊毛</a>
+      <a href="#resources">免费资源</a>
+    </nav>
+    <div class="nav-right">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+        搜索游戏 / 应用
+      </div>
+      <a class="btn btn-primary btn-sm" href="/app/login">免费注册</a>
+      <button class="hamburger" id="hamburger" aria-label="菜单"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="hero">
+  <span class="aurora a1 cyan"></span>
+  <span class="aurora a2 purple"></span>
+  <span class="aurora a3 teal"></span>
+  <div class="container hero-inner">
+    <span class="kicker">CLOUD GAMING · CLOUD PC · DEALS HUB</span>
+    <h1 class="hero-title">一个入口，玩转所有云端世界</h1>
+    <p class="hero-sub">3000+ 云游戏、100+ 云电脑、每日更新的羊毛优惠——一个账号极速开玩，告别卡顿与昂贵硬件。</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="/app/login">免费开始玩</a>
+      <a class="btn btn-ghost" href="/app/cloud-games">浏览全部游戏 →</a>
+    </div>
+    <div class="hero-mock reveal">
+      <div class="mock-bar">
+        <div class="mock-dots"><i></i><i></i><i></i></div>
+        <div class="mock-cap">Windows 11 · 4K 显示 · 多开支持</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-tile"><span>原神</span></div>
+        <div class="mock-tile"><span>赛博朋克 2077</span></div>
+        <div class="mock-tile"><span>艾尔登法环</span></div>
+        <div class="mock-tile"><span>永劫无间</span></div>
+        <div class="mock-tile"><span>黑神话：悟空</span></div>
+        <div class="mock-tile"><span>APEX 英雄</span></div>
+        <div class="mock-tile"><span>王者荣耀</span></div>
+        <div class="mock-tile"><span>崩坏：星穹铁道</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BUSINESS TRIO ===================== -->
+<section class="section-pad" id="why">
+  <div class="container">
+    <div class="reveal">
+      <span class="kicker">WHY 云玩汇</span>
+      <h2 class="sec-title">三块核心，覆盖你的全部云端需求</h2>
+    </div>
+    <div class="trio-grid">
+      <div class="glass trio-card reveal">
+        <div class="trio-icon"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M7 12h4M9 10v4"/></svg></div>
+        <h3>云游戏</h3>
+        <p>3000+ 3A 大作与热门网游，低配设备也能 4K 120 帧畅玩，无需下载。</p>
+        <a class="trio-link" href="#games">立即体验 →</a>
+      </div>
+      <div class="glass trio-card reveal">
+        <div class="trio-icon purple"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <h3>云电脑</h3>
+        <p>100+ 高配云主机，办公、设计、渲染全搞定，按小时计费随开随用。</p>
+        <a class="trio-link" href="#cloudpc">查看配置 →</a>
+      </div>
+      <div class="glass trio-card reveal">
+        <div class="trio-icon teal"><svg viewBox="0 0 24 24"><path d="M12 2v20M5 8l7-4 7 4M5 16l7 4 7-4"/></svg></div>
+        <h3>薅羊毛</h3>
+        <p>每日更新限时优惠与 CPS 返利，省钱玩游戏两不误，专属福利一键领。</p>
+        <a class="trio-link" href="#deals">领取福利 →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CLOUD GAMES ===================== -->
+<section class="section-pad" id="games">
+  <div class="container">
+    <div class="reveal">
+      <span class="kicker">CLOUD GAMES</span>
+      <h2 class="sec-title">热门云游戏，即点即玩</h2>
+    </div>
+    <div class="filter-bar reveal">
+      <span class="chip active">全部</span>
+      <span class="chip">3A 大作</span>
+      <span class="chip">热门网游</span>
+      <span class="chip">竞技对抗</span>
+    </div>
+    <div class="game-grid reveal">
+      <div class="game-card g1"><span>原神</span></div>
+      <div class="game-card g2"><span>赛博朋克 2077</span></div>
+      <div class="game-card g3"><span>艾尔登法环</span></div>
+      <div class="game-card g4"><span>永劫无间</span></div>
+      <div class="game-card g5"><span>黑神话：悟空</span></div>
+      <div class="game-card g6"><span>APEX 英雄</span></div>
+      <div class="game-card g4"><span>王者荣耀</span></div>
+      <div class="game-card g2"><span>崩坏：星穹铁道</span></div>
+      <div class="game-card g3"><span>绝区零</span></div>
+      <div class="game-card g1"><span>双人成行</span></div>
+      <div class="game-card g5"><span>巫师 3</span></div>
+      <div class="game-card g6"><span>极限竞速</span></div>
+    </div>
+    <div class="center-wrap reveal">
+      <button class="btn btn-ghost" id="loadMore">加载更多游戏</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CLOUD PC ===================== -->
+<section class="section-pad" id="cloudpc">
+  <span class="aurora purple" style="width:680px;height:680px;top:60px;right:-120px;"></span>
+  <div class="container">
+    <div class="pc-head reveal">
+      <span class="kicker">CLOUD PC · 云端办公</span>
+      <h2 class="sec-title">云端办公，高性能云电脑随开随用</h2>
+      <p class="sec-sub">告别卡顿与硬件投入，企业级配置秒级开通，数据隔离更安全</p>
+    </div>
+    <div class="pc-main">
+      <div class="glass pc-desktop reveal">
+        <div class="pc-screen"><div class="ring"></div></div>
+        <div class="pc-cap">Windows 11 · 4K 显示 · 多开支持</div>
+      </div>
+      <div class="glass pc-benefit reveal">
+        <h3>为什么选择云电脑</h3>
+        <ul>
+          <li>· 高端显卡与多核 CPU，畅跑 3A 大作与专业软件</li>
+          <li>· 即开即用，无需漫长下载与安装</li>
+          <li>· 数据云端隔离，隐私与数字资产更安全</li>
+          <li>· 按需计费，省去硬件折旧与升级成本</li>
+        </ul>
+      </div>
+    </div>
+    <div class="plan-grid">
+      <div class="glass plan reveal">
+        <h4>入门版</h4>
+        <div class="spec">2核4G · 基础显卡</div>
+        <div class="price">¥9.9<small> /月</small></div>
+        <a class="btn btn-ghost" href="/app/login">立即开通</a>
+      </div>
+      <div class="glass plan popular reveal">
+        <span class="tag">最受欢迎</span>
+        <h4>标准版</h4>
+        <div class="spec">4核8G · 高性能显卡</div>
+        <div class="price">¥29.9<small> /月</small></div>
+        <a class="btn btn-primary" href="/app/login">立即开通</a>
+      </div>
+      <div class="glass plan reveal">
+        <h4>电竞版</h4>
+        <div class="spec">8核16G · 旗舰显卡</div>
+        <div class="price">¥59.9<small> /月</small></div>
+        <a class="btn btn-ghost" href="/app/login">立即开通</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DEALS ===================== -->
+<section class="section-pad" id="deals">
+  <span class="aurora teal" style="width:680px;height:680px;top:40px;left:-140px;"></span>
+  <div class="container">
+    <div class="reveal">
+      <span class="kicker">DEALS HUB · 优惠聚合</span>
+      <h2 class="sec-title">羊毛优惠聚合，省钱才是硬道理</h2>
+      <p class="sec-sub">精选主流平台返利、直降与神券，一键直达，省到就是赚到</p>
+    </div>
+    <div class="deal-grid">
+      <div class="glass deal reveal"><span class="badge">返利</span><h4>京东 PLUS 年卡</h4><p>开通返现 + 专属会员价</p><div class="amt">返 ¥80</div></div>
+      <div class="glass deal reveal"><span class="badge">直降</span><h4>百亿补贴专区</h4><p>大牌直降，无套路真便宜</p><div class="amt">低至 5 折</div></div>
+      <div class="glass deal reveal"><span class="badge">券</span><h4>美团神券包</h4><p>外卖红包天天领，月省过百</p><div class="amt">领 ¥30</div></div>
+      <div class="glass deal reveal"><span class="badge">返利</span><h4>爱优腾会员</h4><p>年卡返现攻略合集</p><div class="amt">返 ¥60</div></div>
+      <div class="glass deal reveal"><span class="badge">限时</span><h4>123云盘会员</h4><p>存储扩容限时特惠</p><div class="amt">5 折</div></div>
+      <div class="glass deal reveal"><span class="badge">直降</span><h4>游戏点券代充</h4><p>主流平台低汇率充值</p><div class="amt">省 15%</div></div>
+    </div>
+    <div class="deals-cta reveal">
+      <h4>还有更多隐藏福利与实时神券？</h4>
+      <a class="btn btn-pp" href="/app/deals">去领福利 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FREE RESOURCES ===================== -->
+<section class="section-pad" id="resources">
+  <span class="aurora cyan" style="width:680px;height:680px;top:30px;right:-120px;"></span>
+  <div class="container">
+    <div class="reveal">
+      <span class="kicker">FREE RESOURCES · 免费资源</span>
+      <h2 class="sec-title">免费游戏资源，一键转存即玩</h2>
+      <p class="sec-sub">精选网盘游戏、周免大作与模组补丁，全部免费，告别下载烦恼</p>
+    </div>
+    <div class="res-grid">
+      <div class="glass res reveal">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 12l9 4 9-4M3 17l9 4 9-4"/></svg></div>
+        <h4>夸克网盘游戏库</h4>
+        <p>26 款热门游戏，一键转存即玩</p>
+        <span class="free">免费领取</span>
+      </div>
+      <div class="glass res reveal">
+        <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <h4>Steam 周免精选</h4>
+        <p>每周白嫖大作，实时更新</p>
+        <span class="free">免费领取</span>
+      </div>
+      <div class="glass res reveal">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M14 3l7 7-9 9-7 0 0-7 9-9z"/><path d="M8 14l-3 3"/></svg></div>
+        <h4>MOD 与补丁库</h4>
+        <p>海量模组、汉化与优化补丁</p>
+        <span class="free">免费领取</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SOCIAL PROOF ===================== -->
+<section class="section-pad" id="proof">
+  <span class="aurora purple" style="width:680px;height:680px;top:40px;left:-140px;"></span>
+  <div class="container">
+    <div class="reveal">
+      <span class="kicker">TRUSTED BY USERS · 用户口碑</span>
+      <h2 class="sec-title">被万千玩家信赖的云端入口</h2>
+      <p class="sec-sub">真实数据说话，好体验自然被口口相传</p>
+    </div>
+    <div class="stats reveal">
+      <div class="stat"><div class="num">50万+</div><div class="lbl">注册用户</div></div>
+      <div class="stat"><div class="num">1000万+</div><div class="lbl">累计游戏时长(小时)</div></div>
+      <div class="stat"><div class="num">99.9%</div><div class="lbl">服务可用性</div></div>
+      <div class="stat"><div class="num">4.9</div><div class="lbl">用户评分</div></div>
+    </div>
+    <div class="testi-grid">
+      <div class="glass testi reveal">
+        <p>"云玩汇把我和朋友的联机档期安排得明明白白，周末开黑再也不用等下载。"</p>
+        <div class="who"><div class="avatar"></div><div><b>小林</b><span>资深玩家</span></div></div>
+      </div>
+      <div class="glass testi reveal">
+        <p>"办公云电脑随开随用，出差也能跑设计软件，月省一台笔记本的钱。"</p>
+        <div class="who"><div class="avatar"></div><div><b>阿哲</b><span>自由设计师</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FINAL CTA ===================== -->
+<section class="section-pad" id="cta">
+  <div class="container">
+    <div class="cta-panel reveal">
+      <span class="aurora cyan"></span>
+      <span class="kicker">GET STARTED · 立即开始</span>
+      <h2>现在加入云玩汇，开启你的云端世界</h2>
+      <p class="sub">免费注册，秒级开通，海量游戏与云电脑等你体验</p>
+      <form class="cta-form" id="ctaForm">
+        <input type="email" id="emailInput" placeholder="输入邮箱，免费注册" required />
+        <button class="btn btn-primary" type="submit">免费注册</button>
+      </form>
+      <p class="trust">无需信用卡 · 随时可注销 · 数据加密保护</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="container">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="/"><span class="logo"></span>云玩汇</a>
+        <p>一个入口，玩转所有云端世界</p>
+      </div>
+      <div class="foot-col">
+        <h5>云游戏</h5>
+        <a href="/app/cloud-games">热门游戏</a>
+        <a href="/app/cloud-games">新游速递</a>
+        <a href="/app/cloud-games">游戏库</a>
+      </div>
+      <div class="foot-col">
+        <h5>云电脑</h5>
+        <a href="/app/cloud-desktops">套餐价格</a>
+        <a href="/app/cloud-desktops">企业版</a>
+        <a href="/app/cloud-desktops">使用帮助</a>
+      </div>
+      <div class="foot-col">
+        <h5>关于我们</h5>
+        <a href="/app/deals">薅羊毛</a>
+        <a href="/app/free-games">免费资源</a>
+        <a href="/app/login">联系我们</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 云玩汇 · 保留所有权利</span>
+      <span>沪ICP备 2026xxxx 号</span>
+      <span>隐私政策 · 服务条款</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">更多游戏即将上线，敬请期待 🎮</div>
+
+<script src="/landing.js"></script>
+</body>
 </html>

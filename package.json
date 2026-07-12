@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "react-snap",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/ functions/ --ext .ts,.tsx",

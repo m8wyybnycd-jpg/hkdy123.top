@@ -1,4 +1,4 @@
-import { verifyJWT, signJWT } from "../lib/auth";
+import { verifyJWTAny, signJWT, getJWTSecrets } from "../lib/auth";
 import { getUserRoleCodes, getUserPermissions } from "../lib/permission";
 import { jsonResponse, unauthorized, serverError } from "../lib/response";
 
@@ -56,15 +56,18 @@ export const onRequestPost = async (
     return unauthorized("缺少认证令牌");
   }
 
-  const secret = context.env.JWT_SECRET;
-  if (!secret) {
+  const primarySecret = context.env.JWT_SECRET;
+  if (!primarySecret) {
     return serverError("JWT_SECRET 未配置");
   }
 
-  // Verify the existing token (must still be valid, not expired)
+  // Verify the existing token (must still be valid, not expired).
+  // Accepts tokens signed with the current OR previous key (dual-key transition),
+  // so a key rotation never invalidates still-valid sessions.
+  const secrets = getJWTSecrets(context.env);
   let payload;
   try {
-    payload = await verifyJWT(token, secret);
+    payload = await verifyJWTAny(token, secrets);
   } catch {
     return unauthorized("令牌无效或已过期，请重新登录");
   }
@@ -103,7 +106,7 @@ export const onRequestPost = async (
       roles,
       permissions,
     },
-    secret
+    primarySecret
   );
 
   // Set the refreshed token as an HttpOnly cookie

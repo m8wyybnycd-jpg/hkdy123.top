@@ -1,3 +1,21 @@
-# SPA fallback for Cloudflare Pages
-# Static files and Functions are checked first, then this rule applies
+# 应用壳：React SPA 挂载在 /app 子路径
+# 注意：/app 的路由由 functions/app/[[path]].ts (Pages Function) 接管，
+# 直接 rewrite 到 app.html，避免 _redirects 与 Cloudflare 自动补斜杠冲突造成的 308 死循环。
+
+# 旧公开内容路由 301 到 /app 下对应页（保留 SEO / 外链权重）
+/cloud-games      /app/cloud-games      301
+/cloud-desktops   /app/cloud-desktops   301
+/deals            /app/deals            301
+/library          /app/library          301
+/free-games       /app/free-games       301
+/sms-platforms    /app/sms-platforms    301
+/login            /app/login            301
+/register         /app/register         301
+/search           /app/search           301
+/messages         /app/messages          301
+/profile          /app/profile           301
+/announcements    /app/announcements    301
+/admin            /app/admin             301
+
+# SPA fallback 兜底（静态文件与 Functions 优先于 _redirects）
 /*    /index.html   200

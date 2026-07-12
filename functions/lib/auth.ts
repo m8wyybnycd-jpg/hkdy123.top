@@ -260,3 +260,48 @@ export async function verifyJWT(
     jti: payload.jti as string | undefined,
   };
 }
+
+/**
+ * Collect the active JWT signing secrets from the environment, in priority
+ * order (primary first). When `JWT_SECRET_OLD` is configured it is included as
+ * a fallback so tokens signed with the *previous* key remain valid during a
+ * key-rotation transition window — preventing a mass forced logout of every
+ * active session the moment the primary key changes.
+ */
+export function getJWTSecrets(env: {
+  JWT_SECRET?: string;
+  JWT_SECRET_OLD?: string;
+}): string[] {
+  const secrets: string[] = [];
+  if (env.JWT_SECRET) secrets.push(env.JWT_SECRET);
+  if (env.JWT_SECRET_OLD) secrets.push(env.JWT_SECRET_OLD);
+  return secrets;
+}
+
+/**
+ * Verify a JWT against one or more HMAC secrets (dual-key transition support).
+ *
+ * Tries each candidate secret in order; the first that validates wins. This is
+ * what makes rotating `JWT_SECRET` safe: set the old value as `JWT_SECRET_OLD`
+ * before deploying the new primary, and existing tokens keep working until
+ * they naturally expire.
+ *
+ * @throws if the token is invalid under every candidate secret, or expired
+ */
+export async function verifyJWTAny(
+  token: string,
+  secrets: string[]
+): Promise<JWTPayload> {
+  if (secrets.length === 0) {
+    throw new Error("No JWT secrets configured");
+  }
+  let lastError: Error | null = null;
+  for (const secret of secrets) {
+    try {
+      return await verifyJWT(token, secret);
+    } catch (err) {
+      lastError = err as Error;
+    }
+  }
+  throw lastError ?? new Error("JWT verification failed");
+}
