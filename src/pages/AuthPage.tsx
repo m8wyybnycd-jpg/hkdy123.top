@@ -21,7 +21,7 @@ interface ApiResponse {
   data?: any;
 }
 
-type AuthTab = "login" | "register" | "sms";
+type AuthTab = "login" | "register" | "sms" | "email";
 
 /** Regular expression for basic email format validation. */
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,7 +51,7 @@ interface LocationState {
  * Centered card layout on a dark themed background with ambient glow accents.
  */
 export default function AuthPage() {
-  const { login, register, smsLogin } = useAuthContext();
+  const { login, register, smsLogin, emailLogin } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -176,10 +176,46 @@ export default function AuthPage() {
     }
   }, [phone]);
 
-  /** Handle form submission for login, register, and SMS login. */
+  /** Handle form submission for login, register, SMS and email-code login. */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // ── Email code login branch (passwordless) ──
+    if (tab === "email") {
+      const trimmedEmail = email.trim();
+      if (!trimmedEmail) {
+        setError("请输入邮箱");
+        return;
+      }
+      if (!EMAIL_REGEX.test(trimmedEmail)) {
+        setError("邮箱格式不正确");
+        return;
+      }
+      if (!code.trim()) {
+        setError("请输入验证码");
+        return;
+      }
+      if (!/^\d{6}$/.test(code.trim())) {
+        setError("验证码为 6 位数字");
+        return;
+      }
+      if (!codeSent) {
+        setError("请先获取验证码");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        await emailLogin(trimmedEmail, code.trim());
+        navigate(getRedirectPath(), { replace: true });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "登录失败，请重试");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
     // ── SMS login branch ──
     if (tab === "sms") {
@@ -316,6 +352,7 @@ export default function AuthPage() {
     if (loading) return "处理中…";
     if (tab === "login") return "登录";
     if (tab === "register") return "注册";
+    if (tab === "email") return "邮箱登录";
     return "短信登录";
   })();
 
@@ -378,6 +415,17 @@ export default function AuthPage() {
           >
             <Smartphone className="h-4 w-4" />
             短信登录
+          </button>
+          <button
+            onClick={() => switchTab("email")}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-medium transition-all duration-200 ${
+              tab === "email"
+                ? "bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-md shadow-neon-blue/20"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <Mail className="h-4 w-4" />
+            邮箱验证码
           </button>
         </div>
 
@@ -446,8 +494,8 @@ export default function AuthPage() {
             </>
           ) : (
             <>
-              {/* Email + Send Code (register) */}
-              {tab === "register" ? (
+              {/* Email + Send Code (register & email-code-login) */}
+              {tab === "register" || tab === "email" ? (
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-300">
                     邮箱
@@ -495,8 +543,8 @@ export default function AuthPage() {
                 </div>
               )}
 
-              {/* Verification Code (register only) */}
-              {tab === "register" && (
+              {/* Verification Code (register & email-code-login) */}
+              {(tab === "register" || tab === "email") && (
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-slate-300">
                     验证码
@@ -520,34 +568,36 @@ export default function AuthPage() {
                 </div>
               )}
 
-              {/* Password */}
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-slate-300">
-                  密码
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="至少 6 位密码"
-                    autoComplete={tab === "login" ? "current-password" : "new-password"}
-                    className="w-full rounded-lg border border-game-border bg-game-darker/60 px-4 py-2.5 pr-11 text-sm text-slate-200 placeholder-slate-500 outline-none transition-all duration-200 focus:border-neon-blue/50 focus:ring-2 focus:ring-neon-blue/20"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-colors hover:text-slate-300"
-                    aria-label={showPassword ? "隐藏密码" : "显示密码"}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
+              {/* Password (login & register only — email-code-login is passwordless) */}
+              {(tab === "login" || tab === "register") && (
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-300">
+                    密码
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="至少 6 位密码"
+                      autoComplete={tab === "login" ? "current-password" : "new-password"}
+                      className="w-full rounded-lg border border-game-border bg-game-darker/60 px-4 py-2.5 pr-11 text-sm text-slate-200 placeholder-slate-500 outline-none transition-all duration-200 focus:border-neon-blue/50 focus:ring-2 focus:ring-neon-blue/20"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-colors hover:text-slate-300"
+                      aria-label={showPassword ? "隐藏密码" : "显示密码"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Confirm Password (register only) */}
               {tab === "register" && (
@@ -590,7 +640,7 @@ export default function AuthPage() {
               <>
                 {tab === "login" && <LogIn className="h-4 w-4" />}
                 {tab === "register" && <UserPlus className="h-4 w-4" />}
-                {tab === "sms" && <Smartphone className="h-4 w-4" />}
+                {(tab === "email" || tab === "sms") && <Smartphone className="h-4 w-4" />}
                 {submitLabel}
               </>
             )}
@@ -629,6 +679,17 @@ export default function AuthPage() {
                 className="font-medium text-neon-blue transition-colors hover:text-neon-blue/80"
               >
                 邮箱登录
+              </button>
+            </>
+          )}
+          {tab === "email" && (
+            <>
+              使用密码？{" "}
+              <button
+                onClick={() => switchTab("login")}
+                className="font-medium text-neon-blue transition-colors hover:text-neon-blue/80"
+              >
+                密码登录
               </button>
             </>
           )}

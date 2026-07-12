@@ -201,6 +201,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  /** Passwordless login / register with email and verification code via the API. */
+  const emailLogin = useCallback(async (email: string, code: string) => {
+    const response = await fetch("/api/email-login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, code }),
+    });
+    const result: ApiResponse = await response.json();
+    if (result.code !== 0) {
+      throw new Error(result.message || "登录失败");
+    }
+    const { user } = result.data;
+    setAuthState({
+      user,
+      token: null,
+      isAuthenticated: true,
+      loading: false,
+    });
+  }, []);
+
   /** Log out: call /api/logout to clear the HttpOnly cookie, then clear state. */
   const logout = useCallback(async () => {
     try {
@@ -220,8 +241,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ authState, login, register, smsLogin, logout }),
-    [authState, login, register, smsLogin, logout]
+    () => ({ authState, login, register, smsLogin, emailLogin, logout }),
+    [authState, login, register, smsLogin, emailLogin, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

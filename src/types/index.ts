@@ -197,6 +197,8 @@ export interface AuthContextValue {
   register: (email: string, code: string, password: string) => Promise<void>;
   /** Log in / register with phone number and SMS verification code. */
   smsLogin: (phone: string, code: string) => Promise<void>;
+  /** Passwordless login / register with email and verification code. */
+  emailLogin: (email: string, code: string) => Promise<void>;
   /** Log out and clear token. */
   logout: () => void;
 }
