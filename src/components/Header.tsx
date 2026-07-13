@@ -4,6 +4,7 @@ import { Gamepad2, Search, LogOut, Menu, X, Shield, User, Bell, LogIn } from "lu
 import { useAuthContext } from "../contexts/AuthContext";
 import { useUnread } from "../contexts/UnreadContext";
 import { usePageConfigs } from "../hooks/usePageConfigs";
+import { usePublicSettings } from "../hooks/usePublicSettings";
 import MessageBell from "./MessageBell";
 
 /**
@@ -25,6 +26,11 @@ export default function Header() {
   const TABS = enabledConfigs
     .filter((c) => c.page_key !== "home")
     .map((c) => ({ path: `/${c.page_key}`, label: c.page_name || c.title }));
+
+  // Public settings for dynamic site name and logo
+  const { get: getSetting } = usePublicSettings();
+  const siteName = getSetting("site_name", "云玩汇");
+  const logoUrl = getSetting("logo_url", "");
 
   /** Handle search submission — navigate to /search?q= */
   const handleSearch = (e: React.FormEvent) => {
@@ -56,12 +62,16 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         {/* Logo + Name */}
         <NavLink to="/" className="flex shrink-0 items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-neon-blue to-neon-purple shadow-lg shadow-neon-blue/20">
-            <Gamepad2 className="h-5 w-5 text-white" />
-          </div>
+          {logoUrl ? (
+            <img src={logoUrl} alt={siteName} className="h-10 w-10 rounded-xl object-cover" />
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-neon-blue to-neon-purple shadow-lg shadow-neon-blue/20">
+              <Gamepad2 className="h-5 w-5 text-white" />
+            </div>
+          )}
           <div className="hidden sm:block">
             <span className="text-lg font-bold tracking-tight">
-              <span className="gradient-text">云玩汇</span>
+              <span className="gradient-text">{siteName}</span>
             </span>
             <p className="text-xs text-slate-500">云游戏 · 云电脑 · 薅羊毛</p>
           </div>

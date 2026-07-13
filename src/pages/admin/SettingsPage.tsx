@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Save, AlertCircle, Check } from "lucide-react";
 import { apiClient } from "../../services/api";
+import { clearPublicSettingsCache } from "../../hooks/usePublicSettings";
 import type { SettingItem } from "../../types";
 
 /** Tab identifiers for the settings page. */
@@ -114,6 +115,8 @@ export default function SettingsPage() {
       });
 
       await apiClient.updateSettings(fieldsToSave);
+      // Clear public settings cache so Header/Footer pick up new values
+      clearPublicSettingsCache();
       setSuccessMsg("设置已保存");
     } catch (err) {
       setError(err instanceof Error ? err.message : "保存失败");

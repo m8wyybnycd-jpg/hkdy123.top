@@ -13,6 +13,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import { useAuthContext } from "../contexts/AuthContext";
+import { usePublicSettings } from "../hooks/usePublicSettings";
 
 /** Standard API envelope returned by the backend functions. */
 interface ApiResponse {
@@ -54,6 +55,10 @@ export default function AuthPage() {
   const { login, register, smsLogin, emailLogin } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Public settings: registration_enabled controls whether the register tab is shown
+  const { get: getSetting } = usePublicSettings();
+  const registrationEnabled = getSetting("registration_enabled", "true") !== "false";
 
   const [tab, setTab] = useState<AuthTab>("login");
   const [email, setEmail] = useState("");
@@ -394,17 +399,19 @@ export default function AuthPage() {
             <LogIn className="h-4 w-4" />
             邮箱登录
           </button>
-          <button
-            onClick={() => switchTab("register")}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-medium transition-all duration-200 ${
-              tab === "register"
-                ? "bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-md shadow-neon-blue/20"
-                : "text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <UserPlus className="h-4 w-4" />
-            邮箱注册
-          </button>
+          {registrationEnabled && (
+            <button
+              onClick={() => switchTab("register")}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-medium transition-all duration-200 ${
+                tab === "register"
+                  ? "bg-gradient-to-r from-neon-blue to-neon-purple text-white shadow-md shadow-neon-blue/20"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <UserPlus className="h-4 w-4" />
+              邮箱注册
+            </button>
+          )}
           <button
             onClick={() => switchTab("sms")}
             className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-medium transition-all duration-200 ${
@@ -649,7 +656,7 @@ export default function AuthPage() {
 
         {/* Switch tab link */}
         <p className="mt-4 text-center text-sm text-slate-400">
-          {tab === "login" && (
+          {tab === "login" && registrationEnabled && (
             <>
               没有账号？{" "}
               <button

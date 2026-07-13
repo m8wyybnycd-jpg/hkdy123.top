@@ -86,6 +86,32 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   const code = body.code?.trim() ?? "";
   const password = body.password ?? "";
 
+  // ── Check registration_enabled setting ──
+  try {
+    const regSetting = await DB.prepare(
+      `SELECT value FROM settings WHERE key = 'registration_enabled'`
+    ).first();
+    if (regSetting && (regSetting.value as string) === "false") {
+      return badRequest("注册功能已关闭，请联系管理员");
+    }
+  } catch {
+    // Settings table missing — allow registration (fail-open for usability)
+  }
+
+  // ── Get password_min_length from settings (default 8) ──
+  let passwordMinLength = 8;
+  try {
+    const lenSetting = await DB.prepare(
+      `SELECT value FROM settings WHERE key = 'password_min_length'`
+    ).first();
+    if (lenSetting) {
+      const parsed = parseInt(lenSetting.value as string, 10);
+      if (parsed >= 6 && parsed <= 128) passwordMinLength = parsed;
+    }
+  } catch {
+    // ignore — use default
+  }
+
   // Validate email format
   if (!email) {
     return badRequest("请输入邮箱");
@@ -106,8 +132,8 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   if (!password) {
     return badRequest("请输入密码");
   }
-  if (password.length < 8) {
-    return badRequest("密码至少 8 位");
+  if (password.length < passwordMinLength) {
+    return badRequest(`密码至少 ${passwordMinLength} 位`);
   }
   // Password complexity: must contain at least 2 of: uppercase, lowercase, digit, special char
   let complexityScore = 0;

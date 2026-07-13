@@ -680,6 +680,13 @@ export class ApiClient {
 
   // ── Settings ────────────────────────────────────────────
 
+  /** Public: Get public-facing settings (basic group, no auth needed). */
+  async getPublicSettings(): Promise<Record<string, string>> {
+    const res = await this.request<Record<string, string>>("/api/settings");
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
   /** Admin: Get all settings, optionally filtered by group. */
   async getSettings(group?: string): Promise<SettingItem[]> {
     const query = group ? `?group=${group}` : "";
