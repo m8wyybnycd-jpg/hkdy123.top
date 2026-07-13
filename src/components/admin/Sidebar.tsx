@@ -67,7 +67,7 @@ const secondaryNav: NavItem[] = [
 const linkBaseClass =
   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors";
 const linkActiveClass =
-  "bg-[#3b9eff]/15 text-[#3b9eff]";
+  "bg-aurora-cyan/15 text-aurora-cyan";
 const linkInactiveClass =
   "text-slate-400 hover:bg-white/5 hover:text-slate-200";
 
@@ -108,7 +108,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
       <aside
         className={`
           fixed top-0 left-0 z-40 flex h-screen w-60 flex-col
-          bg-[#1a1d2e] transition-transform duration-300
+          bg-game-darker transition-transform duration-300
           lg:translate-x-0
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
         `}
@@ -116,7 +116,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         {/* Logo / Brand */}
         <div className="flex h-16 items-center justify-between border-b border-white/5 px-5">
           <div className="flex items-center gap-2">
-            <Gamepad2 className="h-6 w-6 text-[#3b9eff]" />
+            <Gamepad2 className="h-6 w-6 text-aurora-cyan" />
             <span className="text-base font-bold text-white">云游戏后台</span>
           </div>
           {/* Mobile close button */}

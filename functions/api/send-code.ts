@@ -161,24 +161,18 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
     return serverError("数据库查询失败");
   }
 
-  // IP rate limit: max IP_RATE_LIMIT requests per IP in IP_WINDOW_MINUTES
+  // IP rate limit: count verification_codes *sent from this IP* in the window.
+  // Prevents anonymous bombing across many different target emails.
   const clientIP = getClientIP(context.request);
   if (clientIP) {
     try {
       const ipCutoff = new Date(Date.now() - IP_WINDOW_MINUTES * 60 * 1000).toISOString();
-      const ipResult = await DB.prepare(
-        "SELECT COUNT(*) as count FROM verification_codes WHERE created_at > ? AND EXISTS (SELECT 1 FROM login_logs WHERE login_logs.ip = ? AND login_logs.created_at > ?)"
-      )
-        .bind(ipCutoff, clientIP, ipCutoff)
-        .first();
-      // Simpler: just count codes created recently — we don't store IP on verification_codes
-      // Use a simpler check: count login_logs with this IP for rate limiting
       const ipCount = await DB.prepare(
-        "SELECT COUNT(*) as count FROM login_logs WHERE ip = ? AND created_at > ?"
+        "SELECT COUNT(*) as count FROM verification_codes WHERE ip = ? AND created_at > ?"
       )
         .bind(clientIP, ipCutoff)
         .first();
-      if ((ipCount?.count as number) >= 20) {
+      if ((ipCount?.count as number) >= IP_RATE_LIMIT) {
         return errorResponse(429, "请求过于频繁，请稍后再试", 429);
       }
     } catch {
@@ -191,12 +185,12 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   const expiresAt = new Date(now.getTime() + CODE_EXPIRY_MS).toISOString();
   const createdAt = now.toISOString();
 
-  // Store code in D1
+  // Store code in D1 (record sender IP for per-IP rate limiting)
   try {
     await DB.prepare(
-      "INSERT INTO verification_codes (email, code, expires_at, created_at, used) VALUES (?, ?, ?, ?, 0)"
+      "INSERT INTO verification_codes (email, code, expires_at, created_at, used, ip) VALUES (?, ?, ?, ?, 0, ?)"
     )
-      .bind(email, code, expiresAt, createdAt)
+      .bind(email, code, expiresAt, createdAt, clientIP ?? "")
       .run();
   } catch (err) {
     console.error("验证码存储失败:", err);

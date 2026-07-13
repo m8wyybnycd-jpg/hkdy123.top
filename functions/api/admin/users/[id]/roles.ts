@@ -4,6 +4,7 @@ import {
   badRequest,
   notFound,
   serverError,
+  forbidden,
 } from "../../../../lib/response";
 
 /**
@@ -102,6 +103,41 @@ export const onRequestPut = async (
     }
   } catch {
     return serverError("数据库查询失败");
+  }
+
+  // ── Privilege guard (prevents privilege escalation) ──
+  // Caller's roles come from the verified JWT injected by middleware.
+  const callerRoles = ((context.data.user as { roles?: string[] } | undefined)?.roles) ?? [];
+  const callerIsSuperAdmin = callerRoles.includes("super_admin");
+
+  // Determine whether the request assigns the super_admin role.
+  let isAssigningSuperAdmin = false;
+  if (roleIds.length > 0) {
+    const placeholders = roleIds.map(() => "?").join(",");
+    const superAdminRole = await DB.prepare(
+      `SELECT id FROM roles WHERE code = 'super_admin' AND id IN (${placeholders})`
+    )
+      .bind(...roleIds)
+      .first();
+    isAssigningSuperAdmin = !!superAdminRole;
+  }
+
+  // Only a super_admin may grant (or revoke) the super_admin role.
+  if (isAssigningSuperAdmin && !callerIsSuperAdmin) {
+    return forbidden("仅超级管理员可授予或撤销超级管理员角色");
+  }
+
+  // Non-super-admins cannot modify a user who currently holds super_admin.
+  if (!callerIsSuperAdmin) {
+    const targetIsSuperAdmin = await DB.prepare(
+      `SELECT 1 FROM user_roles ur JOIN roles r ON r.id = ur.role_id
+       WHERE ur.user_id = ? AND r.code = 'super_admin' LIMIT 1`
+    )
+      .bind(userId)
+      .first();
+    if (targetIsSuperAdmin) {
+      return forbidden("无权修改超级管理员用户");
+    }
   }
 
   // Full overwrite: DELETE existing + INSERT new (batch for atomicity)

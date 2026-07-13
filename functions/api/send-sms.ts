@@ -145,13 +145,14 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
     return serverError("数据库查询失败");
   }
 
-  // IP rate limit: prevent SMS bombing from a single IP
+  // IP rate limit: count verification_codes *sent from this IP* in the window.
+  // Prevents anonymous SMS bombing across many different target phones.
   const clientIP = getClientIP(context.request);
   if (clientIP) {
     try {
       const ipCutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
       const ipCount = await DB.prepare(
-        "SELECT COUNT(*) as count FROM login_logs WHERE ip = ? AND created_at > ?"
+        "SELECT COUNT(*) as count FROM verification_codes WHERE ip = ? AND created_at > ?"
       )
         .bind(clientIP, ipCutoff)
         .first();
@@ -168,12 +169,12 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   const expiresAt = new Date(now.getTime() + CODE_EXPIRY_MS).toISOString();
   const createdAt = now.toISOString();
 
-  // Store code in D1 — email column is empty string for SMS codes
+  // Store code in D1 — email column is empty string for SMS codes (record IP)
   try {
     await DB.prepare(
-      "INSERT INTO verification_codes (email, phone, code, expires_at, created_at, used) VALUES (?, ?, ?, ?, ?, 0)"
+      "INSERT INTO verification_codes (email, phone, code, expires_at, created_at, used, ip) VALUES (?, ?, ?, ?, ?, 0, ?)"
     )
-      .bind("", phone, code, expiresAt, createdAt)
+      .bind("", phone, code, expiresAt, createdAt, clientIP ?? "")
       .run();
   } catch (err) {
     console.error("验证码存储失败:", err);

@@ -104,7 +104,7 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   let codeRow: Record<string, unknown> | null;
   try {
     codeRow = await DB.prepare(
-      "SELECT id, code, expires_at, used FROM verification_codes WHERE phone = ? AND used = 0 ORDER BY created_at DESC LIMIT 1"
+      "SELECT id, code, expires_at, used, failed_attempts FROM verification_codes WHERE phone = ? AND used = 0 ORDER BY created_at DESC LIMIT 1"
     )
       .bind(phone)
       .first();
@@ -122,9 +122,33 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
     return badRequest("验证码已过期，请重新获取");
   }
 
-  // Check code match
+  // Check if max attempts exceeded (5 attempts per code)
+  const failedAttempts = (codeRow.failed_attempts as number) || 0;
+  if (failedAttempts >= 5) {
+    // Mark as used to prevent further attempts
+    await DB.prepare("UPDATE verification_codes SET used = 1 WHERE id = ?")
+      .bind(codeRow.id as number)
+      .run();
+    return badRequest("验证码错误次数过多，请重新获取");
+  }
+
+  // Constant-time comparison to prevent timing attacks
   const storedCode = codeRow.code as string;
-  if (storedCode !== code) {
+  const a = new TextEncoder().encode(storedCode);
+  const b = new TextEncoder().encode(code);
+  let codeDiff = 0;
+  const maxLen = Math.max(a.length, b.length);
+  for (let i = 0; i < maxLen; i++) {
+    codeDiff |= (a[i] ?? 0) ^ (b[i] ?? 0);
+  }
+  if (a.length !== b.length) codeDiff |= 1;
+  if (codeDiff !== 0) {
+    // Increment failed attempts
+    await DB.prepare(
+      "UPDATE verification_codes SET failed_attempts = failed_attempts + 1 WHERE id = ?"
+    )
+      .bind(codeRow.id as number)
+      .run();
     return badRequest("验证码不正确");
   }
 
@@ -213,7 +237,9 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   });
 
   // Set HttpOnly cookie with the JWT token
-  const cookieValue = `auth_token=${token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=604800`;
+  // __Host- prefix: forces Secure + Path=/ + no Domain (strongest origin-binding)
+  // SameSite=Strict: prevents CSRF (matches email-login / refresh / logout)
+  const cookieValue = `__Host-auth_token=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800`;
 
   const response = jsonResponse(
     {
