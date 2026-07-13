@@ -42,17 +42,17 @@ const MODULE_OPTIONS: { value: string; label: string }[] = [
 
 /** Action badge color mapping. */
 const ACTION_COLORS: Record<string, string> = {
-  create: "bg-green-50 text-green-500",
-  update: "bg-blue-50 text-blue-500",
-  delete: "bg-red-50 text-red-500",
+  create: "bg-green-500/15 text-green-400",
+  update: "bg-aurora-cyan/15 text-aurora-cyan",
+  delete: "bg-red-500/15 text-red-400",
   login: "bg-purple-50 text-purple-500",
-  logout: "bg-slate-100 text-slate-500",
+  logout: "bg-white/[0.10] text-slate-400",
 };
 
 /** Status badge color mapping for login logs. */
 const LOGIN_STATUS_COLORS: Record<string, string> = {
-  success: "bg-green-50 text-green-500",
-  fail: "bg-red-50 text-red-500",
+  success: "bg-green-500/15 text-green-400",
+  fail: "bg-red-500/15 text-red-400",
 };
 
 /**
@@ -71,11 +71,11 @@ export default function LogsPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-800">日志查看</h1>
+        <h1 className="text-xl font-bold text-slate-100">日志查看</h1>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-slate-200">
+      <div className="border-b border-white/10">
         <nav className="flex gap-6">
           {TABS.map((tab) => (
             <button
@@ -83,8 +83,8 @@ export default function LogsPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-1.5 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? "border-[#3b9eff] text-[#3b9eff]"
-                  : "border-transparent text-slate-500 hover:text-slate-700"
+                  ? "border-[#2EA7FF] text-[#2EA7FF]"
+                  : "border-transparent text-slate-400 hover:text-slate-200"
               }`}
             >
               <tab.icon className="h-4 w-4" />
@@ -174,12 +174,12 @@ function OperationLogsTab() {
     <div className="space-y-4">
       {/* Error Banner */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div className="flex items-center gap-2 rounded-lg border border-red-500/50/30 bg-red-500/15 px-4 py-3 text-sm text-red-400">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
           <button
             onClick={() => setError("")}
-            className="ml-auto text-red-400 hover:text-red-600"
+            className="ml-auto text-red-400 hover:text-red-400"
           >
             ✕
           </button>
@@ -196,13 +196,13 @@ function OperationLogsTab() {
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={handleSearchKeyDown}
             placeholder="搜索用户名..."
-            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-10 pr-4 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+            className="w-full rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-10 pr-4 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
           />
         </div>
         <select
           value={moduleFilter}
           onChange={(e) => handleModuleChange(e.target.value)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+          className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
         >
           {MODULE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -212,13 +212,13 @@ function OperationLogsTab() {
         </select>
         <button
           onClick={handleSearch}
-          className="rounded-lg bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8ae6]"
+          className="rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d8ad6]"
         >
           搜索
         </button>
         <button
           onClick={handleExport}
-          className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
         >
           <Download className="h-4 w-4" />
           导出CSV
@@ -226,18 +226,18 @@ function OperationLogsTab() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] shadow-[0_8px_32px_rgba(2,6,23,0.45)]">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="px-4 py-3 font-semibold text-slate-600">ID</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">用户</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">操作</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">模块</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">目标</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">IP</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">时间</th>
+              <tr className="border-b border-white/10 bg-white/[0.06]">
+                <th className="px-4 py-3 font-semibold text-slate-300">ID</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">用户</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">操作</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">模块</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">目标</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">IP</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">时间</th>
               </tr>
             </thead>
             <tbody>
@@ -257,21 +257,21 @@ function OperationLogsTab() {
                 data.list.map((log) => (
                   <tr
                     key={log.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                    className="border-b border-white/10 last:border-0 hover:bg-white/[0.08]"
                   >
-                    <td className="px-4 py-3 text-slate-500">{log.id}</td>
-                    <td className="px-4 py-3 text-slate-700">
+                    <td className="px-4 py-3 text-slate-400">{log.id}</td>
+                    <td className="px-4 py-3 text-slate-200">
                       {log.username ?? `用户#${log.userId ?? "?"}`}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${ACTION_COLORS[log.action] ?? "bg-slate-100 text-slate-500"}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${ACTION_COLORS[log.action] ?? "bg-white/[0.10] text-slate-400"}`}>
                         {log.action}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{log.module}</td>
-                    <td className="px-4 py-3 text-slate-500">{log.target ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-500">{log.ip ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-500">{formatDate(log.createdAt)}</td>
+                    <td className="px-4 py-3 text-slate-300">{log.module}</td>
+                    <td className="px-4 py-3 text-slate-400">{log.target ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-400">{log.ip ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-400">{formatDate(log.createdAt)}</td>
                   </tr>
                 ))
               )}
@@ -281,7 +281,7 @@ function OperationLogsTab() {
 
         {/* Pagination */}
         {data && data.total > 0 && (
-          <div className="flex items-center justify-between border-t border-slate-200 px-4 py-3">
+          <div className="flex items-center justify-between border-t border-white/10 px-4 py-3">
             <p className="text-xs text-slate-400">
               共 {data.total} 条记录，第 {data.page}/{totalPages} 页
             </p>
@@ -289,15 +289,15 @@ function OperationLogsTab() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 上一页
               </button>
-              <span className="text-sm text-slate-600">{page}</span>
+              <span className="text-sm text-slate-300">{page}</span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 下一页
               </button>
@@ -370,12 +370,12 @@ function LoginLogsTab() {
     <div className="space-y-4">
       {/* Error Banner */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div className="flex items-center gap-2 rounded-lg border border-red-500/50/30 bg-red-500/15 px-4 py-3 text-sm text-red-400">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
           <button
             onClick={() => setError("")}
-            className="ml-auto text-red-400 hover:text-red-600"
+            className="ml-auto text-red-400 hover:text-red-400"
           >
             ✕
           </button>
@@ -392,18 +392,18 @@ function LoginLogsTab() {
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={handleSearchKeyDown}
             placeholder="搜索用户名..."
-            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-10 pr-4 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+            className="w-full rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-10 pr-4 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
           />
         </div>
         <button
           onClick={handleSearch}
-          className="rounded-lg bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8ae6]"
+          className="rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d8ad6]"
         >
           搜索
         </button>
         <button
           onClick={handleExport}
-          className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
         >
           <Download className="h-4 w-4" />
           导出CSV
@@ -411,17 +411,17 @@ function LoginLogsTab() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] shadow-[0_8px_32px_rgba(2,6,23,0.45)]">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="px-4 py-3 font-semibold text-slate-600">ID</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">用户</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">状态</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">方式</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">IP</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">时间</th>
+              <tr className="border-b border-white/10 bg-white/[0.06]">
+                <th className="px-4 py-3 font-semibold text-slate-300">ID</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">用户</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">状态</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">方式</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">IP</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">时间</th>
               </tr>
             </thead>
             <tbody>
@@ -441,22 +441,22 @@ function LoginLogsTab() {
                 data.list.map((log) => (
                   <tr
                     key={log.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                    className="border-b border-white/10 last:border-0 hover:bg-white/[0.08]"
                   >
-                    <td className="px-4 py-3 text-slate-500">{log.id}</td>
-                    <td className="px-4 py-3 text-slate-700">
+                    <td className="px-4 py-3 text-slate-400">{log.id}</td>
+                    <td className="px-4 py-3 text-slate-200">
                       {log.username ?? `用户#${log.userId ?? "?"}`}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${LOGIN_STATUS_COLORS[log.status] ?? "bg-slate-100 text-slate-500"}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${LOGIN_STATUS_COLORS[log.status] ?? "bg-white/[0.10] text-slate-400"}`}>
                         {log.status === "success" ? "成功" : "失败"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
+                    <td className="px-4 py-3 text-slate-300">
                       {log.method === "email" ? "邮箱" : log.method === "sms" ? "短信" : log.method ?? "—"}
                     </td>
-                    <td className="px-4 py-3 text-slate-500">{log.ip ?? "—"}</td>
-                    <td className="px-4 py-3 text-slate-500">{formatDate(log.createdAt)}</td>
+                    <td className="px-4 py-3 text-slate-400">{log.ip ?? "—"}</td>
+                    <td className="px-4 py-3 text-slate-400">{formatDate(log.createdAt)}</td>
                   </tr>
                 ))
               )}
@@ -466,7 +466,7 @@ function LoginLogsTab() {
 
         {/* Pagination */}
         {data && data.total > 0 && (
-          <div className="flex items-center justify-between border-t border-slate-200 px-4 py-3">
+          <div className="flex items-center justify-between border-t border-white/10 px-4 py-3">
             <p className="text-xs text-slate-400">
               共 {data.total} 条记录，第 {data.page}/{totalPages} 页
             </p>
@@ -474,15 +474,15 @@ function LoginLogsTab() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 上一页
               </button>
-              <span className="text-sm text-slate-600">{page}</span>
+              <span className="text-sm text-slate-300">{page}</span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 下一页
               </button>

@@ -133,12 +133,12 @@ export default function BannersPage() {
     <div className="space-y-4">
       {/* Error Banner */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div className="flex items-center gap-2 rounded-lg border border-red-500/50/30 bg-red-500/15 px-4 py-3 text-sm text-red-400">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
           <button
             onClick={() => setError("")}
-            className="ml-auto text-red-400 hover:text-red-600"
+            className="ml-auto text-red-400 hover:text-red-400"
             aria-label="关闭错误提示"
           >
             <X className="h-4 w-4" />
@@ -148,11 +148,11 @@ export default function BannersPage() {
 
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-800">轮播图管理</h1>
+        <h1 className="text-xl font-bold text-slate-100">轮播图管理</h1>
         <HasPermission code="banner:write">
           <button
             onClick={handleOpenCreate}
-            className="flex items-center gap-1.5 rounded-lg bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8ae6]"
+            className="flex items-center gap-1.5 rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d8ad6]"
           >
             <Plus className="h-4 w-4" />
             新建轮播图
@@ -173,12 +173,12 @@ export default function BannersPage() {
               onKeyDown={handleSearchKeyDown}
               placeholder="搜索标题…"
               aria-label="搜索轮播图"
-              className="w-48 rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-3 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+              className="w-48 rounded-lg border border-white/10 bg-white/[0.04] py-1.5 pl-8 pr-3 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
             />
           </div>
           <button
             onClick={handleSearch}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+            className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-slate-300 hover:bg-white/[0.08]"
           >
             搜索
           </button>
@@ -192,8 +192,8 @@ export default function BannersPage() {
               onClick={() => handleStatusFilterChange(opt.value)}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                 statusFilter === opt.value
-                  ? "bg-[#3b9eff] text-white"
-                  : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  ? "bg-[#2EA7FF] text-white"
+                  : "border border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]"
               }`}
             >
               {opt.label}
@@ -203,18 +203,18 @@ export default function BannersPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] shadow-[0_8px_32px_rgba(2,6,23,0.45)]">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="px-4 py-3 font-semibold text-slate-600">ID</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">图片</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">标题</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">状态</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">排序</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">创建时间</th>
-                <th className="px-4 py-3 text-right font-semibold text-slate-600">操作</th>
+              <tr className="border-b border-white/10 bg-white/[0.06]">
+                <th className="px-4 py-3 font-semibold text-slate-300">ID</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">图片</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">标题</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">状态</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">排序</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">创建时间</th>
+                <th className="px-4 py-3 text-right font-semibold text-slate-300">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -234,11 +234,11 @@ export default function BannersPage() {
                 data.list.map((banner) => (
                   <tr
                     key={banner.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                    className="border-b border-white/10 last:border-0 hover:bg-white/[0.08]"
                   >
-                    <td className="px-4 py-3 text-slate-500">{banner.id}</td>
+                    <td className="px-4 py-3 text-slate-400">{banner.id}</td>
                     <td className="px-4 py-3">
-                      <div className="h-10 w-16 overflow-hidden rounded border border-slate-200 bg-slate-100">
+                      <div className="h-10 w-16 overflow-hidden rounded border border-white/10 bg-white/[0.10]">
                         {banner.imageUrl ? (
                           <img
                             src={banner.imageUrl}
@@ -256,7 +256,7 @@ export default function BannersPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="font-medium text-slate-700">{banner.title}</span>
+                      <span className="font-medium text-slate-200">{banner.title}</span>
                       {banner.linkUrl && (
                         <span className="ml-1 text-xs text-slate-400">
                           → {banner.linkUrl}
@@ -267,15 +267,15 @@ export default function BannersPage() {
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                           banner.isActive === 1
-                            ? "bg-green-50 text-green-500"
-                            : "bg-slate-100 text-slate-500"
+                            ? "bg-green-500/15 text-green-400"
+                            : "bg-white/[0.10] text-slate-400"
                         }`}
                       >
                         {banner.isActive === 1 ? "启用" : "禁用"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{banner.sortOrder}</td>
-                    <td className="px-4 py-3 text-slate-500">{formatDate(banner.createdAt)}</td>
+                    <td className="px-4 py-3 text-slate-300">{banner.sortOrder}</td>
+                    <td className="px-4 py-3 text-slate-400">{formatDate(banner.createdAt)}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
                         <HasPermission code="banner:write">
@@ -286,8 +286,8 @@ export default function BannersPage() {
                             aria-label={banner.isActive === 1 ? "禁用" : "启用"}
                             className={`flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium disabled:opacity-50 ${
                               banner.isActive === 1
-                                ? "text-green-500 hover:bg-green-50"
-                                : "text-slate-400 hover:bg-slate-100"
+                                ? "text-green-400 hover:bg-green-500/10"
+                                : "text-slate-400 hover:bg-white/[0.10]"
                             }`}
                           >
                             {banner.isActive === 1 ? (
@@ -298,7 +298,7 @@ export default function BannersPage() {
                           </button>
                           <button
                             onClick={() => handleOpenEdit(banner)}
-                            className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100"
+                            className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/[0.10]"
                             aria-label="编辑"
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -307,7 +307,7 @@ export default function BannersPage() {
                           <button
                             onClick={() => setDeleteTarget(banner)}
                             disabled={actionLoading === banner.id}
-                            className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-red-500 hover:bg-red-50 disabled:opacity-50"
+                            className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 disabled:opacity-50"
                             aria-label="删除"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -325,7 +325,7 @@ export default function BannersPage() {
 
         {/* Pagination */}
         {data && data.total > 0 && (
-          <div className="flex items-center justify-between border-t border-slate-200 px-4 py-3">
+          <div className="flex items-center justify-between border-t border-white/10 px-4 py-3">
             <p className="text-xs text-slate-400">
               共 {data.total} 条记录，第 {data.page}/{totalPages} 页
             </p>
@@ -333,15 +333,15 @@ export default function BannersPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 上一页
               </button>
-              <span className="text-sm text-slate-600">{page}</span>
+              <span className="text-sm text-slate-300">{page}</span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 下一页
               </button>
@@ -366,30 +366,30 @@ export default function BannersPage() {
             role="dialog"
             aria-modal="true"
             aria-label="确认删除轮播图"
-            className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl"
+            className="w-full max-w-sm rounded-lg bg-white/[0.04] p-6 shadow-[0_20px_60px_rgba(2,6,23,0.6)]"
           >
             <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/15">
+                <AlertTriangle className="h-5 w-5 text-red-400" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-800">确认删除</h3>
+              <h3 className="text-lg font-semibold text-slate-100">确认删除</h3>
             </div>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-400">
               确定要删除轮播图{" "}
-              <span className="font-medium text-slate-700">{deleteTarget.title}</span>{" "}
+              <span className="font-medium text-slate-200">{deleteTarget.title}</span>{" "}
               吗？此操作不可撤销。
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+                className="rounded-md border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/[0.08]"
               >
                 取消
               </button>
               <button
                 onClick={handleDelete}
                 disabled={actionLoading === deleteTarget.id}
-                className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-50"
+                className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
               >
                 {actionLoading === deleteTarget.id ? "删除中…" : "确认删除"}
               </button>

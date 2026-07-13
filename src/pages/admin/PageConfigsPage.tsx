@@ -179,7 +179,7 @@ export default function PageConfigsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-bold text-white">
-            <LayoutTemplate className="h-5 w-5 text-neon-blue" />
+            <LayoutTemplate className="h-5 w-5 text-aurora-cyan" />
             页面配置管理
           </h1>
           <p className="mt-1 text-sm text-slate-400">
@@ -188,7 +188,7 @@ export default function PageConfigsPage() {
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-1.5 rounded-lg bg-neon-blue px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neon-blue/80"
+          className="flex items-center gap-1.5 rounded-lg bg-aurora-cyan px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-aurora-cyan/80"
         >
           <Plus className="h-4 w-4" />
           新增配置
@@ -205,7 +205,7 @@ export default function PageConfigsPage() {
 
       {/* Error message */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+        <div className="flex items-center gap-2 rounded-lg border border-red-500/50/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
           <AlertCircle className="h-4 w-4 shrink-0" />
           {error}
         </div>
@@ -214,14 +214,14 @@ export default function PageConfigsPage() {
       {/* Loading state */}
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-600 border-t-neon-blue" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-aurora-cyan" />
         </div>
       ) : (
         /* Config table */
         <div className="overflow-hidden rounded-xl border border-white/5 bg-[#1a1d2e]">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+              <tr className="border-b border-white/5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
                 <th className="px-4 py-3">页面标识</th>
                 <th className="px-4 py-3">页面名称</th>
                 <th className="px-4 py-3">标题</th>
@@ -233,7 +233,7 @@ export default function PageConfigsPage() {
             <tbody>
               {configs.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-slate-500">
+                  <td colSpan={6} className="px-4 py-12 text-center text-slate-400">
                     暂无页面配置数据
                   </td>
                 </tr>
@@ -243,10 +243,10 @@ export default function PageConfigsPage() {
                   .map((config) => (
                     <tr
                       key={config.page_key}
-                      className="border-b border-white/5 transition-colors last:border-0 hover:bg-white/[0.02]"
+                      className="border-b border-white/5 transition-colors last:border-0 hover:bg-white/[0.08]"
                     >
                       <td className="px-4 py-3">
-                        <code className="rounded bg-white/5 px-1.5 py-0.5 text-xs text-slate-400">
+                        <code className="rounded bg-white/[0.04]/5 px-1.5 py-0.5 text-xs text-slate-400">
                           {config.page_key}
                         </code>
                       </td>
@@ -261,13 +261,13 @@ export default function PageConfigsPage() {
                           onClick={() => handleToggleEnabled(config)}
                           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                             config.is_enabled
-                              ? "bg-green-500/10 text-green-400 hover:bg-green-500/20"
-                              : "bg-slate-500/10 text-slate-500 hover:bg-slate-500/20"
+                              ? "bg-green-500/10 text-green-400 hover:bg-green-500/100/20"
+                              : "bg-white/[0.20]/10 text-slate-400 hover:bg-white/[0.20]/20"
                           }`}
                         >
                           <span
                             className={`h-1.5 w-1.5 rounded-full ${
-                              config.is_enabled ? "bg-green-400" : "bg-slate-500"
+                              config.is_enabled ? "bg-green-400" : "bg-white/[0.20]"
                             }`}
                           />
                           {config.is_enabled ? "启用" : "禁用"}
@@ -277,7 +277,7 @@ export default function PageConfigsPage() {
                       <td className="px-4 py-3 text-right">
                         <button
                           onClick={() => handleEdit(config)}
-                          className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-neon-blue transition-colors hover:bg-neon-blue/10"
+                          className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-aurora-cyan transition-colors hover:bg-aurora-cyan/10"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                           编辑
@@ -316,7 +316,7 @@ export default function PageConfigsPage() {
               <button
                 onClick={() => !saving && setEditing(null)}
                 aria-label="关闭"
-                className="rounded-md p-1 text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+                className="rounded-md p-1 text-slate-400 transition-colors hover:bg-white/[0.04]/5 hover:text-white"
                 disabled={saving}
               >
                 <X className="h-5 w-5" />
@@ -327,7 +327,7 @@ export default function PageConfigsPage() {
             <div className="space-y-5 px-5 py-5">
               {/* Section: Basic info */}
               <div className="space-y-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   基础信息
                 </h3>
 
@@ -344,7 +344,7 @@ export default function PageConfigsPage() {
                     }
                     disabled={!isNew}
                     placeholder="如 cloud-games"
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full rounded-lg border border-white/10 bg-white/[0.04]/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-aurora-cyan/50 disabled:cursor-not-allowed disabled:opacity-50"
                   />
                 </div>
 
@@ -360,7 +360,7 @@ export default function PageConfigsPage() {
                       setEditing({ ...editing, page_name: e.target.value })
                     }
                     placeholder="如 云游戏"
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
+                    className="w-full rounded-lg border border-white/10 bg-white/[0.04]/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-aurora-cyan/50"
                   />
                 </div>
 
@@ -374,7 +374,7 @@ export default function PageConfigsPage() {
                       }
                       aria-label={editing.is_enabled ? "禁用" : "启用"}
                       className={`relative h-6 w-11 rounded-full transition-colors ${
-                        editing.is_enabled ? "bg-green-500" : "bg-slate-600"
+                        editing.is_enabled ? "bg-green-500" : "bg-white/[0.25]"
                       }`}
                     >
                       <span
@@ -397,7 +397,7 @@ export default function PageConfigsPage() {
                           sort_order: parseInt(e.target.value) || 0,
                         })
                       }
-                      className="w-24 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
+                      className="w-24 rounded-lg border border-white/10 bg-white/[0.04]/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-aurora-cyan/50"
                     />
                   </div>
                 </div>
@@ -405,7 +405,7 @@ export default function PageConfigsPage() {
 
               {/* Section: Hero text */}
               <div className="space-y-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   Hero 文案
                 </h3>
 
@@ -418,7 +418,7 @@ export default function PageConfigsPage() {
                       setEditing({ ...editing, title: e.target.value })
                     }
                     placeholder="如 不用高配电脑，也能畅玩 3A 大作"
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
+                    className="w-full rounded-lg border border-white/10 bg-white/[0.04]/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-aurora-cyan/50"
                   />
                 </div>
 
@@ -433,7 +433,7 @@ export default function PageConfigsPage() {
                       setEditing({ ...editing, subtitle: e.target.value })
                     }
                     placeholder="如 汇聚各大云游戏平台"
-                    className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
+                    className="w-full rounded-lg border border-white/10 bg-white/[0.04]/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-aurora-cyan/50"
                   />
                 </div>
 
@@ -448,14 +448,14 @@ export default function PageConfigsPage() {
                     }
                     rows={2}
                     placeholder="页面描述（可选）"
-                    className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
+                    className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.04]/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-aurora-cyan/50"
                   />
                 </div>
               </div>
 
               {/* Section: Custom params */}
               <div className="space-y-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                   自定义参数 (JSON)
                 </h3>
                 <textarea
@@ -465,9 +465,9 @@ export default function PageConfigsPage() {
                   }
                   rows={4}
                   placeholder='{"key": "value"}'
-                  className="w-full resize-none rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs text-slate-200 outline-none transition-colors focus:border-neon-blue/50"
+                  className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.04]/5 px-3 py-2 font-mono text-xs text-slate-200 outline-none transition-colors focus:border-aurora-cyan/50"
                 />
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-400">
                   JSON 格式的自定义参数，预留扩展用途
                 </p>
               </div>
@@ -478,14 +478,14 @@ export default function PageConfigsPage() {
               <button
                 onClick={() => setEditing(null)}
                 disabled={saving}
-                className="rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200 disabled:opacity-50"
+                className="rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-400 transition-colors hover:bg-white/[0.04]/5 hover:text-slate-200 disabled:opacity-50"
               >
                 取消
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-1.5 rounded-lg bg-neon-blue px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neon-blue/80 disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-aurora-cyan px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-aurora-cyan/80 disabled:opacity-50"
               >
                 {saving ? (
                   <>

@@ -39,14 +39,14 @@ const TYPE_OPTIONS: { value: AnnouncementType; label: string }[] = [
 
 /** Status badge style mapping. */
 const STATUS_BADGES: Record<number, { label: string; className: string }> = {
-  0: { label: "草稿", className: "bg-slate-100 text-slate-500" },
-  1: { label: "已发布", className: "bg-green-50 text-green-500" },
-  2: { label: "已归档", className: "bg-amber-50 text-amber-500" },
+  0: { label: "草稿", className: "bg-white/[0.10] text-slate-400" },
+  1: { label: "已发布", className: "bg-green-500/15 text-green-400" },
+  2: { label: "已归档", className: "bg-amber-500/15 text-amber-400" },
 };
 
 /** Type badge style mapping. */
 const TYPE_BADGES: Record<string, string> = {
-  notice: "bg-blue-50 text-blue-500",
+  notice: "bg-aurora-cyan/15 text-aurora-cyan",
   announcement: "bg-purple-50 text-purple-500",
   maintenance: "bg-orange-50 text-orange-500",
 };
@@ -127,12 +127,12 @@ export default function AnnouncementsPage() {
     <div className="space-y-4">
       {/* Error Banner */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div className="flex items-center gap-2 rounded-lg border border-red-500/50/30 bg-red-500/15 px-4 py-3 text-sm text-red-400">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
           <button
             onClick={() => setError("")}
-            className="ml-auto text-red-400 hover:text-red-600"
+            className="ml-auto text-red-400 hover:text-red-400"
             aria-label="关闭错误提示"
           >
             ✕
@@ -142,11 +142,11 @@ export default function AnnouncementsPage() {
 
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-800">公告管理</h1>
+        <h1 className="text-xl font-bold text-slate-100">公告管理</h1>
         <HasPermission code="announcement:manage">
           <button
             onClick={handleOpenCreate}
-            className="flex items-center gap-1.5 rounded-lg bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8ae6]"
+            className="flex items-center gap-1.5 rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d8ad6]"
           >
             <Plus className="h-4 w-4" />
             新建公告
@@ -162,8 +162,8 @@ export default function AnnouncementsPage() {
             onClick={() => handleStatusFilterChange(opt.value)}
             className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
               statusFilter === opt.value
-                ? "bg-[#3b9eff] text-white"
-                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                ? "bg-[#2EA7FF] text-white"
+                : "border border-white/10 bg-white/[0.04] text-slate-300 hover:bg-white/[0.08]"
             }`}
           >
             {opt.label}
@@ -172,18 +172,18 @@ export default function AnnouncementsPage() {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] shadow-[0_8px_32px_rgba(2,6,23,0.45)]">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="px-4 py-3 font-semibold text-slate-600">ID</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">标题</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">类型</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">状态</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">排序</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">创建时间</th>
-                <th className="px-4 py-3 text-right font-semibold text-slate-600">操作</th>
+              <tr className="border-b border-white/10 bg-white/[0.06]">
+                <th className="px-4 py-3 font-semibold text-slate-300">ID</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">标题</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">类型</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">状态</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">排序</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">创建时间</th>
+                <th className="px-4 py-3 text-right font-semibold text-slate-300">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -203,33 +203,33 @@ export default function AnnouncementsPage() {
                 data.list.map((ann) => (
                   <tr
                     key={ann.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                    className="border-b border-white/10 last:border-0 hover:bg-white/[0.08]"
                   >
-                    <td className="px-4 py-3 text-slate-500">{ann.id}</td>
+                    <td className="px-4 py-3 text-slate-400">{ann.id}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <Megaphone className="h-4 w-4 text-slate-400 shrink-0" />
-                        <span className="font-medium text-slate-700">{ann.title}</span>
+                        <span className="font-medium text-slate-200">{ann.title}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_BADGES[ann.type] ?? "bg-slate-100 text-slate-500"}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${TYPE_BADGES[ann.type] ?? "bg-white/[0.10] text-slate-400"}`}>
                         {TYPE_OPTIONS.find((t) => t.value === ann.type)?.label ?? ann.type}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGES[ann.status]?.className ?? "bg-slate-100 text-slate-500"}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGES[ann.status]?.className ?? "bg-white/[0.10] text-slate-400"}`}>
                         {STATUS_BADGES[ann.status]?.label ?? "未知"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{ann.sortOrder}</td>
-                    <td className="px-4 py-3 text-slate-500">{formatDate(ann.createdAt)}</td>
+                    <td className="px-4 py-3 text-slate-300">{ann.sortOrder}</td>
+                    <td className="px-4 py-3 text-slate-400">{formatDate(ann.createdAt)}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
                         <HasPermission code="announcement:manage">
                           <button
                             onClick={() => handleOpenEdit(ann)}
-                            className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100"
+                            className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:bg-white/[0.10]"
                             aria-label="编辑"
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -238,7 +238,7 @@ export default function AnnouncementsPage() {
                           <button
                             onClick={() => setDeleteTarget(ann)}
                             disabled={actionLoading === ann.id}
-                            className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-red-500 hover:bg-red-50 disabled:opacity-50"
+                            className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 disabled:opacity-50"
                             aria-label="删除"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -256,7 +256,7 @@ export default function AnnouncementsPage() {
 
         {/* Pagination */}
         {data && data.total > 0 && (
-          <div className="flex items-center justify-between border-t border-slate-200 px-4 py-3">
+          <div className="flex items-center justify-between border-t border-white/10 px-4 py-3">
             <p className="text-xs text-slate-400">
               共 {data.total} 条记录，第 {data.page}/{totalPages} 页
             </p>
@@ -264,15 +264,15 @@ export default function AnnouncementsPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 上一页
               </button>
-              <span className="text-sm text-slate-600">{page}</span>
+              <span className="text-sm text-slate-300">{page}</span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 下一页
               </button>
@@ -297,30 +297,30 @@ export default function AnnouncementsPage() {
             role="dialog"
             aria-modal="true"
             aria-label="确认删除公告"
-            className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl"
+            className="w-full max-w-sm rounded-lg bg-white/[0.04] p-6 shadow-[0_20px_60px_rgba(2,6,23,0.6)]"
           >
             <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/15">
+                <AlertTriangle className="h-5 w-5 text-red-400" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-800">确认删除</h3>
+              <h3 className="text-lg font-semibold text-slate-100">确认删除</h3>
             </div>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-400">
               确定要删除公告{" "}
-              <span className="font-medium text-slate-700">{deleteTarget.title}</span>{" "}
+              <span className="font-medium text-slate-200">{deleteTarget.title}</span>{" "}
               吗？此操作不可撤销。
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+                className="rounded-md border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/[0.08]"
               >
                 取消
               </button>
               <button
                 onClick={handleDelete}
                 disabled={actionLoading === deleteTarget.id}
-                className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-50"
+                className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
               >
                 {actionLoading === deleteTarget.id ? "删除中…" : "确认删除"}
               </button>
@@ -426,17 +426,17 @@ function AnnouncementEditModal({
         role="dialog"
         aria-modal="true"
         aria-label={isEdit ? "编辑公告" : "新建公告"}
-        className="w-full max-w-lg rounded-lg bg-white shadow-xl"
+        className="w-full max-w-lg rounded-lg bg-white/[0.04] shadow-[0_20px_60px_rgba(2,6,23,0.6)]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-          <h3 className="text-lg font-semibold text-slate-800">
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <h3 className="text-lg font-semibold text-slate-100">
             {isEdit ? "编辑公告" : "新建公告"}
           </h3>
           <button
             onClick={onClose}
             aria-label="关闭"
-            className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-md p-1 text-slate-400 hover:bg-white/[0.10] hover:text-slate-300"
           >
             <X className="h-5 w-5" />
           </button>
@@ -445,32 +445,32 @@ function AnnouncementEditModal({
         {/* Body */}
         <div className="space-y-4 px-6 py-5">
           {error && (
-            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+            <div className="rounded-md border border-red-500/50/30 bg-red-500/15 px-3 py-2 text-sm text-red-400">
               {error}
             </div>
           )}
 
           {/* Title */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              公告标题 <span className="text-red-500">*</span>
+            <label className="mb-1 block text-sm font-medium text-slate-200">
+              公告标题 <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="请输入公告标题"
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
             />
           </div>
 
           {/* Type */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">类型</label>
+            <label className="mb-1 block text-sm font-medium text-slate-200">类型</label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value as AnnouncementType)}
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
             >
               {TYPE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -482,25 +482,25 @@ function AnnouncementEditModal({
 
           {/* Content */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              公告内容 <span className="text-red-500">*</span>
+            <label className="mb-1 block text-sm font-medium text-slate-200">
+              公告内容 <span className="text-red-400">*</span>
             </label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="请输入公告内容"
               rows={5}
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
             />
           </div>
 
           {/* Status */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">状态</label>
+            <label className="mb-1 block text-sm font-medium text-slate-200">状态</label>
             <select
               value={status}
               onChange={(e) => setStatus(Number(e.target.value) as AnnouncementStatus)}
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
             >
               <option value={0}>草稿</option>
               <option value={1}>已发布</option>
@@ -510,30 +510,30 @@ function AnnouncementEditModal({
 
           {/* Sort Order */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">排序值</label>
+            <label className="mb-1 block text-sm font-medium text-slate-200">排序值</label>
             <input
               type="number"
               value={sortOrder}
               onChange={(e) => setSortOrder(Number(e.target.value) || 0)}
               placeholder="0"
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
             />
             <p className="mt-1 text-xs text-slate-400">数值越大越靠前显示</p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-4">
+        <div className="flex justify-end gap-3 border-t border-white/10 px-6 py-4">
           <button
             onClick={onClose}
-            className="rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+            className="rounded-md border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/[0.08]"
           >
             取消
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="rounded-md bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8ae6] disabled:opacity-50"
+            className="rounded-md bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d8ad6] disabled:opacity-50"
           >
             {loading ? "保存中…" : "保存"}
           </button>

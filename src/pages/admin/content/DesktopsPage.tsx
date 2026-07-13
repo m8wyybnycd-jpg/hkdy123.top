@@ -41,9 +41,9 @@ function FormField({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-sm font-medium text-slate-600">
+      <label className="mb-1.5 block text-sm font-medium text-slate-300">
         {label}
-        {required && <span className="ml-0.5 text-red-500">*</span>}
+        {required && <span className="ml-0.5 text-red-400">*</span>}
       </label>
       {children}
     </div>
@@ -168,19 +168,19 @@ export default function DesktopsPage() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="搜索名称..."
             aria-label="搜索云电脑"
-            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-10 pr-4 text-sm text-slate-700 placeholder-slate-400 focus:border-[#3b9eff] focus:outline-none focus:ring-1 focus:ring-[#3b9eff]"
+            className="w-full rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-10 pr-4 text-sm text-slate-200 placeholder-slate-400 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
           />
         </div>
         <button
           onClick={fetchList}
-          className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
         >
           <RefreshCw className="h-4 w-4" />
           刷新
         </button>
         <button
           onClick={openCreate}
-          className="flex items-center gap-1.5 rounded-lg bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8aef]"
+          className="flex items-center gap-1.5 rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8aef]"
         >
           <Plus className="h-4 w-4" />
           新增
@@ -188,51 +188,51 @@ export default function DesktopsPage() {
       </div>
 
       {error && (
-        <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
+        <div className="rounded-lg bg-red-500/15 px-4 py-3 text-sm text-red-400">{error}</div>
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-xl border border-slate-100 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-white/10 bg-white/[0.04] shadow-[0_8px_32px_rgba(2,6,23,0.45)]">
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b border-slate-100 bg-slate-50">
-              <th className="px-4 py-3 font-semibold text-slate-600">ID</th>
-              <th className="px-4 py-3 font-semibold text-slate-600">名称</th>
-              <th className="px-4 py-3 font-semibold text-slate-600">价格区间</th>
-              <th className="px-4 py-3 font-semibold text-slate-600">使用场景</th>
-              <th className="px-4 py-3 font-semibold text-slate-600">活动</th>
-              <th className="px-4 py-3 text-right font-semibold text-slate-600">操作</th>
+            <tr className="border-b border-white/10 bg-white/[0.06]">
+              <th className="px-4 py-3 font-semibold text-slate-300">ID</th>
+              <th className="px-4 py-3 font-semibold text-slate-300">名称</th>
+              <th className="px-4 py-3 font-semibold text-slate-300">价格区间</th>
+              <th className="px-4 py-3 font-semibold text-slate-300">使用场景</th>
+              <th className="px-4 py-3 font-semibold text-slate-300">活动</th>
+              <th className="px-4 py-3 text-right font-semibold text-slate-300">操作</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
                 <td colSpan={6} className="px-4 py-12 text-center">
-                  <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-slate-200 border-t-[#3b9eff]" />
+                  <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-white/10 border-t-[#2EA7FF]" />
                 </td>
               </tr>
             ) : filtered.length > 0 ? (
               filtered.map((item) => (
-                <tr key={item.id} className="border-b border-slate-50 hover:bg-slate-50/50">
-                  <td className="px-4 py-3 text-slate-500">{item.id}</td>
-                  <td className="px-4 py-3 font-medium text-slate-700">{item.name}</td>
-                  <td className="px-4 py-3 text-slate-600">{item.priceRange}</td>
-                  <td className="px-4 py-3 text-slate-600">
+                <tr key={item.id} className="border-b border-white/10 hover:bg-white/[0.08]/50">
+                  <td className="px-4 py-3 text-slate-400">{item.id}</td>
+                  <td className="px-4 py-3 font-medium text-slate-200">{item.name}</td>
+                  <td className="px-4 py-3 text-slate-300">{item.priceRange}</td>
+                  <td className="px-4 py-3 text-slate-300">
                     {item.scenarios?.join("、") || "—"}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{item.activity || "—"}</td>
+                  <td className="px-4 py-3 text-slate-300">{item.activity || "—"}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => openEdit(item)}
-                        className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-[#3b9eff] hover:bg-[#3b9eff]/10"
+                        className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-[#2EA7FF] hover:bg-[#2EA7FF]/10"
                       >
                         <Edit2 className="h-3.5 w-3.5" />
                         编辑
                       </button>
                       <button
                         onClick={() => setDeleteTarget(item)}
-                        className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-red-500 hover:bg-red-50"
+                        className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-red-400 hover:bg-red-500/10"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                         删除
@@ -260,13 +260,13 @@ export default function DesktopsPage() {
             role="dialog"
             aria-modal="true"
             aria-label={editing ? "编辑云电脑" : "新增云电脑"}
-            className="flex h-full w-full max-w-md flex-col bg-white shadow-xl"
+            className="flex h-full w-full max-w-md flex-col bg-white/[0.04] shadow-[0_20px_60px_rgba(2,6,23,0.6)]"
           >
-            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-              <h3 className="text-base font-semibold text-slate-800">
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+              <h3 className="text-base font-semibold text-slate-100">
                 {editing ? "编辑云电脑" : "新增云电脑"}
               </h3>
-              <button onClick={() => setDrawerOpen(false)} aria-label="关闭" className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100">
+              <button onClick={() => setDrawerOpen(false)} aria-label="关闭" className="rounded-lg p-1.5 text-slate-400 hover:bg-white/[0.10]">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -277,7 +277,7 @@ export default function DesktopsPage() {
                   value={form.id ?? ""}
                   onChange={(e) => setForm({ ...form, id: e.target.value })}
                   disabled={!!editing}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-[#3b9eff] focus:outline-none focus:ring-1 focus:ring-[#3b9eff] disabled:bg-slate-50 disabled:text-slate-400"
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF] disabled:bg-white/[0.06] disabled:text-slate-400"
                   placeholder="如: dalong"
                 />
               </FormField>
@@ -286,7 +286,7 @@ export default function DesktopsPage() {
                   type="text"
                   value={form.name ?? ""}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-[#3b9eff] focus:outline-none focus:ring-1 focus:ring-[#3b9eff]"
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
                   placeholder="显示名称"
                 />
               </FormField>
@@ -295,7 +295,7 @@ export default function DesktopsPage() {
                   type="url"
                   value={form.url ?? ""}
                   onChange={(e) => setForm({ ...form, url: e.target.value })}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-[#3b9eff] focus:outline-none focus:ring-1 focus:ring-[#3b9eff]"
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
                   placeholder="https://..."
                 />
               </FormField>
@@ -304,7 +304,7 @@ export default function DesktopsPage() {
                   value={form.desc ?? ""}
                   onChange={(e) => setForm({ ...form, desc: e.target.value })}
                   rows={3}
-                  className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-[#3b9eff] focus:outline-none focus:ring-1 focus:ring-[#3b9eff]"
+                  className="w-full resize-none rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
                   placeholder="简短描述"
                 />
               </FormField>
@@ -313,7 +313,7 @@ export default function DesktopsPage() {
                   type="text"
                   value={scenariosInput}
                   onChange={(e) => setScenariosInput(e.target.value)}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-[#3b9eff] focus:outline-none focus:ring-1 focus:ring-[#3b9eff]"
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
                   placeholder="如: 办公, 设计, 游戏"
                 />
               </FormField>
@@ -322,7 +322,7 @@ export default function DesktopsPage() {
                   type="text"
                   value={form.priceRange ?? ""}
                   onChange={(e) => setForm({ ...form, priceRange: e.target.value })}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-[#3b9eff] focus:outline-none focus:ring-1 focus:ring-[#3b9eff]"
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
                   placeholder="如: ¥30-100/月"
                 />
               </FormField>
@@ -331,22 +331,22 @@ export default function DesktopsPage() {
                   type="text"
                   value={form.activity ?? ""}
                   onChange={(e) => setForm({ ...form, activity: e.target.value })}
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:border-[#3b9eff] focus:outline-none focus:ring-1 focus:ring-[#3b9eff]"
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
                   placeholder="如: 新用户免费体验3天"
                 />
               </FormField>
             </div>
-            <div className="flex justify-end gap-3 border-t border-slate-100 px-5 py-4">
+            <div className="flex justify-end gap-3 border-t border-white/10 px-5 py-4">
               <button
                 onClick={() => setDrawerOpen(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
               >
                 取消
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-lg bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8aef] disabled:opacity-50"
+                className="rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8aef] disabled:opacity-50"
               >
                 {saving ? "保存中..." : "保存"}
               </button>
@@ -363,23 +363,23 @@ export default function DesktopsPage() {
             role="dialog"
             aria-modal="true"
             aria-label="确认删除云电脑"
-            className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl"
+            className="w-full max-w-sm rounded-xl bg-white/[0.04] p-6 shadow-[0_20px_60px_rgba(2,6,23,0.6)]"
           >
-            <h3 className="text-lg font-semibold text-slate-800">确认删除</h3>
-            <p className="mt-2 text-sm text-slate-500">
-              确定要删除 <span className="font-medium text-slate-700">{deleteTarget.name}</span> 吗？
+            <h3 className="text-lg font-semibold text-slate-100">确认删除</h3>
+            <p className="mt-2 text-sm text-slate-400">
+              确定要删除 <span className="font-medium text-slate-200">{deleteTarget.name}</span> 吗？
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
               >
                 取消
               </button>
               <button
                 onClick={handleDelete}
                 disabled={saving}
-                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-50"
+                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
               >
                 {saving ? "删除中..." : "确认删除"}
               </button>

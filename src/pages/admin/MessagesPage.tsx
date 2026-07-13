@@ -128,12 +128,12 @@ export default function MessagesPage() {
     <div className="space-y-4">
       {/* Error Banner */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div className="flex items-center gap-2 rounded-lg border border-red-500/50/30 bg-red-500/15 px-4 py-3 text-sm text-red-400">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
           <button
             onClick={() => setError("")}
-            className="ml-auto text-red-400 hover:text-red-600"
+            className="ml-auto text-red-400 hover:text-red-400"
             aria-label="关闭错误提示"
           >
             ✕
@@ -143,12 +143,12 @@ export default function MessagesPage() {
 
       {/* Success Banner */}
       {sendSuccess && (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-600">
+        <div className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/15 px-4 py-3 text-sm text-green-400">
           <Send className="h-4 w-4 shrink-0" />
           <span>{sendSuccess}</span>
           <button
             onClick={() => setSendSuccess("")}
-            className="ml-auto text-green-400 hover:text-green-600"
+            className="ml-auto text-green-400 hover:text-green-400"
             aria-label="关闭成功提示"
           >
             ✕
@@ -158,20 +158,20 @@ export default function MessagesPage() {
 
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-800">站内信管理</h1>
+        <h1 className="text-xl font-bold text-slate-100">站内信管理</h1>
       </div>
 
       {/* Send Message Form */}
       <HasPermission code="message:manage">
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-slate-700">
-            <Send className="h-4 w-4 text-[#3b9eff]" />
+        <div className="rounded-xl border border-white/10 bg-white/[0.04] p-6 shadow-[0_8px_32px_rgba(2,6,23,0.45)]">
+          <h2 className="mb-4 flex items-center gap-2 text-base font-semibold text-slate-200">
+            <Send className="h-4 w-4 text-[#2EA7FF]" />
             发送消息
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {/* Recipient */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
+              <label className="mb-1 block text-sm font-medium text-slate-200">
                 接收者
               </label>
               <div className="flex items-center gap-2">
@@ -184,7 +184,7 @@ export default function MessagesPage() {
                       setRecipientId("");
                     }
                   }}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+                  className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
                 >
                   <option value="-1">全体用户</option>
                   <option value="custom">指定用户</option>
@@ -195,7 +195,7 @@ export default function MessagesPage() {
                     value={recipientId}
                     onChange={(e) => setRecipientId(e.target.value)}
                     placeholder="用户ID"
-                    className="w-32 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+                    className="w-32 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
                   />
                 )}
               </div>
@@ -206,29 +206,29 @@ export default function MessagesPage() {
 
             {/* Title */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                消息标题 <span className="text-red-500">*</span>
+              <label className="mb-1 block text-sm font-medium text-slate-200">
+                消息标题 <span className="text-red-400">*</span>
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="请输入消息标题"
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+                className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
               />
             </div>
 
             {/* Content */}
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-slate-700">
-                消息内容 <span className="text-red-500">*</span>
+              <label className="mb-1 block text-sm font-medium text-slate-200">
+                消息内容 <span className="text-red-400">*</span>
               </label>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="请输入消息内容"
                 rows={4}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+                className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
               />
             </div>
           </div>
@@ -237,7 +237,7 @@ export default function MessagesPage() {
             <button
               onClick={handleSend}
               disabled={sending}
-              className="flex items-center gap-1.5 rounded-lg bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8ae6] disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d8ad6] disabled:opacity-50"
             >
               <Send className="h-4 w-4" />
               {sending ? "发送中…" : "发送消息"}
@@ -247,16 +247,16 @@ export default function MessagesPage() {
       </HasPermission>
 
       {/* Sent Messages Table */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] shadow-[0_8px_32px_rgba(2,6,23,0.45)]">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="px-4 py-3 font-semibold text-slate-600">ID</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">标题</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">接收者</th>
-                <th className="px-4 py-3 font-semibold text-slate-600">发送时间</th>
-                <th className="px-4 py-3 text-right font-semibold text-slate-600">操作</th>
+              <tr className="border-b border-white/10 bg-white/[0.06]">
+                <th className="px-4 py-3 font-semibold text-slate-300">ID</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">标题</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">接收者</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">发送时间</th>
+                <th className="px-4 py-3 text-right font-semibold text-slate-300">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -276,33 +276,33 @@ export default function MessagesPage() {
                 data.list.map((msg) => (
                   <tr
                     key={msg.id}
-                    className="border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                    className="border-b border-white/10 last:border-0 hover:bg-white/[0.08]"
                   >
-                    <td className="px-4 py-3 text-slate-500">{msg.id}</td>
+                    <td className="px-4 py-3 text-slate-400">{msg.id}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <Mail className="h-4 w-4 text-slate-400 shrink-0" />
-                        <span className="font-medium text-slate-700">{msg.title}</span>
+                        <span className="font-medium text-slate-200">{msg.title}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       {msg.recipientId === -1 ? (
-                        <span className="flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-500">
+                        <span className="flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-aurora-cyan">
                           <Users className="h-3 w-3" />
                           全体
                         </span>
                       ) : (
-                        <span className="text-slate-600">用户 #{msg.recipientId}</span>
+                        <span className="text-slate-300">用户 #{msg.recipientId}</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-500">{formatDate(msg.createdAt)}</td>
+                    <td className="px-4 py-3 text-slate-400">{formatDate(msg.createdAt)}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
                         {canManage && (
                           <button
                             onClick={() => setDeleteTarget(msg)}
                             disabled={actionLoading === msg.id}
-                            className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-red-500 hover:bg-red-50 disabled:opacity-50"
+                            className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 disabled:opacity-50"
                             aria-label="删除"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -320,7 +320,7 @@ export default function MessagesPage() {
 
         {/* Pagination */}
         {data && data.total > 0 && (
-          <div className="flex items-center justify-between border-t border-slate-200 px-4 py-3">
+          <div className="flex items-center justify-between border-t border-white/10 px-4 py-3">
             <p className="text-xs text-slate-400">
               共 {data.total} 条记录，第 {data.page}/{totalPages} 页
             </p>
@@ -328,15 +328,15 @@ export default function MessagesPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 上一页
               </button>
-              <span className="text-sm text-slate-600">{page}</span>
+              <span className="text-sm text-slate-300">{page}</span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-slate-400 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 下一页
               </button>
@@ -353,30 +353,30 @@ export default function MessagesPage() {
             role="dialog"
             aria-modal="true"
             aria-label="确认删除消息"
-            className="w-full max-w-sm rounded-lg bg-white p-6 shadow-xl"
+            className="w-full max-w-sm rounded-lg bg-white/[0.04] p-6 shadow-[0_20px_60px_rgba(2,6,23,0.6)]"
           >
             <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/15">
+                <AlertTriangle className="h-5 w-5 text-red-400" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-800">确认删除</h3>
+              <h3 className="text-lg font-semibold text-slate-100">确认删除</h3>
             </div>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-400">
               确定要删除消息{" "}
-              <span className="font-medium text-slate-700">{deleteTarget.title}</span>{" "}
+              <span className="font-medium text-slate-200">{deleteTarget.title}</span>{" "}
               吗？此操作不可撤销。
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+                className="rounded-md border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/[0.08]"
               >
                 取消
               </button>
               <button
                 onClick={handleDelete}
                 disabled={actionLoading === deleteTarget.id}
-                className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-50"
+                className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
               >
                 {actionLoading === deleteTarget.id ? "删除中…" : "确认删除"}
               </button>

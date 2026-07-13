@@ -142,16 +142,16 @@ export default function BannerFormDialog({
         role="dialog"
         aria-modal="true"
         aria-label={isEdit ? "编辑轮播图" : "新建轮播图"}
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white shadow-xl"
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white/[0.04] shadow-[0_20px_60px_rgba(2,6,23,0.6)]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-          <h3 className="text-lg font-semibold text-slate-800">
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <h3 className="text-lg font-semibold text-slate-100">
             {isEdit ? "编辑轮播图" : "新建轮播图"}
           </h3>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-md p-1 text-slate-400 hover:bg-white/[0.10] hover:text-slate-300"
             aria-label="关闭"
           >
             <X className="h-5 w-5" />
@@ -161,29 +161,29 @@ export default function BannerFormDialog({
         {/* Body */}
         <div className="space-y-4 px-6 py-5">
           {error && (
-            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+            <div className="rounded-md border border-red-500/50/30 bg-red-500/15 px-3 py-2 text-sm text-red-400">
               {error}
             </div>
           )}
 
           {/* Title */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              标题 <span className="text-red-500">*</span>
+            <label className="mb-1 block text-sm font-medium text-slate-200">
+              标题 <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="请输入轮播图标题"
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
             />
           </div>
 
           {/* Image: Upload / URL toggle */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              图片 <span className="text-red-500">*</span>
+            <label className="mb-1 block text-sm font-medium text-slate-200">
+              图片 <span className="text-red-400">*</span>
             </label>
 
             {/* Mode toggle */}
@@ -193,8 +193,8 @@ export default function BannerFormDialog({
                 onClick={() => setImageMode("upload")}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                   imageMode === "upload"
-                    ? "bg-[#3b9eff] text-white"
-                    : "border border-slate-200 text-slate-500 hover:bg-slate-50"
+                    ? "bg-[#2EA7FF] text-white"
+                    : "border border-white/10 text-slate-400 hover:bg-white/[0.08]"
                 }`}
               >
                 <Upload className="h-3.5 w-3.5" />
@@ -205,8 +205,8 @@ export default function BannerFormDialog({
                 onClick={() => setImageMode("url")}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                   imageMode === "url"
-                    ? "bg-[#3b9eff] text-white"
-                    : "border border-slate-200 text-slate-500 hover:bg-slate-50"
+                    ? "bg-[#2EA7FF] text-white"
+                    : "border border-white/10 text-slate-400 hover:bg-white/[0.08]"
                 }`}
               >
                 <Link2 className="h-3.5 w-3.5" />
@@ -218,17 +218,17 @@ export default function BannerFormDialog({
             {imageMode === "upload" && (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-200 bg-slate-50 px-4 py-8 transition-colors hover:border-[#3b9eff]"
+                className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-white/10 bg-white/[0.06] px-4 py-8 transition-colors hover:border-[#2EA7FF]"
               >
                 {uploading ? (
                   <>
-                    <Loader2 className="mb-2 h-6 w-6 animate-spin text-[#3b9eff]" />
-                    <p className="text-xs text-slate-500">上传中…</p>
+                    <Loader2 className="mb-2 h-6 w-6 animate-spin text-[#2EA7FF]" />
+                    <p className="text-xs text-slate-400">上传中…</p>
                   </>
                 ) : (
                   <>
                     <ImageIcon className="mb-2 h-6 w-6 text-slate-400" />
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-400">
                       点击选择图片（JPG/PNG/WebP/GIF，最大 10MB）
                     </p>
                   </>
@@ -250,13 +250,13 @@ export default function BannerFormDialog({
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="https://example.com/banner.jpg"
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+                className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
               />
             )}
 
             {/* Image preview */}
             {imageUrl && (
-              <div className="mt-2 overflow-hidden rounded-lg border border-slate-200">
+              <div className="mt-2 overflow-hidden rounded-lg border border-white/10">
                 <img
                   src={imageUrl}
                   alt="预览"
@@ -271,7 +271,7 @@ export default function BannerFormDialog({
 
           {/* Link URL */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
+            <label className="mb-1 block text-sm font-medium text-slate-200">
               跳转链接
             </label>
             <input
@@ -279,7 +279,7 @@ export default function BannerFormDialog({
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
               placeholder="/cloud-games 或 https://example.com"
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
             />
             <p className="mt-1 text-xs text-slate-400">
               点击轮播图时跳转的链接，留空则不可点击
@@ -289,7 +289,7 @@ export default function BannerFormDialog({
           {/* Sort Order + Active toggle */}
           <div className="flex gap-4">
             <div className="flex-1">
-              <label className="mb-1 block text-sm font-medium text-slate-700">
+              <label className="mb-1 block text-sm font-medium text-slate-200">
                 排序值
               </label>
               <input
@@ -297,18 +297,18 @@ export default function BannerFormDialog({
                 value={sortOrder}
                 onChange={(e) => setSortOrder(Number(e.target.value) || 0)}
                 placeholder="0"
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+                className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
               />
               <p className="mt-1 text-xs text-slate-400">数值越小越靠前</p>
             </div>
             <div className="flex-1">
-              <label className="mb-1 block text-sm font-medium text-slate-700">
+              <label className="mb-1 block text-sm font-medium text-slate-200">
                 状态
               </label>
               <select
                 value={isActive}
                 onChange={(e) => setIsActive(Number(e.target.value))}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+                className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
               >
                 <option value={1}>启用</option>
                 <option value={0}>禁用</option>
@@ -319,7 +319,7 @@ export default function BannerFormDialog({
           {/* Time range */}
           <div className="flex gap-4">
             <div className="flex-1">
-              <label className="mb-1 block text-sm font-medium text-slate-700">
+              <label className="mb-1 block text-sm font-medium text-slate-200">
                 生效开始时间
               </label>
               <input
@@ -328,11 +328,11 @@ export default function BannerFormDialog({
                 onChange={(e) =>
                   setStartTime(e.target.value ? new Date(e.target.value).toISOString() : "")
                 }
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+                className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
               />
             </div>
             <div className="flex-1">
-              <label className="mb-1 block text-sm font-medium text-slate-700">
+              <label className="mb-1 block text-sm font-medium text-slate-200">
                 生效结束时间
               </label>
               <input
@@ -341,7 +341,7 @@ export default function BannerFormDialog({
                 onChange={(e) =>
                   setEndTime(e.target.value ? new Date(e.target.value).toISOString() : "")
                 }
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+                className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
               />
             </div>
           </div>
@@ -351,7 +351,7 @@ export default function BannerFormDialog({
 
           {/* Description */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
+            <label className="mb-1 block text-sm font-medium text-slate-200">
               备注
             </label>
             <textarea
@@ -359,23 +359,23 @@ export default function BannerFormDialog({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="可选，内部备注"
               rows={2}
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-[#3b9eff] focus:ring-1 focus:ring-[#3b9eff]"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
             />
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-4">
+        <div className="flex justify-end gap-3 border-t border-white/10 px-6 py-4">
           <button
             onClick={onClose}
-            className="rounded-md border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+            className="rounded-md border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/[0.08]"
           >
             取消
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading || uploading}
-            className="rounded-md bg-[#3b9eff] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8ae6] disabled:opacity-50"
+            className="rounded-md bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d8ad6] disabled:opacity-50"
           >
             {loading ? "保存中…" : "保存"}
           </button>

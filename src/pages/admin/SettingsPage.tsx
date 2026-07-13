@@ -129,7 +129,7 @@ export default function SettingsPage() {
     const inputType = field.type === "email" ? "email" : "text";
     return (
       <div key={field.key}>
-        <label className="mb-1 block text-sm font-medium text-slate-700">
+        <label className="mb-1 block text-sm font-medium text-slate-200">
           {field.label}
         </label>
         <input
@@ -137,7 +137,7 @@ export default function SettingsPage() {
           value={settings[field.key] ?? ""}
           onChange={(e) => handleFieldChange(field.key, e.target.value)}
           placeholder={field.placeholder}
-          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue"
+          className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-aurora-cyan focus:ring-1 focus:ring-aurora-cyan"
         />
       </div>
     );
@@ -149,7 +149,7 @@ export default function SettingsPage() {
   ): React.ReactNode => {
     return (
       <div key={field.key}>
-        <label className="mb-1 block text-sm font-medium text-slate-700">
+        <label className="mb-1 block text-sm font-medium text-slate-200">
           {field.label}
         </label>
         <input
@@ -157,7 +157,7 @@ export default function SettingsPage() {
           value={settings[field.key] ?? ""}
           onChange={(e) => handleFieldChange(field.key, e.target.value)}
           placeholder={field.placeholder}
-          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue"
+          className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 outline-none focus:border-aurora-cyan focus:ring-1 focus:ring-aurora-cyan"
         />
       </div>
     );
@@ -170,12 +170,12 @@ export default function SettingsPage() {
     const enabled = settings[field.key] === "true";
     return (
       <div key={field.key} className="flex items-center justify-between">
-        <label className="text-sm font-medium text-slate-700">{field.label}</label>
+        <label className="text-sm font-medium text-slate-200">{field.label}</label>
         <button
           type="button"
           onClick={() => handleFieldChange(field.key, enabled ? "false" : "true")}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-            enabled ? "bg-neon-blue" : "bg-slate-300"
+            enabled ? "bg-aurora-cyan" : "bg-white/[0.15]"
           }`}
         >
           <span
@@ -226,7 +226,7 @@ export default function SettingsPage() {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-neon-blue" />
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-aurora-cyan" />
           <span className="text-sm text-slate-400">加载中…</span>
         </div>
       </div>
@@ -237,11 +237,11 @@ export default function SettingsPage() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-800">系统设置</h1>
+        <h1 className="text-xl font-bold text-slate-100">系统设置</h1>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 rounded-lg bg-neon-blue px-4 py-2 text-sm font-medium text-white hover:bg-neon-blue/80 disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-lg bg-aurora-cyan px-4 py-2 text-sm font-medium text-white hover:bg-aurora-cyan/80 disabled:opacity-50"
         >
           <Save className="h-4 w-4" />
           {saving ? "保存中…" : "保存当前页设置"}
@@ -250,12 +250,12 @@ export default function SettingsPage() {
 
       {/* Error Banner */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div className="flex items-center gap-2 rounded-lg border border-red-500/50/30 bg-red-500/15 px-4 py-3 text-sm text-red-400">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
           <button
             onClick={() => setError("")}
-            className="ml-auto text-red-400 hover:text-red-600"
+            className="ml-auto text-red-400 hover:text-red-400"
           >
             ✕
           </button>
@@ -264,12 +264,12 @@ export default function SettingsPage() {
 
       {/* Success Banner */}
       {successMsg && (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-600">
+        <div className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/15 px-4 py-3 text-sm text-green-400">
           <Check className="h-4 w-4 shrink-0" />
           <span>{successMsg}</span>
           <button
             onClick={() => setSuccessMsg("")}
-            className="ml-auto text-green-400 hover:text-green-600"
+            className="ml-auto text-green-400 hover:text-green-400"
           >
             ✕
           </button>
@@ -277,7 +277,7 @@ export default function SettingsPage() {
       )}
 
       {/* Tabs */}
-      <div className="border-b border-slate-200">
+      <div className="border-b border-white/10">
         <nav className="flex gap-6">
           {TABS.map((tab) => (
             <button
@@ -285,8 +285,8 @@ export default function SettingsPage() {
               onClick={() => handleTabChange(tab.id)}
               className={`border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? "border-neon-blue text-neon-blue"
-                  : "border-transparent text-slate-500 hover:text-slate-700"
+                  ? "border-aurora-cyan text-aurora-cyan"
+                  : "border-transparent text-slate-400 hover:text-slate-200"
               }`}
             >
               {tab.label}
@@ -296,7 +296,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-xl border border-white/10 bg-white/[0.04] p-6 shadow-[0_8px_32px_rgba(2,6,23,0.45)]">
         <div className="max-w-2xl">{renderTabFields()}</div>
       </div>
     </div>
