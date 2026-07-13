@@ -1,124 +1,57 @@
-import {
-  jsonResponse,
-  badRequest,
-  serverError,
-} from "../../lib/response";
-import { requirePermission } from "../../lib/permission";
+import { jsonResponse, badRequest, serverError } from "../../lib/response";
+import { requirePermission, validateUrl } from "../../lib/auth";
+import { generateId } from "../../lib/utils";
 
 /**
- * Generate a URL-safe slug ID from a name, with a timestamp suffix
- * to ensure uniqueness.
- */
-function generateId(name: string): string {
-  const slug = name
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return `${slug || "game"}-${Date.now().toString(36)}`;
-}
-
-/**
- * POST /api/admin/games
- *
- * Creates a new game entry. Requires admin privileges.
- *
- * Body fields (camelCase → DB snake_case):
- * - name (required)       → name
- * - type (required)       → type
- * - rating (0–10)         → rating
- * - config / specs        → config
- * - platforms (string[])  → platforms (JSON)
- * - description           → description
- * - reason                → reason
- * - tags (string[])       → tags (JSON)
- * - emoji (default 🎮)    → emoji
- * - sortOrder             → sort_order
- * - id (optional)         → id
+ * POST /api/admin/games — create a new game entry.
+ * Requires `game:manage` permission.
  */
 export const onRequestPost = async (
   context: PageContext
 ): Promise<Response> => {
-  const denied = await requirePermission(context, "game:manage");
-  if (denied) return denied;
+  const auth = await requirePermission(context, "game:manage");
+  if (auth instanceof Response) return auth;
 
-  const { DB } = context.env;
-  if (!DB) {
-    return serverError("数据库不可用");
-  }
-
-  let body: {
-    id?: string;
-    name?: string;
-    type?: string;
-    rating?: number;
-    config?: string;
-    specs?: string;
-    platforms?: string[];
-    description?: string;
-    reason?: string;
-    tags?: string[];
-    emoji?: string;
-    sortOrder?: number;
-  };
+  let body: Record<string, unknown>;
   try {
     body = await context.request.json();
   } catch {
-    return badRequest("无效的请求体");
+    return badRequest("无效的 JSON 请求体");
   }
 
-  const name = body.name?.trim() ?? "";
-  if (!name) {
-    return badRequest("请输入游戏名称");
-  }
-  const type = body.type?.trim() ?? "";
-  if (!type) {
-    return badRequest("请选择游戏类型");
+  const name = (body.name as string)?.trim();
+  const type = (body.type as string)?.trim();
+  const config = (body.config as string)?.trim() || "mid";
+  const rating = parseFloat(body.rating as string) || 0;
+  const platforms = body.platforms;
+  const description = (body.description as string)?.trim() || "";
+  const reason = (body.reason as string)?.trim() || "";
+  const tags = body.tags;
+  const emoji = (body.emoji as string)?.trim() || "";
+  const cover = (body.cover as string)?.trim() || null;
+
+  if (!name || !type) {
+    return badRequest("游戏名称和类型不能为空");
   }
 
-  const id = body.id?.trim() || generateId(name);
-  const rating = typeof body.rating === "number" ? body.rating : 0;
-  const config = body.config ?? body.specs ?? "mid";
-  const platformsJson = JSON.stringify(body.platforms ?? []);
-  const tagsJson = JSON.stringify(body.tags ?? []);
+  const id = (body.id as string)?.trim() || generateId(name);
+  const platformsJson = JSON.stringify(Array.isArray(platforms) ? platforms : []);
+  const tagsJson = JSON.stringify(Array.isArray(tags) ? tags : []);
 
   try {
-    await DB.prepare(
-      `INSERT INTO games (id, name, type, rating, config, platforms, description, reason, tags, emoji, sort_order)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    await context.env.DB.prepare(
+      `INSERT INTO games (id, name, type, rating, config, platforms, description, reason, tags, emoji, cover, sort_order, is_enabled)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)`
     )
-      .bind(
-        id,
-        name,
-        type,
-        rating,
-        config,
-        platformsJson,
-        body.description ?? "",
-        body.reason ?? "",
-        tagsJson,
-        body.emoji ?? "🎮",
-        body.sortOrder ?? 0
-      )
+      .bind(id, name, type, rating, config, platformsJson, description, reason, tagsJson, emoji, cover)
       .run();
-  } catch (err) {
-    console.error("创建游戏失败:", err);
-    return serverError("创建失败，ID 可能已存在");
-  }
 
-  return jsonResponse(
-    {
-      id,
-      name,
-      type,
-      rating,
-      config,
-      platforms: body.platforms ?? [],
-      desc: body.description ?? "",
-      reason: body.reason ?? "",
-      tags: body.tags ?? [],
-      emoji: body.emoji ?? "🎮",
-      sortOrder: body.sortOrder ?? 0,
-    },
-    "创建成功"
-  );
+    return jsonResponse({ code: 0, message: "创建成功", data: { id } });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("UNIQUE")) {
+      return badRequest("游戏 ID 已存在");
+    }
+    return serverError("数据库写入失败");
+  }
 };

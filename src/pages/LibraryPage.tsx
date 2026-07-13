@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Library } from "lucide-react";
 import type { Config, Game, GameType, PlatformId } from "../types";
-import { games } from "../data/games";
+import { games as staticGames } from "../data/games";
 import { platforms } from "../data/platforms";
+import { apiClient } from "../services/api";
 import FilterBar from "../components/FilterBar";
 import GameCard from "../components/GameCard";
 import GameModal from "../components/GameModal";
@@ -31,6 +32,7 @@ function GameSkeleton() {
  * Game data stays as static TS file (per architecture decision A4).
  */
 export default function LibraryPage() {
+  const [allGames, setAllGames] = useState<Game[]>(staticGames);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedType, setSelectedType] = useState<GameType | "全部">("全部");
   const [selectedPlatforms, setSelectedPlatforms] = useState<PlatformId[]>([]);
@@ -39,6 +41,21 @@ export default function LibraryPage() {
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const { getConfig } = usePageConfigs();
   const config = getConfig("library");
+
+  useEffect(() => {
+    let mounted = true;
+    apiClient
+      .getGames()
+      .then((data) => {
+        if (mounted && data.length > 0) setAllGames(data);
+      })
+      .catch(() => {
+        // Fallback to static data already in state
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   /** Toggle a platform in the multi-select filter. */
   const handlePlatformToggle = (id: PlatformId): void => {
@@ -50,7 +67,7 @@ export default function LibraryPage() {
   /** Compute filtered + sorted game list. */
   const filteredGames = useMemo<Game[]>(() => {
     const query = searchQuery.trim().toLowerCase();
-    let result = games.filter((g) => {
+    let result = allGames.filter((g) => {
       if (query && !g.name.toLowerCase().includes(query)) return false;
       if (selectedType !== "全部" && g.type !== selectedType) return false;
       if (
@@ -88,7 +105,7 @@ export default function LibraryPage() {
             <span className="gradient-text">{config?.title || "游戏库"}</span>
           </h1>
           <p className="text-sm text-slate-400">
-            {config?.subtitle || `汇聚 ${games.length} 款热门游戏 × ${platforms.length} 大云平台，按类型发现好游戏`}
+            {config?.subtitle || `汇聚 ${allGames.length} 款热门游戏 × ${platforms.length} 大云平台，按类型发现好游戏`}
           </p>
         </div>
       </div>

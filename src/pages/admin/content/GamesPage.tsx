@@ -10,56 +10,27 @@ import {
 import { apiClient } from "../../../services/api";
 import HasPermission from "../../../components/HasPermission";
 import { useFocusTrap } from "../../../hooks/useFocusTrap";
-import type { Game, GameType, Config, PlatformId } from "../../../types";
-import { ALL_GAME_TYPES, ALL_CONFIGS } from "../../../types";
+import type { Game } from "../../../types";
 
-/** Empty game form for creating new entries. */
-const EMPTY_FORM: Partial<Game> = {
+/** Empty form for creating a new game. */
+const EMPTY_FORM: Partial<Game> & { platformsInput?: string; tagsInput?: string } = {
   id: "",
   name: "",
-  type: "休闲" as GameType,
-  rating: 7.0,
-  config: "mid" as Config,
+  type: "",
+  rating: 0,
+  config: "mid",
   platforms: [],
   desc: "",
   reason: "",
   tags: [],
-  emoji: "🎮",
+  emoji: "",
   cover: "",
+  platformsInput: "",
+  tagsInput: "",
 };
 
-/** Tags / platforms input helper — comma-separated string ↔ string array. */
-const arrToString = (arr: string[] | undefined): string =>
-  arr ? arr.join(", ") : "";
-
-const arrFromString = (str: string): string[] =>
-  str.split(",").map((t) => t.trim()).filter(Boolean);
-
-/** Reusable form field wrapper with label. */
-function FormField({
-  label,
-  required,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-sm font-medium text-slate-300">
-        {label}
-        {required && <span className="ml-0.5 text-red-400">*</span>}
-      </label>
-      {children}
-    </div>
-  );
-}
-
 /**
- * Admin page for managing the game library.
- *
- * Features: search, type filter, table, create/edit drawer, delete modal.
+ * Admin page for managing the game catalogue (111+ titles).
  */
 export default function GamesPage() {
   const [list, setList] = useState<Game[]>([]);
@@ -67,12 +38,9 @@ export default function GamesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState<GameType | "全部">("全部");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<Game | null>(null);
-  const [form, setForm] = useState<Partial<Game>>(EMPTY_FORM);
-  const [tagsInput, setTagsInput] = useState("");
-  const [platformsInput, setPlatformsInput] = useState("");
+  const [form, setForm] = useState<typeof EMPTY_FORM>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Game | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -100,34 +68,33 @@ export default function GamesPage() {
 
   useEffect(() => {
     const q = search.trim().toLowerCase();
-    let result = list;
-    if (typeFilter !== "全部") {
-      result = result.filter((g) => g.type === typeFilter);
-    }
-    if (q) {
-      result = result.filter(
-        (g) =>
-          g.name.toLowerCase().includes(q) ||
-          g.desc.toLowerCase().includes(q) ||
-          g.id.toLowerCase().includes(q)
+    if (!q) {
+      setFiltered(list);
+    } else {
+      setFiltered(
+        list.filter(
+          (g) =>
+            g.name.toLowerCase().includes(q) ||
+            g.type.toLowerCase().includes(q) ||
+            g.id.toLowerCase().includes(q)
+        )
       );
     }
-    setFiltered(result);
-  }, [search, typeFilter, list]);
+  }, [search, list]);
 
   const openCreate = (): void => {
     setEditing(null);
-    setForm(EMPTY_FORM);
-    setTagsInput("");
-    setPlatformsInput("");
+    setForm({ ...EMPTY_FORM });
     setDrawerOpen(true);
   };
 
   const openEdit = (item: Game): void => {
     setEditing(item);
-    setForm({ ...item });
-    setTagsInput(arrToString(item.tags));
-    setPlatformsInput(arrToString(item.platforms));
+    setForm({
+      ...item,
+      platformsInput: (item.platforms || []).join(", "),
+      tagsInput: (item.tags || []).join(", "),
+    });
     setDrawerOpen(true);
   };
 
@@ -136,14 +103,27 @@ export default function GamesPage() {
     setError(null);
     try {
       const payload: Record<string, unknown> = {
-        ...form,
-        tags: arrFromString(tagsInput),
-        platforms: arrFromString(platformsInput) as PlatformId[],
-        rating: Number(form.rating) || 0,
+        name: form.name,
+        type: form.type,
+        rating: form.rating,
+        config: form.config,
+        platforms: (form.platformsInput || "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        description: form.desc,
+        reason: form.reason,
+        tags: (form.tagsInput || "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+        emoji: form.emoji,
+        cover: form.cover,
       };
       if (editing) {
         await apiClient.updateGame(editing.id, payload);
       } else {
+        if (form.id) payload.id = form.id;
         await apiClient.createGame(payload);
       }
       setDrawerOpen(false);
@@ -169,16 +149,10 @@ export default function GamesPage() {
     }
   };
 
-  const inputClass =
-    "w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]";
-
-  const configLabel = (cfg: Config): string =>
-    ALL_CONFIGS.find((c) => c.value === cfg)?.label ?? cfg;
-
   return (
     <div className="space-y-4">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
@@ -190,18 +164,6 @@ export default function GamesPage() {
             className="w-full rounded-lg border border-white/10 bg-white/[0.04] py-2 pl-10 pr-4 text-sm text-slate-200 placeholder-slate-400 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
           />
         </div>
-        <select
-          value={typeFilter}
-          onChange={(e) => setTypeFilter(e.target.value as GameType | "全部")}
-          aria-label="按类型筛选"
-          className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none"
-        >
-          {ALL_GAME_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
         <button
           onClick={fetchList}
           className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-medium text-slate-300 hover:bg-white/[0.08]"
@@ -211,11 +173,11 @@ export default function GamesPage() {
         </button>
         <HasPermission code="game:manage">
           <button
-          onClick={openCreate}
-          className="flex items-center gap-1.5 rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8aef]"
+            onClick={openCreate}
+            className="flex items-center gap-1.5 rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8aef]"
           >
-          <Plus className="h-4 w-4" />
-          新增
+            <Plus className="h-4 w-4" />
+            新增
           </button>
         </HasPermission>
       </div>
@@ -255,34 +217,28 @@ export default function GamesPage() {
                       <span className="font-medium text-slate-200">{item.name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <span className="inline-flex rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-600">
-                      {item.type}
-                    </span>
-                  </td>
+                  <td className="px-4 py-3 text-slate-300">{item.type}</td>
                   <td className="px-4 py-3 text-slate-300">{item.rating.toFixed(1)}</td>
-                  <td className="px-4 py-3 text-slate-300">{configLabel(item.config)}</td>
-                  <td className="px-4 py-3 text-slate-400">
-                    {item.platforms?.length ?? 0} 个平台
-                  </td>
+                  <td className="px-4 py-3 text-slate-300">{item.config}</td>
+                  <td className="px-4 py-3 text-slate-300">{(item.platforms || []).join(", ")}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <HasPermission code="game:manage">
                         <button
-                        onClick={() => openEdit(item)}
-                        className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-[#2EA7FF] hover:bg-[#2EA7FF]/10"
+                          onClick={() => openEdit(item)}
+                          className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-[#2EA7FF] hover:bg-[#2EA7FF]/10"
                         >
-                        <Edit2 className="h-3.5 w-3.5" />
-                        编辑
+                          <Edit2 className="h-3.5 w-3.5" />
+                          编辑
                         </button>
                       </HasPermission>
                       <HasPermission code="game:manage">
                         <button
-                        onClick={() => setDeleteTarget(item)}
-                        className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-red-400 hover:bg-red-500/10"
+                          onClick={() => setDeleteTarget(item)}
+                          className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-red-400 hover:bg-red-500/10"
                         >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        删除
+                          <Trash2 className="h-3.5 w-3.5" />
+                          删除
                         </button>
                       </HasPermission>
                     </div>
@@ -325,8 +281,8 @@ export default function GamesPage() {
                   value={form.id ?? ""}
                   onChange={(e) => setForm({ ...form, id: e.target.value })}
                   disabled={!!editing}
-                  className={inputClass}
-                  placeholder="如: genshin-impact"
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
+                  placeholder="如: naraka-bladepoint"
                 />
               </FormField>
               <FormField label="名称" required>
@@ -334,90 +290,70 @@ export default function GamesPage() {
                   type="text"
                   value={form.name ?? ""}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className={inputClass}
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
                   placeholder="游戏名称"
                 />
               </FormField>
-              <FormField label="Emoji">
-                <input
-                  type="text"
-                  value={form.emoji ?? ""}
-                  onChange={(e) => setForm({ ...form, emoji: e.target.value })}
-                  className={inputClass}
-                  placeholder="🎮"
-                />
-              </FormField>
-              <FormField label="类型" required>
-                <select
-                  value={form.type ?? "休闲"}
-                  onChange={(e) => setForm({ ...form, type: e.target.value as GameType })}
-                  className={inputClass}
-                >
-                  {ALL_GAME_TYPES.filter((t) => t !== "全部").map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-              <FormField label="评分 (0-10)">
-                <input
-                  type="number"
-                  min={0}
-                  max={10}
-                  step={0.1}
-                  value={form.rating ?? 7}
-                  onChange={(e) => setForm({ ...form, rating: parseFloat(e.target.value) })}
-                  className={inputClass}
-                />
-              </FormField>
-              <FormField label="配置要求" required>
-                <select
-                  value={form.config ?? "mid"}
-                  onChange={(e) => setForm({ ...form, config: e.target.value as Config })}
-                  className={inputClass}
-                >
-                  {ALL_CONFIGS.filter((c) => c.value !== "all").map((c) => (
-                    <option key={c.value} value={c.value}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField label="类型">
+                  <input
+                    type="text"
+                    value={form.type ?? ""}
+                    onChange={(e) => setForm({ ...form, type: e.target.value })}
+                    className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
+                    placeholder="如: 动作RPG"
+                  />
+                </FormField>
+                <FormField label="评分 (0-10)">
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="10"
+                    value={form.rating ?? 0}
+                    onChange={(e) => setForm({ ...form, rating: parseFloat(e.target.value) || 0 })}
+                    className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
+                  />
+                </FormField>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField label="配置要求">
+                  <select
+                    value={form.config ?? "mid"}
+                    onChange={(e) => setForm({ ...form, config: e.target.value as "low" | "mid" | "high" })}
+                    className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
+                  >
+                    <option value="low">低配</option>
+                    <option value="mid">中配</option>
+                    <option value="high">高配</option>
+                  </select>
+                </FormField>
+                <FormField label="封面 Emoji">
+                  <input
+                    type="text"
+                    value={form.emoji ?? ""}
+                    onChange={(e) => setForm({ ...form, emoji: e.target.value })}
+                    className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
+                    placeholder="如: 🎮"
+                  />
+                </FormField>
+              </div>
               <FormField label="支持平台 (逗号分隔)">
                 <input
                   type="text"
-                  value={platformsInput}
-                  onChange={(e) => setPlatformsInput(e.target.value)}
-                  className={inputClass}
-                  placeholder="如: netease, start, shunwang"
-                />
-              </FormField>
-              <FormField label="描述">
-                <textarea
-                  value={form.desc ?? ""}
-                  onChange={(e) => setForm({ ...form, desc: e.target.value })}
-                  rows={3}
-                  className={`${inputClass} resize-none`}
-                  placeholder="游戏简介"
-                />
-              </FormField>
-              <FormField label="推荐理由">
-                <textarea
-                  value={form.reason ?? ""}
-                  onChange={(e) => setForm({ ...form, reason: e.target.value })}
-                  rows={2}
-                  className={`${inputClass} resize-none`}
-                  placeholder="推荐理由"
+                  value={form.platformsInput ?? ""}
+                  onChange={(e) => setForm({ ...form, platformsInput: e.target.value })}
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
+                  placeholder="如: netease, start, gelaiyun"
                 />
               </FormField>
               <FormField label="标签 (逗号分隔)">
                 <input
                   type="text"
-                  value={tagsInput}
-                  onChange={(e) => setTagsInput(e.target.value)}
-                  className={inputClass}
-                  placeholder="如: 热门, 多人"
+                  value={form.tagsInput ?? ""}
+                  onChange={(e) => setForm({ ...form, tagsInput: e.target.value })}
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
+                  placeholder="如: 武侠, 大逃杀, 多人竞技"
                 />
               </FormField>
               <FormField label="封面图 URL">
@@ -425,8 +361,26 @@ export default function GamesPage() {
                   type="url"
                   value={form.cover ?? ""}
                   onChange={(e) => setForm({ ...form, cover: e.target.value })}
-                  className={inputClass}
+                  className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
                   placeholder="https://..."
+                />
+              </FormField>
+              <FormField label="描述">
+                <textarea
+                  value={form.desc ?? ""}
+                  onChange={(e) => setForm({ ...form, desc: e.target.value })}
+                  rows={3}
+                  className="w-full resize-none rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
+                  placeholder="简短描述"
+                />
+              </FormField>
+              <FormField label="推荐理由">
+                <textarea
+                  value={form.reason ?? ""}
+                  onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                  rows={2}
+                  className="w-full resize-none rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
+                  placeholder="推荐理由"
                 />
               </FormField>
             </div>
@@ -439,11 +393,11 @@ export default function GamesPage() {
               </button>
               <HasPermission code="game:manage">
                 <button
-                onClick={handleSave}
-                disabled={saving}
-                className="rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8aef] disabled:opacity-50"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8aef] disabled:opacity-50"
                 >
-                {saving ? "保存中..." : "保存"}
+                  {saving ? "保存中..." : "保存"}
                 </button>
               </HasPermission>
             </div>
@@ -463,7 +417,7 @@ export default function GamesPage() {
           >
             <h3 className="text-lg font-semibold text-slate-100">确认删除</h3>
             <p className="mt-2 text-sm text-slate-400">
-              确定要删除 <span className="font-medium text-slate-200">{deleteTarget.name}</span> 吗？
+              确定要删除游戏 <span className="font-medium text-slate-200">{deleteTarget.name}</span> 吗？
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <button
@@ -474,17 +428,38 @@ export default function GamesPage() {
               </button>
               <HasPermission code="game:manage">
                 <button
-                onClick={handleDelete}
-                disabled={saving}
-                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
+                  onClick={handleDelete}
+                  disabled={saving}
+                  className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
                 >
-                {saving ? "删除中..." : "确认删除"}
+                  {saving ? "删除中..." : "确认删除"}
                 </button>
               </HasPermission>
             </div>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/** Reusable form field wrapper with label. */
+function FormField({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className="mb-1.5 block text-sm font-medium text-slate-300">
+        {label}
+        {required && <span className="ml-0.5 text-red-400">*</span>}
+      </label>
+      {children}
     </div>
   );
 }
