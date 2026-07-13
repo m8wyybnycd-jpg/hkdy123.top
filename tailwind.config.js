@@ -4,21 +4,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Layered dark backgrounds — softer blue-grey, not pure black
-        "game-dark": "#0e131c",
-        "game-darker": "#090d14",
-        "game-card": "#171e2b",
-        "game-elevated": "#1f2738",
-        // Refined borders with hover counterpart
-        "game-border": "#283044",
-        "game-border-hover": "#3a4560",
-        // Softened brand palette — less radioactive, more premium
-        "neon-blue": "#3b9eff",
-        "neon-purple": "#a78bfa",
-        "neon-green": "#34d399",
+        // ── Aurora dark canvas + surfaces (unified design language) ──
+        "game-dark": "#030014", // aurora canvas
+        "game-darker": "#07021c", // nested surfaces / header
+        "game-card": "#0d0a26", // card surface (aurora-tinted)
+        "game-elevated": "#141033", // elevated surface
+        // Aurora-tinted borders (lighter than pure dark for the glass look)
+        "game-border": "#2a2358",
+        "game-border-hover": "#3d3480",
+        // ── Aurora brand accents ──
+        "neon-blue": "#2EA7FF", // aurora cyan
+        "neon-purple": "#9381FF", // aurora purple
+        "neon-green": "#13DDC4", // aurora teal
+        // Semantic aliases (match root landing CSS variables)
+        "aurora-cyan": "#2EA7FF",
+        "aurora-purple": "#9381FF",
+        "aurora-teal": "#13DDC4",
+        "canvas": "#030014",
       },
       fontFamily: {
         sans: [
+          "Inter",
+          "Noto Sans SC",
           "system-ui",
           "-apple-system",
           "Segoe UI",

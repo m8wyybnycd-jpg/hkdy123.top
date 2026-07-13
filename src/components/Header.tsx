@@ -20,8 +20,11 @@ export default function Header() {
   // Dynamic navigation tabs from page configs (enabled + sorted by sort_order)
   // path is derived from page_key (e.g. "cloud-games" → "/cloud-games")
   // label uses page_name (display name, e.g. "云游戏")
-  const { enabledConfigs: tabs } = usePageConfigs();
-  const TABS = tabs.map((c) => ({ path: `/${c.page_key}`, label: c.page_name || c.title }));
+  const { enabledConfigs } = usePageConfigs();
+  // Exclude the 'home' config — it backs the root landing (/), not a nav tab.
+  const TABS = enabledConfigs
+    .filter((c) => c.page_key !== "home")
+    .map((c) => ({ path: `/${c.page_key}`, label: c.page_name || c.title }));
 
   /** Handle search submission — navigate to /search?q= */
   const handleSearch = (e: React.FormEvent) => {

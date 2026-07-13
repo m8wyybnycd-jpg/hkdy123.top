@@ -87,6 +87,20 @@ export const DEFAULT_PAGE_CONFIGS: PageConfig[] = [
     updated_at: "",
     updated_by: null,
   },
+  {
+    page_key: "home",
+    page_name: "首页",
+    title: "一个入口，玩转所有云端世界",
+    subtitle:
+      "3000+ 云游戏、100+ 云电脑、每日更新的羊毛优惠——一个账号极速开玩，告别卡顿与昂贵硬件。",
+    description: "",
+    is_enabled: true,
+    params:
+      '{"kickerHero":"CLOUD GAMING · CLOUD PC · DEALS HUB","secTrioKicker":"WHY 云玩汇","secTrioTitle":"三块核心，覆盖你的全部云端需求","secGamesKicker":"CLOUD GAMES","secGamesTitle":"热门云游戏，即点即玩","secPcKicker":"CLOUD PC · 云端办公","secPcTitle":"云端办公，高性能云电脑随开随用","secDealsKicker":"DEALS HUB · 优惠聚合","secDealsTitle":"羊毛优惠聚合，省钱才是硬道理","secResKicker":"FREE RESOURCES · 免费资源","secResTitle":"免费游戏资源，一键转存即玩","secProofKicker":"TRUSTED BY USERS · 用户口碑","secProofTitle":"被万千玩家信赖的云端入口","secCtaKicker":"GET STARTED · 立即开始","secCtaTitle":"现在加入云玩汇，开启你的云端世界","secCtaSub":"免费注册，秒级开通，海量游戏与云电脑等你体验"}',
+    sort_order: 0,
+    updated_at: "",
+    updated_by: null,
+  },
 ];
 
 /**
