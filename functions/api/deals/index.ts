@@ -29,11 +29,26 @@ function mapDealRow(row: Record<string, unknown>): Deal {
   };
 }
 
+/** Cache-Control header for public content APIs (5min + SWR). */
+const CACHE_HEADERS: HeadersInit = {
+  "Content-Type": "application/json",
+  "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+};
+
+/** JSON response with cache headers. */
+function cachedJsonResponse<T>(data: T): Response {
+  return new Response(
+    JSON.stringify({ code: 0, data, message: "success" }),
+    { status: 200, headers: CACHE_HEADERS }
+  );
+}
+
 /**
  * GET /api/deals?category=
  *
  * Returns all deals, optionally filtered by category.
  * Tries D1 first, falls back to static TS data.
+ * Public endpoint — no auth required.
  */
 export const onRequestGet = async (context: PageContext): Promise<Response> => {
   // Parse category filter from query string
@@ -49,7 +64,7 @@ export const onRequestGet = async (context: PageContext): Promise<Response> => {
       staticDeals.filter((d) => d.category === cat),
       mapDealRow
     );
-    return jsonResponse(deals);
+    return cachedJsonResponse(deals);
   }
 
   // No category filter — return all deals
@@ -61,5 +76,5 @@ export const onRequestGet = async (context: PageContext): Promise<Response> => {
     mapDealRow
   );
 
-  return jsonResponse(deals);
+  return cachedJsonResponse(deals);
 };

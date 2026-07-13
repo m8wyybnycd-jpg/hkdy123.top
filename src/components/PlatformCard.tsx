@@ -82,7 +82,7 @@ export default function PlatformCard({ platform, onClick }: PlatformCardProps) {
       {/* Activity badge */}
       {platform.activity && (
         <div className="mb-3.5 flex items-center gap-1.5 rounded-lg border border-neon-green/20 bg-neon-green/5 px-3 py-1.5 text-xs text-neon-green">
-          <span>🎁</span>
+          <Gift className="h-3.5 w-3.5 shrink-0" />
           <span className="line-clamp-2 break-words">{platform.activity}</span>
         </div>
       )}

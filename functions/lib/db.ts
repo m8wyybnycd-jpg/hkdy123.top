@@ -23,7 +23,10 @@ export async function queryWithFallback<T>(
   fallback: T[],
   mapper?: (row: Record<string, unknown>) => T
 ): Promise<T[]> {
-  if (!db) return fallback;
+  if (!db) {
+    console.warn("[db] D1 binding undefined, using fallback");
+    return fallback;
+  }
   try {
     const stmt = db.prepare(sql);
     const bound = params.length > 0 ? stmt.bind(...params) : stmt;
@@ -35,7 +38,8 @@ export async function queryWithFallback<T>(
       return result.results.map((row) => mapper(row as Record<string, unknown>));
     }
     return result.results as T[];
-  } catch {
+  } catch (err) {
+    console.error("[db] queryWithFallback failed, using fallback:", err instanceof Error ? err.message : String(err));
     return fallback;
   }
 }
@@ -57,13 +61,17 @@ export async function queryOneWithFallback<T>(
   fallback: T | null,
   mapper?: (row: Record<string, unknown>) => T
 ): Promise<T | null> {
-  if (!db) return fallback;
+  if (!db) {
+    console.warn("[db] D1 binding undefined, using fallback");
+    return fallback;
+  }
   try {
     const result = await db.prepare(sql).bind(...params).first();
     if (!result) return fallback;
     if (mapper) return mapper(result as Record<string, unknown>);
     return result as T;
-  } catch {
+  } catch (err) {
+    console.error("[db] queryOneWithFallback failed, using fallback:", err instanceof Error ? err.message : String(err));
     return fallback;
   }
 }
@@ -81,11 +89,15 @@ export async function executeStatement(
   sql: string,
   params: unknown[]
 ): Promise<boolean> {
-  if (!db) return false;
+  if (!db) {
+    console.warn("[db] D1 binding undefined, cannot execute statement");
+    return false;
+  }
   try {
     await db.prepare(sql).bind(...params).run();
     return true;
-  } catch {
+  } catch (err) {
+    console.error("[db] executeStatement failed:", err instanceof Error ? err.message : String(err));
     return false;
   }
 }
@@ -96,7 +108,8 @@ export function parseJsonArray(value: unknown): string[] {
   try {
     const parsed = JSON.parse(value);
     return Array.isArray(parsed) ? parsed : [];
-  } catch {
+  } catch (err) {
+    console.warn("[db] parseJsonArray failed:", err instanceof Error ? err.message : String(err));
     return [];
   }
 }

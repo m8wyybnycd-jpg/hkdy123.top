@@ -1,7 +1,6 @@
-import { useState, useMemo, useEffect } from "react";
-import { Download, Filter, Gamepad2, ExternalLink, Search } from "lucide-react";
-import { apiClient } from "../services/api";
-import { FREE_GAME_TYPES, FREE_GAME_PLATFORMS, typeGradients, type FreeGame, freeGames as staticFreeGames } from "../data/freeGames";
+import { useState, useMemo } from "react";
+import { Download, Filter, Gamepad2, ExternalLink, Search, AlertTriangle } from "lucide-react";
+import { freeGames, FREE_GAME_TYPES, FREE_GAME_PLATFORMS, typeGradients, type FreeGame } from "../data/freeGames";
 import { useExternalLink } from "../hooks/useExternalLink";
 import PageDisabledNotice from "../components/PageDisabledNotice";
 import SEO from "../components/SEO";
@@ -10,34 +9,17 @@ import { usePageConfigs } from "../hooks/usePageConfigs";
 
 /**
  * Free single-player game resource page.
- * Displays free games from Quark Pan shares with type/platform filtering.
- * Data is D1-backed (admin managed), with a static fallback.
+ * Displays 26 games from Quark Pan shares with type/platform filtering.
  */
 export default function FreeGamesPage() {
-  const [games, setGames] = useState<FreeGame[]>(staticFreeGames);
   const [selectedType, setSelectedType] = useState<string>("全部");
   const [selectedPlatform, setSelectedPlatform] = useState<string>("全部");
   const [searchQuery, setSearchQuery] = useState("");
   const { getConfig } = usePageConfigs();
-  const config = getConfig("free-games");
-
-  useEffect(() => {
-    let mounted = true;
-    apiClient
-      .getFreeGames()
-      .then((data) => {
-        if (mounted && data.length > 0) setGames(data);
-      })
-      .catch(() => {
-        // Fallback to static data already in state
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const config = getConfig("free_games");
 
   const filteredGames = useMemo(() => {
-    return games.filter((game) => {
+    return freeGames.filter((game) => {
       const typeMatch = selectedType === "全部" || game.type === selectedType;
       const platformMatch = selectedPlatform === "全部" || game.platform === selectedPlatform;
       const searchMatch =
@@ -49,13 +31,13 @@ export default function FreeGamesPage() {
   }, [selectedType, selectedPlatform, searchQuery]);
 
   // Show disabled notice if the page is turned off by admin
-  if (config && !config.is_enabled) {
+  if (config?.is_enabled === 0) {
     return <PageDisabledNotice pageTitle={config?.title} />;
   }
 
   return (
     <>
-    <SEO pageKey="free-games" breadcrumbName="免费游戏资源" pageConfig={config} />
+    <SEO pageKey="free-games" breadcrumbName="免费游戏资源" />
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
       {/* Header */}
       <div className="mb-6 animate-slide-up">
@@ -168,9 +150,10 @@ export default function FreeGamesPage() {
 
       {/* Disclaimer */}
       <div className="mt-8 rounded-xl border border-game-border bg-game-card/40 p-4">
-        <p className="text-xs leading-relaxed text-slate-500">
-          ⚠️ 免责声明：以上游戏资源来源于夸克网盘公开分享，仅供个人学习体验，请在下载后 24 小时内删除。
-          游戏版权归各开发商/发行商所有。如喜欢游戏请支持正版。
+        <p className="flex items-start gap-1.5 text-xs leading-relaxed text-slate-500">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+          <span>免责声明：以上游戏资源来源于夸克网盘公开分享，仅供个人学习体验，请在下载后 24 小时内删除。
+          游戏版权归各开发商/发行商所有。如喜欢游戏请支持正版。</span>
         </p>
       </div>
 

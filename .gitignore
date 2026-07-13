@@ -47,3 +47,6 @@ backups/
 # Puppeteer (react-snap)
 node_modules/puppeteer/.local-chromium/
 vite.config.ts.timestamp-*.mjs
+
+# One-off repair scripts (no longer needed)
+repair_*.cjs

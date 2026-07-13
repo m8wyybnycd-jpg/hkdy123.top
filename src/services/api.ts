@@ -110,48 +110,80 @@ export class ApiClient {
    * Base request method: sends credentials via cookie, parses the
    * ApiResponse envelope, and throws on non-zero code.
    * On HTTP 401, triggers the onUnauthorized callback once (if registered).
+   *
+   * GET requests automatically retry on network errors and 5xx responses
+   * (max 2 retries with exponential backoff: 500ms, 1000ms).
    */
   async request<T>(
     path: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      ...((options.headers as Record<string, string>) || {}),
-    };
+    const method = (options.method || "GET").toUpperCase();
+    const isRetryable = method === "GET";
+    const maxRetries = isRetryable ? 2 : 0;
 
-    const response = await fetch(path, {
-      ...options,
-      headers,
-      credentials: "include",
-    });
+    let lastError: Error | null = null;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+          ...((options.headers as Record<string, string>) || {}),
+        };
 
-    // Detect HTTP 401: token expired or invalid — trigger auto-logout
-    if (response.status === 401) {
-      if (this.onUnauthorized) {
-        const cb = this.onUnauthorized;
-        this.onUnauthorized = null; // Ensure callback fires only once
-        cb();
+        const response = await fetch(path, {
+          ...options,
+          headers,
+          credentials: "include",
+        });
+
+        // Detect HTTP 401: token expired or invalid — trigger auto-logout
+        if (response.status === 401) {
+          if (this.onUnauthorized) {
+            const cb = this.onUnauthorized;
+            this.onUnauthorized = null; // Ensure callback fires only once
+            cb();
+          }
+          return {
+            code: 401,
+            data: null,
+            message: "认证已过期，请重新登录",
+          } as ApiResponse<T>;
+        }
+
+        // Retry on 5xx for GET requests
+        if (response.status >= 500 && attempt < maxRetries) {
+          await this._delay(500 * Math.pow(2, attempt));
+          continue;
+        }
+
+        const result = (await response.json()) as ApiResponse<T>;
+
+        // Also detect response body code === 401 (some endpoints may return 200 with code 401)
+        if (result.code === 401) {
+          if (this.onUnauthorized) {
+            const cb = this.onUnauthorized;
+            this.onUnauthorized = null; // Ensure callback fires only once
+            cb();
+          }
+        }
+
+        return result;
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err));
+        if (attempt < maxRetries) {
+          await this._delay(500 * Math.pow(2, attempt));
+          continue;
+        }
       }
-      return {
-        code: 401,
-        data: null,
-        message: "认证已过期，请重新登录",
-      } as ApiResponse<T>;
     }
 
-    const result = (await response.json()) as ApiResponse<T>;
+    // All retries exhausted — re-throw the last error
+    throw lastError || new Error("Request failed after retries");
+  }
 
-    // Also detect response body code === 401 (some endpoints may return 200 with code 401)
-    if (result.code === 401) {
-      if (this.onUnauthorized) {
-        const cb = this.onUnauthorized;
-        this.onUnauthorized = null; // Ensure callback fires only once
-        cb();
-      }
-    }
-
-    return result;
+  /** Exponential backoff delay helper. */
+  private _delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   // ── Auth Endpoints ──────────────────────────────────────

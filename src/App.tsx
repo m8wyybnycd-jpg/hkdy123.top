@@ -7,6 +7,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import PermissionRoute from "./components/PermissionRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
+import RouteProgress from "./components/RouteProgress";
+import OfflineBanner from "./components/OfflineBanner";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import AnnouncementBar from "./components/AnnouncementBar";
@@ -37,8 +39,6 @@ const PlatformsPage = lazy(() => import("./pages/admin/content/PlatformsPage"));
 const DesktopsPage = lazy(() => import("./pages/admin/content/DesktopsPage"));
 const DealsAdminPage = lazy(() => import("./pages/admin/content/DealsPage"));
 const GamesPage = lazy(() => import("./pages/admin/content/GamesPage"));
-const FreeGamesAdminPage = lazy(() => import("./pages/admin/content/FreeGamesPage"));
-const SmsPlatformsAdminPage = lazy(() => import("./pages/admin/content/SmsPlatformsPage"));
 const RolesPage = lazy(() => import("./pages/admin/RolesPage"));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage"));
 const AnnouncementsPage = lazy(() => import("./pages/admin/AnnouncementsPage"));
@@ -160,6 +160,8 @@ export default function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
+        <RouteProgress />
+        <OfflineBanner />
         <Routes>
         {/* Public routes — content visible without login (SEO friendly) */}
         <Route element={<PublicLayout />}>
@@ -232,22 +234,6 @@ export default function App() {
             element={
               <PermissionRoute permission="game:view">
                 <GamesPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="content/free-games"
-            element={
-              <PermissionRoute permission="free_game:view">
-                <FreeGamesAdminPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="content/sms-platforms"
-            element={
-              <PermissionRoute permission="sms_platform:view">
-                <SmsPlatformsAdminPage />
               </PermissionRoute>
             }
           />

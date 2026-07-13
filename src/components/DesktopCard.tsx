@@ -1,4 +1,4 @@
-import { ExternalLink, Monitor, Coins, Activity } from "lucide-react";
+import { ExternalLink, Monitor, Coins, Activity, Gift } from "lucide-react";
 import type { CloudDesktop } from "../types";
 import { useExternalLink } from "../hooks/useExternalLink";
 
@@ -67,7 +67,7 @@ export default function DesktopCard({ desktop }: DesktopCardProps) {
             <Activity className="h-3 w-3" /> 活动
           </span>
           <div className="mt-1 flex items-start gap-1.5 rounded-lg border border-neon-green/20 bg-neon-green/5 px-2.5 py-1.5">
-            <span>🎁</span>
+            <Gift className="mt-0.5 h-3.5 w-3.5 shrink-0 text-neon-green" />
             <p className="line-clamp-2 break-words text-xs leading-relaxed text-neon-green">
               {desktop.activity}
             </p>
