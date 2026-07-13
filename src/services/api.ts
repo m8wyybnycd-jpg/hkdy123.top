@@ -137,16 +137,39 @@ export class ApiClient {
         });
 
         // Detect HTTP 401: token expired or invalid — trigger auto-logout
+        // Exception: login/register endpoints return 401 for wrong credentials,
+        // which should NOT trigger auto-logout or override the error message.
         if (response.status === 401) {
-          if (this.onUnauthorized) {
+          // Try to parse the response body for the actual error message
+          let bodyMessage = "认证已过期，请重新登录";
+          try {
+            const body = await response.json();
+            if (body && typeof body.message === "string") {
+              bodyMessage = body.message;
+            }
+          } catch {
+            // Response body is not JSON — use default message
+          }
+
+          // Only trigger auto-logout for authenticated API calls,
+          // not for login/register/refresh-token attempts
+          const isAuthEndpoint =
+            path === "/api/login" ||
+            path === "/api/register" ||
+            path === "/api/refresh-token" ||
+            path === "/api/email-login" ||
+            path === "/api/send-code";
+
+          if (!isAuthEndpoint && this.onUnauthorized) {
             const cb = this.onUnauthorized;
             this.onUnauthorized = null; // Ensure callback fires only once
             cb();
           }
+
           return {
             code: 401,
             data: null,
-            message: "认证已过期，请重新登录",
+            message: bodyMessage,
           } as ApiResponse<T>;
         }
 

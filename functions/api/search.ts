@@ -1,4 +1,4 @@
-import { jsonResponse, unauthorized, requireAuth } from "../lib/response";
+import { jsonResponse } from "../lib/response";
 import { queryWithFallback, parseJsonArray } from "../lib/db";
 import { games as staticGames } from "../../src/data/games";
 import { platforms as staticPlatforms } from "../../src/data/platforms";
@@ -55,11 +55,6 @@ function mapDealRow(row: Record<string, unknown>): Deal {
  * Games use static data; platforms and deals try D1 with static fallback.
  */
 export const onRequestGet = async (context: PageContext): Promise<Response> => {
-  const user = requireAuth(context.data);
-  if (!user) {
-    return unauthorized();
-  }
-
   const url = new URL(context.request.url);
   const q = url.searchParams.get("q") || "";
 
