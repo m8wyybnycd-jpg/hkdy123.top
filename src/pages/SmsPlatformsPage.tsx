@@ -101,7 +101,7 @@ export default function SmsPlatformsPage() {
 
   return (
     <>
-    <SEO pageKey="sms-platforms" breadcrumbName="接码平台导航" />
+    <SEO pageKey="sms-platforms" breadcrumbName="接码平台导航" pageConfig={config} />
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
       {/* ================================================================ */}
       {/* Hero Header                                                      */}

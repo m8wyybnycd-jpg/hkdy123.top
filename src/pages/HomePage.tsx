@@ -13,16 +13,21 @@ import {
 } from "lucide-react";
 import SEO from "../components/SEO";
 import RelatedLinks from "../components/RelatedLinks";
+import { usePageConfigs } from "../hooks/usePageConfigs";
 
 /**
  * Public landing page (no login required).
  * SEO-optimized homepage with H1 containing primary keywords,
  * feature cards for each category, and descriptive content.
+ * Hero title/subtitle and SEO meta are admin-managed via page_configs.
  */
 export default function HomePage() {
+  const { getConfig } = usePageConfigs();
+  const config = getConfig("home");
+
   return (
     <>
-      <SEO pageKey="home" breadcrumbName="首页" />
+      <SEO pageKey="home" breadcrumbName="首页" pageConfig={config} />
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         {/* Hero Section */}
         <section className="relative mb-12 overflow-hidden rounded-3xl border border-game-border bg-gradient-to-br from-game-card to-game-darker px-6 py-16 text-center">
@@ -31,12 +36,11 @@ export default function HomePage() {
           <div className="relative">
             <h1 className="mb-4 text-3xl font-bold sm:text-4xl lg:text-5xl">
               <span className="gradient-text">
-                云游戏平台哪个好？
+                {config?.title || "云游戏平台哪个好？"}
               </span>
             </h1>
             <p className="mx-auto mb-6 max-w-2xl text-base text-slate-400 sm:text-lg">
-              2026年免费云游戏平台大全。聚合全网10+云游戏平台、5+云电脑入口和26款免费游戏资源，
-              一页看全、一键直达。不用买显卡，手机也能玩3A大作。
+              {config?.subtitle || "2026年免费云游戏平台大全。聚合全网10+云游戏平台、5+云电脑入口和26款免费游戏资源，一页看全、一键直达。不用买显卡，手机也能玩3A大作。"}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Link

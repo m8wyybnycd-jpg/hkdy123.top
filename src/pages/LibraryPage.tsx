@@ -75,7 +75,7 @@ export default function LibraryPage() {
 
   return (
     <>
-    <SEO pageKey="library" breadcrumbName="攻略文章库" />
+    <SEO pageKey="library" breadcrumbName="攻略文章库" pageConfig={config} />
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       {/* Hero */}
       <div className="relative mb-8 overflow-hidden rounded-3xl border border-game-border bg-gradient-to-br from-game-card to-game-darker px-6 py-10 text-center">

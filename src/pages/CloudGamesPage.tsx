@@ -62,7 +62,7 @@ export default function CloudGamesPage() {
 
   return (
     <>
-    <SEO pageKey="cloud-games" breadcrumbName="云游戏平台" />
+    <SEO pageKey="cloud-games" breadcrumbName="云游戏平台" pageConfig={config} />
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       {/* Hero */}
       <div className="relative mb-10 overflow-hidden rounded-3xl border border-game-border bg-gradient-to-br from-game-card to-game-darker px-6 py-12 text-center">

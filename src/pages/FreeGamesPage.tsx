@@ -55,7 +55,7 @@ export default function FreeGamesPage() {
 
   return (
     <>
-    <SEO pageKey="free-games" breadcrumbName="免费游戏资源" />
+    <SEO pageKey="free-games" breadcrumbName="免费游戏资源" pageConfig={config} />
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
       {/* Header */}
       <div className="mb-6 animate-slide-up">

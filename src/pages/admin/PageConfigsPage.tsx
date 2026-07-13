@@ -406,7 +406,7 @@ export default function PageConfigsPage() {
               {/* Section: Hero text */}
               <div className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Hero 文案
+                  Hero 文案 <span className="text-xs text-aurora-cyan/70">(标题/描述同步 SEO)</span>
                 </h3>
 
                 <div>
@@ -439,7 +439,7 @@ export default function PageConfigsPage() {
 
                 <div>
                   <label className="mb-1 block text-sm text-slate-400">
-                    描述
+                    描述 <span className="text-xs text-aurora-cyan/70">(同步 SEO meta description)</span>
                   </label>
                   <textarea
                     value={editing.description}
@@ -447,7 +447,7 @@ export default function PageConfigsPage() {
                       setEditing({ ...editing, description: e.target.value })
                     }
                     rows={2}
-                    placeholder="页面描述（可选）"
+                    placeholder="影响搜索引擎收录的页面描述，建议 80-160 字"
                     className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.04]/5 px-3 py-2 text-sm text-slate-200 outline-none transition-colors focus:border-aurora-cyan/50"
                   />
                 </div>

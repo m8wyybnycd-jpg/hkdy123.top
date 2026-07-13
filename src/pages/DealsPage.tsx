@@ -77,7 +77,7 @@ export default function DealsPage() {
 
   return (
     <>
-    <SEO pageKey="deals" breadcrumbName="薅羊毛优惠" />
+    <SEO pageKey="deals" breadcrumbName="薅羊毛优惠" pageConfig={config} />
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       {/* Hero */}
       <div className="relative mb-8 overflow-hidden rounded-3xl border border-game-border bg-gradient-to-br from-game-card to-game-darker px-6 py-10 text-center">
