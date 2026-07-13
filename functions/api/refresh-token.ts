@@ -117,10 +117,10 @@ export const onRequestPost = async (
   // token cannot be replayed after rotation. Fail-soft: a KV error here
   // must never block the refresh itself.
   const oldJti = payload.jti;
-  const oldExp = (payload as unknown as { exp?: number }).exp;
+  const oldExp = payload.exp ?? 0;
   if (context.env.TOKEN_BLACKLIST && oldJti) {
     try {
-      await revokeToken(context.env.TOKEN_BLACKLIST, oldJti, oldExp ?? 0, payload.userId);
+      await revokeToken(context.env.TOKEN_BLACKLIST, oldJti, oldExp, payload.userId);
     } catch {
       // best-effort; ignore KV errors
     }

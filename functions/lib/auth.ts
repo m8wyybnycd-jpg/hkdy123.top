@@ -162,6 +162,8 @@ export interface JWTPayload {
   permissions: string[];
   /** JWT ID — used for token revocation. Present in verified tokens. */
   jti?: string;
+  /** Expiration timestamp (Unix seconds) — used to compute revocation TTL. */
+  exp?: number;
 }
 
 /** JWT claims including standard JWT fields. */
@@ -258,6 +260,7 @@ export async function verifyJWT(
       ? (payload.permissions as string[])
       : [],
     jti: payload.jti as string | undefined,
+    exp: payload.exp as number,
   };
 }
 
