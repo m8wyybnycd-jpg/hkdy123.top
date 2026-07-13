@@ -109,7 +109,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Auto-refresh: call /api/refresh-token every 30 minutes.
   // The endpoint reads the cookie, verifies the JWT, and sets a new cookie.
-  // If the JWT has expired, it returns 401 and the onUnauthorized handler fires.
+  // If the JWT has expired or been revoked, it returns 401 (or a non-zero
+  // code) — in that case we actively log the user out via handleUnauthorized
+  // rather than leaving them stuck in a "logged in" limbo state.
   useEffect(() => {
     if (!authState.isAuthenticated) return;
 
@@ -120,20 +122,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           headers: { "Content-Type": "application/json" },
           credentials: "include",
         });
+        if (response.status === 401) {
+          // Refresh token expired/revoked — force logout.
+          handleUnauthorized();
+          return;
+        }
         const result: ApiResponse = await response.json();
         if (result.code === 0 && result.data?.user) {
           setAuthState((prev) => ({
             ...prev,
             user: result.data.user,
           }));
+        } else if (result.code !== 0) {
+          // Server rejected the refresh (e.g. token revoked) — log out.
+          handleUnauthorized();
         }
       } catch {
-        // Silent fail — will retry on next interval tick.
+        // Network error — will retry on next interval tick.
       }
     }, 30 * 60 * 1000); // 30 minutes
 
     return () => clearInterval(interval);
-  }, [authState.isAuthenticated]);
+  }, [authState.isAuthenticated, handleUnauthorized]);
 
   /** Log in with email and password via the API. */
   const login = useCallback(async (email: string, password: string) => {

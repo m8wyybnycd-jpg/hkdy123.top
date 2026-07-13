@@ -8,6 +8,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { apiClient } from "../../../services/api";
+import HasPermission from "../../../components/HasPermission";
 import { useFocusTrap } from "../../../hooks/useFocusTrap";
 import type { Game, GameType, Config, PlatformId } from "../../../types";
 import { ALL_GAME_TYPES, ALL_CONFIGS } from "../../../types";
@@ -208,13 +209,15 @@ export default function GamesPage() {
           <RefreshCw className="h-4 w-4" />
           刷新
         </button>
-        <button
+        <HasPermission code="game:manage">
+          <button
           onClick={openCreate}
           className="flex items-center gap-1.5 rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8aef]"
-        >
+          >
           <Plus className="h-4 w-4" />
           新增
-        </button>
+          </button>
+        </HasPermission>
       </div>
 
       {error && (
@@ -264,20 +267,24 @@ export default function GamesPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
-                      <button
+                      <HasPermission code="game:manage">
+                        <button
                         onClick={() => openEdit(item)}
                         className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-[#2EA7FF] hover:bg-[#2EA7FF]/10"
-                      >
+                        >
                         <Edit2 className="h-3.5 w-3.5" />
                         编辑
-                      </button>
-                      <button
+                        </button>
+                      </HasPermission>
+                      <HasPermission code="game:manage">
+                        <button
                         onClick={() => setDeleteTarget(item)}
                         className="flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium text-red-400 hover:bg-red-500/10"
-                      >
+                        >
                         <Trash2 className="h-3.5 w-3.5" />
                         删除
-                      </button>
+                        </button>
+                      </HasPermission>
                     </div>
                   </td>
                 </tr>
@@ -430,13 +437,15 @@ export default function GamesPage() {
               >
                 取消
               </button>
-              <button
+              <HasPermission code="game:manage">
+                <button
                 onClick={handleSave}
                 disabled={saving}
                 className="rounded-lg bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#2b8aef] disabled:opacity-50"
-              >
+                >
                 {saving ? "保存中..." : "保存"}
-              </button>
+                </button>
+              </HasPermission>
             </div>
           </div>
         </div>
@@ -463,13 +472,15 @@ export default function GamesPage() {
               >
                 取消
               </button>
-              <button
+              <HasPermission code="game:manage">
+                <button
                 onClick={handleDelete}
                 disabled={saving}
                 className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
-              >
+                >
                 {saving ? "删除中..." : "确认删除"}
-              </button>
+                </button>
+              </HasPermission>
             </div>
           </div>
         </div>
