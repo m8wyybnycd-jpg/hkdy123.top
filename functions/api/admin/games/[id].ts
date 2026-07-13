@@ -1,5 +1,5 @@
 import { jsonResponse, badRequest, serverError, notFound } from "../../../lib/response";
-import { requirePermission } from "../../../lib/auth";
+import { requirePermission } from "../../../lib/permission";
 
 /**
  * PUT /api/admin/games/[id] — update a game entry.

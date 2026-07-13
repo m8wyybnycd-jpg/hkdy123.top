@@ -19,6 +19,7 @@ function mapGameRow(row: Record<string, unknown>): Game {
     reason: (row.reason as string) ?? "",
     tags: parseJsonArray(row.tags),
     emoji: row.emoji as string,
+    cover: (row.cover as string) || undefined,
   };
 }
 
@@ -32,7 +33,7 @@ function mapGameRow(row: Record<string, unknown>): Game {
 export const onRequestGet = async (context: PageContext): Promise<Response> => {
   const games = await queryWithFallback<Game>(
     context.env.DB,
-    "SELECT id, name, type, rating, config, platforms, description, reason, tags, emoji FROM games ORDER BY sort_order, rating DESC",
+    "SELECT id, name, type, rating, config, platforms, description, reason, tags, emoji, cover FROM games WHERE is_enabled = 1 ORDER BY sort_order, rating DESC",
     [],
     staticGames,
     mapGameRow

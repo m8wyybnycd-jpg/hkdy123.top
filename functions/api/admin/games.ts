@@ -1,6 +1,17 @@
 import { jsonResponse, badRequest, serverError } from "../../lib/response";
-import { requirePermission, validateUrl } from "../../lib/auth";
-import { generateId } from "../../lib/utils";
+import { requirePermission } from "../../lib/permission";
+
+/**
+ * Generate a URL-safe slug ID from a name, with a timestamp suffix
+ * to ensure uniqueness.
+ */
+function generateId(name: string): string {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `${slug || "game"}-${Date.now().toString(36)}`;
+}
 
 /**
  * POST /api/admin/games — create a new game entry.
