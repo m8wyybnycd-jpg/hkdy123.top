@@ -18,6 +18,10 @@ export const ALL_PERMISSION_CODES = [
   "deal:manage",
   "game:view",
   "game:manage",
+  "free_game:view",
+  "free_game:manage",
+  "sms_platform:view",
+  "sms_platform:manage",
   "role:manage",
   "settings:manage",
   "announcement:view",
@@ -82,6 +86,22 @@ export const PERMISSION_GROUPS: {
     ],
   },
   {
+    module: "free_game",
+    moduleLabel: "免费资源",
+    permissions: [
+      { code: "free_game:view", name: "查看免费资源" },
+      { code: "free_game:manage", name: "管理免费资源" },
+    ],
+  },
+  {
+    module: "sms_platform",
+    moduleLabel: "接码平台",
+    permissions: [
+      { code: "sms_platform:view", name: "查看接码平台" },
+      { code: "sms_platform:manage", name: "管理接码平台" },
+    ],
+  },
+  {
     module: "role",
     moduleLabel: "系统管理",
     permissions: [{ code: "role:manage", name: "管理权限角色" }],
@@ -137,6 +157,8 @@ export const NAV_PERMISSIONS: Record<string, string> = {
   "/admin/content/desktops": "desktop:view",
   "/admin/content/deals": "deal:view",
   "/admin/content/games": "game:view",
+  "/admin/content/free-games": "free_game:view",
+  "/admin/content/sms-platforms": "sms_platform:view",
   "/admin/roles": "role:manage",
   "/admin/settings": "settings:manage",
   "/admin/announcements": "announcement:view",

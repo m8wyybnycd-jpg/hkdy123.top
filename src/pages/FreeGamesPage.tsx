@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Download, Filter, Gamepad2, ExternalLink, Search } from "lucide-react";
-import { freeGames, FREE_GAME_TYPES, FREE_GAME_PLATFORMS, typeGradients, type FreeGame } from "../data/freeGames";
+import { apiClient } from "../services/api";
+import { FREE_GAME_TYPES, FREE_GAME_PLATFORMS, typeGradients, type FreeGame, freeGames as staticFreeGames } from "../data/freeGames";
 import { useExternalLink } from "../hooks/useExternalLink";
 import PageDisabledNotice from "../components/PageDisabledNotice";
 import SEO from "../components/SEO";
@@ -9,17 +10,34 @@ import { usePageConfigs } from "../hooks/usePageConfigs";
 
 /**
  * Free single-player game resource page.
- * Displays 26 games from Quark Pan shares with type/platform filtering.
+ * Displays free games from Quark Pan shares with type/platform filtering.
+ * Data is D1-backed (admin managed), with a static fallback.
  */
 export default function FreeGamesPage() {
+  const [games, setGames] = useState<FreeGame[]>(staticFreeGames);
   const [selectedType, setSelectedType] = useState<string>("全部");
   const [selectedPlatform, setSelectedPlatform] = useState<string>("全部");
   const [searchQuery, setSearchQuery] = useState("");
   const { getConfig } = usePageConfigs();
   const config = getConfig("free-games");
 
+  useEffect(() => {
+    let mounted = true;
+    apiClient
+      .getFreeGames()
+      .then((data) => {
+        if (mounted && data.length > 0) setGames(data);
+      })
+      .catch(() => {
+        // Fallback to static data already in state
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const filteredGames = useMemo(() => {
-    return freeGames.filter((game) => {
+    return games.filter((game) => {
       const typeMatch = selectedType === "全部" || game.type === selectedType;
       const platformMatch = selectedPlatform === "全部" || game.platform === selectedPlatform;
       const searchMatch =

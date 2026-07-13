@@ -355,6 +355,38 @@ export interface SmsLoginRequest {
   code: string;
 }
 
+// ── Free Games (Quark Pan resources) ─────────────────────
+
+/** A free single-player game resource shared via Quark Pan. */
+export interface FreeGame {
+  id: string;
+  name: string;
+  type: string;
+  platform: string;
+  description: string;
+  quarkLink: string;
+  emoji: string;
+  sortOrder?: number;
+}
+
+// ── SMS Platforms (接码平台导航) ─────────────────────────
+
+/** A receive-SMS / verification-code platform. */
+export interface SmsPlatform {
+  id: string;
+  name: string;
+  url: string;
+  category: string;
+  countries: string;
+  isFree: boolean;
+  needRegister: boolean;
+  supportChinese: boolean;
+  retention: string;
+  description: string;
+  features: string[];
+  sortOrder?: number;
+}
+
 // ── RBAC + Settings Types (re-export) ─────────────────────
 
 export * from "./rbac";

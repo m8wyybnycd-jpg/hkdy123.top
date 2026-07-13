@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   MessageSquare,
   Filter,
@@ -12,11 +12,12 @@ import {
   AlertTriangle,
   X,
 } from "lucide-react";
+import { apiClient } from "../services/api";
 import {
-  smsPlatforms,
   SMS_CATEGORIES,
   categoryGradients,
   type SmsPlatform,
+  smsPlatforms as staticSmsPlatforms,
 } from "../data/smsPlatforms";
 import { useExternalLink } from "../hooks/useExternalLink";
 import PageDisabledNotice from "../components/PageDisabledNotice";
@@ -30,16 +31,33 @@ import { usePageConfigs } from "../hooks/usePageConfigs";
  * Displays free/paid SMS verification platforms with category filtering,
  * search, and a redesigned card layout featuring category color bars,
  * structured info grids, and prominent CTA buttons.
+ * Data is D1-backed (admin managed), with a static fallback.
  */
 export default function SmsPlatformsPage() {
+  const [platforms, setPlatforms] = useState<SmsPlatform[]>(staticSmsPlatforms);
   const [selectedCategory, setSelectedCategory] = useState<string>("全部");
   const [searchQuery, setSearchQuery] = useState("");
   const { getConfig } = usePageConfigs();
   const config = getConfig("sms-platforms");
 
+  useEffect(() => {
+    let mounted = true;
+    apiClient
+      .getSmsPlatforms()
+      .then((data) => {
+        if (mounted && data.length > 0) setPlatforms(data);
+      })
+      .catch(() => {
+        // Fallback to static data already in state
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   /** Platforms matching the current category filter and search query. */
   const filteredPlatforms = useMemo(() => {
-    return smsPlatforms.filter((platform) => {
+    return platforms.filter((platform) => {
       const categoryMatch =
         selectedCategory === "全部" || platform.category === selectedCategory;
       const searchMatch =
@@ -49,17 +67,17 @@ export default function SmsPlatformsPage() {
         platform.countries.toLowerCase().includes(searchQuery.toLowerCase());
       return categoryMatch && searchMatch;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, searchQuery, platforms]);
 
   /** Per-category platform counts for the hero stats strip. */
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const cat of SMS_CATEGORIES) {
       if (cat === "全部") continue;
-      counts[cat] = smsPlatforms.filter((p) => p.category === cat).length;
+      counts[cat] = platforms.filter((p) => p.category === cat).length;
     }
     return counts;
-  }, []);
+  }, [platforms]);
 
   /** Whether any filter or search is currently active. */
   const hasActiveFilter =

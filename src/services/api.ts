@@ -9,6 +9,8 @@ import type {
   Game,
   PaginatedResponse,
   Platform,
+  FreeGame,
+  SmsPlatform,
   SearchResult,
   RoleListItem,
   Role,
@@ -41,6 +43,24 @@ let _platforms: Platform[] | null = null;
 let _games: Game[] | null = null;
 let _desktops: CloudDesktop[] | null = null;
 let _deals: Deal[] | null = null;
+let _freeGames: FreeGame[] | null = null;
+let _smsPlatforms: SmsPlatform[] | null = null;
+
+async function getStaticFreeGames(): Promise<FreeGame[]> {
+  if (!_freeGames) {
+    const mod = await import("../data/freeGames");
+    _freeGames = mod.freeGames;
+  }
+  return _freeGames;
+}
+
+async function getStaticSmsPlatforms(): Promise<SmsPlatform[]> {
+  if (!_smsPlatforms) {
+    const mod = await import("../data/smsPlatforms");
+    _smsPlatforms = mod.smsPlatforms;
+  }
+  return _smsPlatforms;
+}
 
 async function getStaticPlatforms(): Promise<Platform[]> {
   if (!_platforms) {
@@ -468,6 +488,99 @@ export class ApiClient {
   /** Admin: Delete a game. */
   async deleteGame(id: string): Promise<void> {
     const res = await this.request<null>(`/api/admin/games/${id}`, {
+      method: "DELETE",
+    });
+    if (res.code !== 0) throw new Error(res.message);
+  }
+
+  /** Get all free single-player game resources (fallback: static data). */
+  async getFreeGames(): Promise<FreeGame[]> {
+    try {
+      const res = await this.request<FreeGame[]>("/api/free-games");
+      if (res.code === 0 && res.data && res.data.length > 0) {
+        return res.data;
+      }
+      return await getStaticFreeGames();
+    } catch {
+      return await getStaticFreeGames();
+    }
+  }
+
+  /** Get all SMS-receiving platforms (fallback: static data). */
+  async getSmsPlatforms(): Promise<SmsPlatform[]> {
+    try {
+      const res = await this.request<SmsPlatform[]>("/api/sms-platforms");
+      if (res.code === 0 && res.data && res.data.length > 0) {
+        return res.data;
+      }
+      return await getStaticSmsPlatforms();
+    } catch {
+      return await getStaticSmsPlatforms();
+    }
+  }
+
+  /** Admin: Create a free game resource. */
+  async createFreeGame(data: Record<string, unknown>): Promise<FreeGame> {
+    const res = await this.request<FreeGame>("/api/admin/free-games", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Update a free game resource. */
+  async updateFreeGame(
+    id: string,
+    data: Record<string, unknown>
+  ): Promise<FreeGame> {
+    const res = await this.request<FreeGame>(`/api/admin/free-games/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Delete a free game resource. */
+  async deleteFreeGame(id: string): Promise<void> {
+    const res = await this.request<null>(`/api/admin/free-games/${id}`, {
+      method: "DELETE",
+    });
+    if (res.code !== 0) throw new Error(res.message);
+  }
+
+  /** Admin: Create an SMS platform. */
+  async createSmsPlatform(
+    data: Record<string, unknown>
+  ): Promise<SmsPlatform> {
+    const res = await this.request<SmsPlatform>("/api/admin/sms-platforms", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Update an SMS platform. */
+  async updateSmsPlatform(
+    id: string,
+    data: Record<string, unknown>
+  ): Promise<SmsPlatform> {
+    const res = await this.request<SmsPlatform>(
+      `/api/admin/sms-platforms/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }
+    );
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Delete an SMS platform. */
+  async deleteSmsPlatform(id: string): Promise<void> {
+    const res = await this.request<null>(`/api/admin/sms-platforms/${id}`, {
       method: "DELETE",
     });
     if (res.code !== 0) throw new Error(res.message);

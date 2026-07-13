@@ -6,6 +6,7 @@ import {
   Monitor,
   Tag,
   Library,
+  Gift,
   ShieldCheck,
   Settings,
   X,
@@ -14,6 +15,7 @@ import {
   ScrollText,
   Images,
   LayoutTemplate,
+  MessageSquare,
 } from "lucide-react";
 import { usePermission } from "../../contexts/PermissionContext";
 import { NAV_PERMISSIONS } from "../../constants/permissions";
@@ -46,6 +48,8 @@ const contentNav: NavItem[] = [
   { label: "办公云电脑", to: "/admin/content/desktops", icon: Monitor, permission: NAV_PERMISSIONS["/admin/content/desktops"] },
   { label: "薅羊毛", to: "/admin/content/deals", icon: Tag, permission: NAV_PERMISSIONS["/admin/content/deals"] },
   { label: "游戏库", to: "/admin/content/games", icon: Library, permission: NAV_PERMISSIONS["/admin/content/games"] },
+  { label: "免费资源", to: "/admin/content/free-games", icon: Gift, permission: NAV_PERMISSIONS["/admin/content/free-games"] },
+  { label: "接码平台", to: "/admin/content/sms-platforms", icon: MessageSquare, permission: NAV_PERMISSIONS["/admin/content/sms-platforms"] },
 ];
 
 /** Communication sub-menu items (announcements + messages). */
