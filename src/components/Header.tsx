@@ -43,8 +43,8 @@ export default function Header() {
   };
 
   /** Handle logout — clear token and redirect to /login */
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/login", { replace: true });
   };
 

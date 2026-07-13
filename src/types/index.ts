@@ -199,8 +199,8 @@ export interface AuthContextValue {
   smsLogin: (phone: string, code: string) => Promise<void>;
   /** Passwordless login / register with email and verification code. */
   emailLogin: (email: string, code: string) => Promise<void>;
-  /** Log out and clear token. */
-  logout: () => void;
+  /** Log out: call /api/logout and clear auth state. */
+  logout: () => Promise<void>;
 }
 
 // ── API Types ─────────────────────────────────────────────

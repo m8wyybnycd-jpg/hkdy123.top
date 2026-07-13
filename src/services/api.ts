@@ -125,10 +125,14 @@ export class ApiClient {
     let lastError: Error | null = null;
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
+        // FormData: let the browser set Content-Type (multipart/form-data + boundary)
+        const isFormData = options.body instanceof FormData;
         const headers: Record<string, string> = {
-          "Content-Type": "application/json",
           ...((options.headers as Record<string, string>) || {}),
         };
+        if (!isFormData) {
+          headers["Content-Type"] = headers["Content-Type"] || "application/json";
+        }
 
         const response = await fetch(path, {
           ...options,
@@ -911,12 +915,13 @@ export class ApiClient {
   async uploadBannerImage(file: File): Promise<string> {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await fetch("/api/admin/banners/upload-image", {
-      method: "POST",
-      body: formData,
-      credentials: "include",
-    });
-    const res = (await response.json()) as ApiResponse<{ imageUrl: string }>;
+    const res = await this.request<{ imageUrl: string }>(
+      "/api/admin/banners/upload-image",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
     if (res.code !== 0) throw new Error(res.message);
     return res.data.imageUrl;
   }

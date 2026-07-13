@@ -42,8 +42,8 @@ export default function ProfilePage() {
     return "bg-neon-purple/15 text-neon-purple";
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/login", { replace: true });
   };
 

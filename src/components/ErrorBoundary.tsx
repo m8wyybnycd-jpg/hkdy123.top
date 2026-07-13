@@ -51,10 +51,10 @@ export default class ErrorBoundary extends Component<
         <div className="flex min-h-[60vh] items-center justify-center px-4">
           <div className="flex flex-col items-center gap-4 text-center">
             <AlertCircle className="h-12 w-12 text-red-400" />
-            <h2 className="text-xl font-bold text-slate-200">
+            <h2 className="text-xl font-bold text-slate-700 dark:text-slate-200">
               页面出了点问题
             </h2>
-            <p className="max-w-md text-sm text-slate-400">
+            <p className="max-w-md text-sm text-slate-500 dark:text-slate-400">
               页面加载时发生了错误。您可以尝试刷新页面，如果问题持续存在，请联系管理员。
             </p>
             <button

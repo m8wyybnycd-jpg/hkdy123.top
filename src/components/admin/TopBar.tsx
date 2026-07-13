@@ -29,8 +29,8 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
 
   const title: string = PAGE_TITLES[location.pathname] ?? "后台管理";
 
-  const handleLogout = (): void => {
-    logout();
+  const handleLogout = async (): Promise<void> => {
+    await logout();
     navigate("/login", { replace: true });
   };
 

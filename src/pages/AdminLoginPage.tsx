@@ -45,11 +45,13 @@ export default function AdminLoginPage() {
     if (authState.isAuthenticated && authState.user) {
       if (authState.user.isAdmin) {
         navigate("/admin/dashboard", { replace: true });
+        setPendingCheck(false);
       } else {
-        logout();
-        setError("该账号无管理员权限，请使用用户登录入口");
+        logout().then(() => {
+          setError("该账号无管理员权限，请使用用户登录入口");
+          setPendingCheck(false);
+        });
       }
-      setPendingCheck(false);
     }
   }, [pendingCheck, authState, navigate, logout]);
 
