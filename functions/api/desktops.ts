@@ -1,4 +1,4 @@
-import { jsonResponse, unauthorized, requireAuth } from "../lib/response";
+import { jsonResponse } from "../lib/response";
 import { queryWithFallback, parseJsonArray } from "../lib/db";
 import { desktops as staticDesktops } from "../../src/data/desktops";
 import type { CloudDesktop } from "../../src/types";
@@ -26,11 +26,6 @@ function mapDesktopRow(row: Record<string, unknown>): CloudDesktop {
  * Tries D1 first, falls back to static TS data.
  */
 export const onRequestGet = async (context: PageContext): Promise<Response> => {
-  const user = requireAuth(context.data);
-  if (!user) {
-    return unauthorized();
-  }
-
   const desktops = await queryWithFallback<CloudDesktop>(
     context.env.DB,
     "SELECT id, name, url, description, scenarios, price_range, activity FROM cloud_desktops ORDER BY sort_order, id",

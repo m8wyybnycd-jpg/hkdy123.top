@@ -1,4 +1,4 @@
-import { jsonResponse, unauthorized, requireAuth } from "../../lib/response";
+import { jsonResponse } from "../../lib/response";
 import { queryWithFallback, parseJsonArray } from "../../lib/db";
 import { platforms as staticPlatforms } from "../../../src/data/platforms";
 import type { Platform, PlatformId } from "../../../src/types";
@@ -28,11 +28,6 @@ function mapPlatformRow(row: Record<string, unknown>): Platform {
  * Tries D1 first, falls back to static TS data.
  */
 export const onRequestGet = async (context: PageContext): Promise<Response> => {
-  const user = requireAuth(context.data);
-  if (!user) {
-    return unauthorized();
-  }
-
   const platforms = await queryWithFallback<Platform>(
     context.env.DB,
     "SELECT id, name, color, price, free_info, url, description, tags, activity FROM platforms ORDER BY sort_order, id",

@@ -33,7 +33,7 @@ export default function CloudGamesPage() {
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
   const [loading, setLoading] = useState(true);
   const { getConfig } = usePageConfigs();
-  const config = getConfig("cloud_games");
+  const config = getConfig("cloud-games");
 
   useEffect(() => {
     let mounted = true;
@@ -56,7 +56,7 @@ export default function CloudGamesPage() {
   }, []);
 
   // Show disabled notice if the page is turned off by admin
-  if (config?.is_enabled === 0) {
+  if (config && !config.is_enabled) {
     return <PageDisabledNotice pageTitle={config?.title} />;
   }
 

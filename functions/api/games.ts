@@ -1,4 +1,4 @@
-import { jsonResponse, unauthorized, requireAuth } from "../lib/response";
+import { jsonResponse } from "../lib/response";
 import { queryWithFallback, parseJsonArray } from "../lib/db";
 import { games as staticGames } from "../../src/data/games";
 import type { Game, GameType, Config, PlatformId } from "../../src/types";
@@ -30,11 +30,6 @@ function mapGameRow(row: Record<string, unknown>): Game {
  * (Games table is pre-built for future P1 migration; currently uses static data.)
  */
 export const onRequestGet = async (context: PageContext): Promise<Response> => {
-  const user = requireAuth(context.data);
-  if (!user) {
-    return unauthorized();
-  }
-
   const games = await queryWithFallback<Game>(
     context.env.DB,
     "SELECT id, name, type, rating, config, platforms, description, reason, tags, emoji FROM games ORDER BY sort_order, rating DESC",

@@ -69,7 +69,7 @@ export default function LibraryPage() {
   }, [searchQuery, selectedType, selectedPlatforms, selectedConfig, sortByRating]);
 
   // Show disabled notice if the page is turned off by admin
-  if (config?.is_enabled === 0) {
+  if (config && !config.is_enabled) {
     return <PageDisabledNotice pageTitle={config?.title} />;
   }
 

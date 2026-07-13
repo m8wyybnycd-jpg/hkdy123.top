@@ -16,7 +16,7 @@ export default function FreeGamesPage() {
   const [selectedPlatform, setSelectedPlatform] = useState<string>("全部");
   const [searchQuery, setSearchQuery] = useState("");
   const { getConfig } = usePageConfigs();
-  const config = getConfig("free_games");
+  const config = getConfig("free-games");
 
   const filteredGames = useMemo(() => {
     return freeGames.filter((game) => {
@@ -31,7 +31,7 @@ export default function FreeGamesPage() {
   }, [selectedType, selectedPlatform, searchQuery]);
 
   // Show disabled notice if the page is turned off by admin
-  if (config?.is_enabled === 0) {
+  if (config && !config.is_enabled) {
     return <PageDisabledNotice pageTitle={config?.title} />;
   }
 

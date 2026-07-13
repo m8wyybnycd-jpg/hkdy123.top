@@ -22,8 +22,9 @@ function mapPageConfigRow(row: Record<string, unknown>) {
 /**
  * GET /api/page-configs — 前台公开接口。
  *
- * 返回所有已启用（is_enabled = 1）的页面配置，按 sort_order ASC 排序。
- * 无需认证，用于前台导航和页面 Hero 区域渲染。
+ * 返回全部页面配置（含已禁用），按 sort_order ASC 排序。
+ * 无需认证，用于前台导航与页面 Hero 区域渲染。
+ * 前端依据 is_enabled 决定是否在导航展示、以及是否显示「页面已停用」提示。
  */
 export const onRequestGet = async (
   context: PageContext
@@ -36,7 +37,6 @@ export const onRequestGet = async (
       `SELECT page_key, page_name, title, subtitle, description,
               is_enabled, params, sort_order, updated_at, updated_by
        FROM page_configs
-       WHERE is_enabled = 1
        ORDER BY sort_order ASC`
     ).all<Record<string, unknown>>();
 

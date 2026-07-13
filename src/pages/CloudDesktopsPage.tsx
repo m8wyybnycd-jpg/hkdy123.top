@@ -31,7 +31,7 @@ export default function CloudDesktopsPage() {
   const [desktops, setDesktops] = useState<CloudDesktop[]>(staticDesktops);
   const [loading, setLoading] = useState(true);
   const { getConfig } = usePageConfigs();
-  const config = getConfig("cloud_desktops");
+  const config = getConfig("cloud-desktops");
 
   useEffect(() => {
     let mounted = true;
@@ -54,7 +54,7 @@ export default function CloudDesktopsPage() {
   }, []);
 
   // Show disabled notice if the page is turned off by admin
-  if (config?.is_enabled === 0) {
+  if (config && !config.is_enabled) {
     return <PageDisabledNotice pageTitle={config?.title} />;
   }
 

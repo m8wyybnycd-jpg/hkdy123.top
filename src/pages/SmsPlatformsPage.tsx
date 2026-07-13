@@ -35,7 +35,7 @@ export default function SmsPlatformsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("全部");
   const [searchQuery, setSearchQuery] = useState("");
   const { getConfig } = usePageConfigs();
-  const config = getConfig("sms_platforms");
+  const config = getConfig("sms-platforms");
 
   /** Platforms matching the current category filter and search query. */
   const filteredPlatforms = useMemo(() => {
@@ -77,7 +77,7 @@ export default function SmsPlatformsPage() {
     : `显示全部 ${filteredPlatforms.length} 个平台`;
 
   // Show disabled notice if the page is turned off by admin
-  if (config?.is_enabled === 0) {
+  if (config && !config.is_enabled) {
     return <PageDisabledNotice pageTitle={config?.title} />;
   }
 

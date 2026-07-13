@@ -1,4 +1,4 @@
-import { jsonResponse, unauthorized, requireAuth } from "../../lib/response";
+import { jsonResponse } from "../../lib/response";
 import { queryWithFallback, parseJsonArray } from "../../lib/db";
 import { deals as staticDeals } from "../../../src/data/deals";
 import type { Deal, DealCategory } from "../../../src/types";
@@ -36,11 +36,6 @@ function mapDealRow(row: Record<string, unknown>): Deal {
  * Tries D1 first, falls back to static TS data.
  */
 export const onRequestGet = async (context: PageContext): Promise<Response> => {
-  const user = requireAuth(context.data);
-  if (!user) {
-    return unauthorized();
-  }
-
   // Parse category filter from query string
   const url = new URL(context.request.url);
   const category = url.searchParams.get("category");
