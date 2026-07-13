@@ -146,10 +146,11 @@ export async function requirePermission(
   }
 
   // In-request cache: avoid redundant D1 queries within the same request
-  if (!context.data[PERM_CACHE_KEY]) {
-    context.data[PERM_CACHE_KEY] = await getUserPermissions(db, user.userId);
+  const data = context.data as Record<string, unknown>;
+  if (!data[PERM_CACHE_KEY]) {
+    data[PERM_CACHE_KEY] = await getUserPermissions(db, user.userId);
   }
-  const permissions = context.data[PERM_CACHE_KEY] as string[];
+  const permissions = data[PERM_CACHE_KEY] as string[];
 
   if (!permissions.includes(code)) {
     return new Response(

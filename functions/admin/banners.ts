@@ -163,7 +163,7 @@ export const onRequestPost = async (
     }
 
     // Log the operation
-    const user = context.data.user;
+    const user = context.data.user!;
     await logOperation(DB, {
       userId: user.userId,
       username: user.username,

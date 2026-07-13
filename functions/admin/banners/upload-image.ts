@@ -38,7 +38,7 @@ export const onRequestPost = async (
 
       // Log the operation
       const { DB } = context.env;
-      const user = context.data.user;
+      const user = context.data.user!;
       if (DB) {
         await logOperation(DB, {
           userId: user.userId,
@@ -105,7 +105,7 @@ export const onRequestPost = async (
 
       // Log the operation
       const { DB } = context.env;
-      const user = context.data.user;
+      const user = context.data.user!;
       if (DB) {
         await logOperation(DB, {
           userId: user.userId,

@@ -10,11 +10,11 @@ import {
 import { apiClient } from "../../../services/api";
 import HasPermission from "../../../components/HasPermission";
 import { useFocusTrap } from "../../../hooks/useFocusTrap";
-import type { Platform } from "../../../types";
+import type { Platform, PlatformId } from "../../../types";
 
 /** Empty platform form for creating new entries. */
 const EMPTY_FORM: Partial<Platform> = {
-  id: "",
+  id: undefined,
   name: "",
   color: "#2EA7FF",
   price: "",
@@ -266,7 +266,7 @@ export default function PlatformsPage() {
                 <input
                   type="text"
                   value={form.id ?? ""}
-                  onChange={(e) => setForm({ ...form, id: e.target.value })}
+                  onChange={(e) => setForm({ ...form, id: (e.target.value || undefined) as PlatformId | undefined })}
                   disabled={!!editing}
                   className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
                   placeholder="如: netease"

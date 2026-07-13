@@ -147,7 +147,7 @@ export class ApiClient {
           // Try to parse the response body for the actual error message
           let bodyMessage = "认证已过期，请重新登录";
           try {
-            const body = await response.json();
+            const body: { message?: string } = await response.json();
             if (body && typeof body.message === "string") {
               bodyMessage = body.message;
             }

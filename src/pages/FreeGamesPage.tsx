@@ -31,7 +31,7 @@ export default function FreeGamesPage() {
   }, [selectedType, selectedPlatform, searchQuery]);
 
   // Show disabled notice if the page is turned off by admin
-  if (config?.is_enabled === 0) {
+  if (config?.is_enabled === false) {
     return <PageDisabledNotice pageTitle={config?.title} />;
   }
 

@@ -141,7 +141,7 @@ export const onRequestPut = async (
     if (!row) return notFound("轮播图不存在");
 
     // Log the operation
-    const user = context.data.user;
+    const user = context.data.user!;
     await logOperation(DB, {
       userId: user.userId,
       username: user.username,
@@ -188,7 +188,7 @@ export const onRequestDelete = async (
     await DB.prepare("DELETE FROM banners WHERE id = ?").bind(id).run();
 
     // Log the operation
-    const user = context.data.user;
+    const user = context.data.user!;
     await logOperation(DB, {
       userId: user.userId,
       username: user.username,

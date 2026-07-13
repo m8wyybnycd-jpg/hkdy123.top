@@ -10,13 +10,13 @@ import {
 import { apiClient } from "../../../services/api";
 import HasPermission from "../../../components/HasPermission";
 import { useFocusTrap } from "../../../hooks/useFocusTrap";
-import type { Game } from "../../../types";
+import type { Game, GameType } from "../../../types";
 
 /** Empty form for creating a new game. */
 const EMPTY_FORM: Partial<Game> & { platformsInput?: string; tagsInput?: string } = {
   id: "",
   name: "",
-  type: "",
+  type: undefined,
   rating: 0,
   config: "mid",
   platforms: [],
@@ -299,7 +299,7 @@ export default function GamesPage() {
                   <input
                     type="text"
                     value={form.type ?? ""}
-                    onChange={(e) => setForm({ ...form, type: e.target.value })}
+                    onChange={(e) => setForm({ ...form, type: (e.target.value || undefined) as GameType | undefined })}
                     className="w-full rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 focus:border-[#2EA7FF] focus:outline-none focus:ring-1 focus:ring-[#2EA7FF]"
                     placeholder="如: 动作RPG"
                   />
