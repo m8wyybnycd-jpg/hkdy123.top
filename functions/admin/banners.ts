@@ -6,6 +6,7 @@ import {
 } from "../lib/response";
 import { requirePermission } from "../lib/permission";
 import { logOperation, getClientIP } from "../lib/logger";
+import { validateUrl } from "../lib/validation";
 
 /**
  * 将 D1 行（snake_case）映射为 Banner 对象（camelCase）。
@@ -126,8 +127,12 @@ export const onRequestPost = async (
     if (!imageUrl) {
       return badRequest("imageUrl 为必填项");
     }
+    const imageUrlErr = validateUrl(imageUrl, "imageUrl");
+    if (imageUrlErr) return badRequest(imageUrlErr);
 
     const linkUrl = (body.linkUrl as string) ?? "";
+    const linkUrlErr = validateUrl(linkUrl, "linkUrl");
+    if (linkUrlErr) return badRequest(linkUrlErr);
     const sortOrder = (body.sortOrder as number) ?? 0;
     const isActive = (body.isActive as number) ?? 1;
     const startTime = body.startTime as string | null ?? null;

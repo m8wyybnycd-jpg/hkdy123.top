@@ -5,6 +5,7 @@ import {
 } from "../../lib/response";
 import { requirePermission } from "../../lib/permission";
 import { logOperation, getClientIP } from "../../lib/logger";
+import { validateUrl } from "../../lib/validation";
 
 /**
  * POST /admin/banners/upload-image — 上传轮播图图片。
@@ -32,6 +33,8 @@ export const onRequestPost = async (
       if (!imageUrl) {
         return badRequest("imageUrl 为必填项");
       }
+      const imageUrlErr = validateUrl(imageUrl, "imageUrl");
+      if (imageUrlErr) return badRequest(imageUrlErr);
 
       // Log the operation
       const { DB } = context.env;

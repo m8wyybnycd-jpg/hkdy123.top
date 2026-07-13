@@ -48,19 +48,34 @@ export async function revokeToken(
  * @param jti - JWT ID from the token's claims
  * @returns true if the token has been revoked
  */
+/**
+ * Check if a JWT has been revoked (is in the KV blacklist).
+ *
+ * Fail-closed vs fail-open policy:
+ * - If `kvConfigured` is false (KV binding absent, e.g. local dev or a
+ *   transitional deploy), return `false` (fail-open) so existing sessions
+ *   are not mass-invalidated when the binding is temporarily missing.
+ * - If `kvConfigured` is true but the KV read throws (outage / rate-limit),
+ *   return `true` (fail-closed): during a KV outage we must NOT trust a
+ *   token that might have been logged out — better to force re-auth than
+ *   accept a potentially-revoked session.
+ *
+ * @param kv           - Cloudflare KV namespace binding
+ * @param jti          - JWT ID from the token's claims
+ * @param kvConfigured - whether the TOKEN_BLACKLIST binding is present
+ * @returns true if the token has been revoked (or KV is down while configured)
+ */
 export async function isTokenRevoked(
   kv: KVNamespace,
-  jti: string
+  jti: string,
+  kvConfigured: boolean
 ): Promise<boolean> {
+  if (!kvConfigured) return false;
   try {
     const value = await kv.get(`${REVOKED_PREFIX}${jti}`);
     return value !== null;
   } catch {
-    // If KV is unavailable, fail-open (don't block valid users).
-    // This is acceptable because:
-    // 1. KV outages are rare and temporary
-    // 2. The token will still expire normally
-    // 3. Blocking all users during a KV outage is worse
-    return false;
+    // KV is configured but the read failed — fail-closed.
+    return true;
   }
 }

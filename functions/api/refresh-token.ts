@@ -1,6 +1,7 @@
 import { verifyJWTAny, signJWT, getJWTSecrets } from "../lib/auth";
 import { getUserRoleCodes, getUserPermissions } from "../lib/permission";
 import { jsonResponse, unauthorized, serverError } from "../lib/response";
+import { revokeToken } from "../lib/revocation";
 
 /**
  * Extract auth token from Cookie header.
@@ -83,18 +84,21 @@ export const onRequestPost = async (
     getUserPermissions(DB, payload.userId),
   ]);
 
-  // Check if user is still active / admin status
+  // Check the user still exists
   const userRow = await DB.prepare(
-    "SELECT is_admin, username FROM users WHERE id = ?"
+    "SELECT username FROM users WHERE id = ?"
   )
     .bind(payload.userId)
-    .first<{ is_admin: number; username: string }>();
+    .first<{ username: string }>();
 
   if (!userRow) {
     return unauthorized("用户不存在");
   }
 
-  const isAdmin = userRow.is_admin === 1;
+  // P2-1: isAdmin single source of truth = super_admin role.
+  // Keeps refresh-token consistent with login.ts (which derives isAdmin
+  // from roles, not the legacy is_admin column).
+  const isAdmin = roles.includes("super_admin");
 
   // Issue a new JWT with fresh expiration and updated permissions
   const newToken = await signJWT(
@@ -108,6 +112,19 @@ export const onRequestPost = async (
     },
     primarySecret
   );
+
+  // P2-4: revoke the previously-valid token's jti so a refresh-rotated
+  // token cannot be replayed after rotation. Fail-soft: a KV error here
+  // must never block the refresh itself.
+  const oldJti = payload.jti;
+  const oldExp = (payload as unknown as { exp?: number }).exp;
+  if (context.env.TOKEN_BLACKLIST && oldJti) {
+    try {
+      await revokeToken(context.env.TOKEN_BLACKLIST, oldJti, oldExp ?? 0, payload.userId);
+    } catch {
+      // best-effort; ignore KV errors
+    }
+  }
 
   // Set the refreshed token as an HttpOnly cookie
   // __Host- prefix: forces Secure + Path=/ + no Domain (strongest origin-binding)

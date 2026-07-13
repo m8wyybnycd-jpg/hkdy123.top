@@ -7,6 +7,7 @@ import {
 } from "../../lib/response";
 import { requirePermission } from "../../lib/permission";
 import { logOperation, getClientIP } from "../../lib/logger";
+import { validateUrl } from "../../lib/validation";
 
 /**
  * 将 D1 行（snake_case）映射为 Banner 对象（camelCase）。
@@ -90,10 +91,14 @@ export const onRequestPut = async (
       values.push(body.title as string);
     }
     if (body.imageUrl !== undefined) {
+      const err = validateUrl(body.imageUrl as string, "imageUrl");
+      if (err) return badRequest(err);
       fields.push("image_url = ?");
       values.push(body.imageUrl as string);
     }
     if (body.linkUrl !== undefined) {
+      const err = validateUrl(body.linkUrl as string, "linkUrl");
+      if (err) return badRequest(err);
       fields.push("link_url = ?");
       values.push(body.linkUrl as string);
     }

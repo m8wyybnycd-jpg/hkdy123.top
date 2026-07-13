@@ -2,6 +2,22 @@ import { verifyJWTAny, getJWTSecrets } from "./lib/auth";
 import { isTokenRevoked } from "./lib/revocation";
 
 /**
+ * Apply defense-in-depth security response headers to every response.
+ * Covers HSTS, MIME sniffing protection, referrer leakage, and
+ * clickjacking protection. Safe for both API JSON responses and
+ * static / SPA assets.
+ */
+function applySecurityHeaders(res: Response): void {
+  res.headers.set(
+    "Strict-Transport-Security",
+    "max-age=63072000; includeSubDomains; preload"
+  );
+  res.headers.set("X-Content-Type-Options", "nosniff");
+  res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.headers.set("X-Frame-Options", "DENY");
+}
+
+/**
  * Allowed origins for CORS. Only these domains can make authenticated
  * cross-origin requests to the API.
  */
@@ -102,7 +118,7 @@ export const onRequest = async (context: PageContext): Promise<Response> => {
 
       // Check revocation blacklist (if KV is configured)
       if (user.jti && context.env.TOKEN_BLACKLIST) {
-        const revoked = await isTokenRevoked(context.env.TOKEN_BLACKLIST, user.jti);
+        const revoked = await isTokenRevoked(context.env.TOKEN_BLACKLIST, user.jti, true);
         if (revoked) {
           // Token has been revoked — treat as unauthenticated
           // Don't set context.data.user, let handlers return 401
@@ -135,6 +151,9 @@ export const onRequest = async (context: PageContext): Promise<Response> => {
     corsResponse.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     corsResponse.headers.set("Access-Control-Allow-Credentials", "true");
   }
+
+  // Defense-in-depth: security headers on every response
+  applySecurityHeaders(corsResponse);
 
   return corsResponse;
 };
