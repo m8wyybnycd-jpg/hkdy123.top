@@ -30,6 +30,7 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const AnnouncementsListPage = lazy(() => import("./pages/AnnouncementsListPage"));
 const FreeGamesPage = lazy(() => import("./pages/FreeGamesPage"));
 const SmsPlatformsPage = lazy(() => import("./pages/SmsPlatformsPage"));
+const NetDiskSearchPage = lazy(() => import("./pages/NetDiskSearchPage"));
 
 // ── Lazy-loaded admin pages ──
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
@@ -175,6 +176,7 @@ export default function App() {
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/free-games" element={<FreeGamesPage />} />
           <Route path="/sms-platforms" element={<SmsPlatformsPage />} />
+          <Route path="/net-disk-search" element={<NetDiskSearchPage />} />
         </Route>
 
         {/* Standalone public routes (no layout) */}

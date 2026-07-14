@@ -88,6 +88,18 @@ export const DEFAULT_PAGE_CONFIGS: PageConfig[] = [
     updated_by: null,
   },
   {
+    page_key: "net-disk-search",
+    page_name: "网盘搜索",
+    title: "网盘资源搜索",
+    subtitle: "聚合 14 种网盘资源，快速找到你需要的文件",
+    description: "",
+    is_enabled: true,
+    params: "{}",
+    sort_order: 7,
+    updated_at: "",
+    updated_by: null,
+  },
+  {
     page_key: "home",
     page_name: "首页",
     title: "一个入口，玩转所有云端世界",

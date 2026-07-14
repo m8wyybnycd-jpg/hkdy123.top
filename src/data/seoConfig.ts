@@ -64,6 +64,14 @@ export const seoConfig: Record<string, PageSEO> = {
     path: "/sms-platforms",
     ogType: "website",
   },
+  "net-disk-search": {
+    title: "网盘资源搜索 - 百度/夸克/阿里云盘聚合搜索 - 云玩汇",
+    description:
+      "聚合14种网盘资源搜索，支持百度网盘、夸克网盘、阿里云盘、迅雷、UC等，快速找到你需要的电影、软件、教程等文件资源。",
+    keywords: "网盘搜索,百度网盘搜索,夸克网盘搜索,阿里云盘搜索,网盘资源,云玩汇",
+    path: "/net-disk-search",
+    ogType: "website",
+  },
   library: {
     title: "云游戏攻略库 - 新手入门/平台对比/常见问题 - 云玩汇",
     description:
