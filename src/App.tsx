@@ -39,6 +39,8 @@ const PlatformsPage = lazy(() => import("./pages/admin/content/PlatformsPage"));
 const DesktopsPage = lazy(() => import("./pages/admin/content/DesktopsPage"));
 const DealsAdminPage = lazy(() => import("./pages/admin/content/DealsPage"));
 const GamesPage = lazy(() => import("./pages/admin/content/GamesPage"));
+const FreeGamesAdminPage = lazy(() => import("./pages/admin/content/FreeGamesPage"));
+const SmsPlatformsAdminPage = lazy(() => import("./pages/admin/content/SmsPlatformsPage"));
 const RolesPage = lazy(() => import("./pages/admin/RolesPage"));
 const SettingsPage = lazy(() => import("./pages/admin/SettingsPage"));
 const AnnouncementsPage = lazy(() => import("./pages/admin/AnnouncementsPage"));
@@ -234,6 +236,22 @@ export default function App() {
             element={
               <PermissionRoute permission="game:view">
                 <GamesPage />
+              </PermissionRoute>
+            }
+          />
+          <Route
+            path="content/free-games"
+            element={
+              <PermissionRoute permission="free_game:view">
+                <FreeGamesAdminPage />
+              </PermissionRoute>
+            }
+          />
+          <Route
+            path="content/sms-platforms"
+            element={
+              <PermissionRoute permission="sms_platform:view">
+                <SmsPlatformsAdminPage />
               </PermissionRoute>
             }
           />
