@@ -402,3 +402,7 @@ export * from "./banner";
 // ── Page Config Types (re-export) ────────────────────────
 
 export * from "./pageConfig";
+
+// ── Gallery Types (re-export) ────────────────────────────
+
+export * from "./gallery";

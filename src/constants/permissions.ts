@@ -32,6 +32,8 @@ export const ALL_PERMISSION_CODES = [
   "banner:read",
   "banner:write",
   "page:manage",
+  "gallery:view",
+  "gallery:manage",
 ] as const;
 
 /** 权限按模块分组（用于权限分配视图渲染）。 */
@@ -147,6 +149,14 @@ export const PERMISSION_GROUPS: {
       { code: "page:manage", name: "管理页面配置" },
     ],
   },
+  {
+    module: "gallery",
+    moduleLabel: "图片库",
+    permissions: [
+      { code: "gallery:view", name: "查看图片库" },
+      { code: "gallery:manage", name: "管理图片库" },
+    ],
+  },
 ];
 
 /** 侧边栏菜单项与权限码映射。 */
@@ -167,4 +177,5 @@ export const NAV_PERMISSIONS: Record<string, string> = {
   "/admin/logs/login": "log:view",
   "/admin/banners": "banner:read",
   "/admin/page-configs": "page:manage",
+  "/admin/gallery": "gallery:view",
 };

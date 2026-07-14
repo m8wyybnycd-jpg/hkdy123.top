@@ -34,6 +34,8 @@ import type {
   PageConfig,
   CreatePageConfigPayload,
   UpdatePageConfigPayload,
+  GalleryImage,
+  GalleryListResponse,
 } from "../types";
 
 // ── Lazy-loaded static data (only loaded when API is unavailable) ──
@@ -1093,6 +1095,56 @@ export class ApiClient {
   /** Admin: Delete a page config by page_key. */
   async deletePageConfig(key: string): Promise<void> {
     const res = await this.request<null>(`/api/admin/page-configs/${key}`, {
+      method: "DELETE",
+    });
+    if (res.code !== 0) throw new Error(res.message);
+  }
+
+  // ── Gallery (图片库) ─────────────────────────────────────
+
+  /** Admin: Get paginated gallery images with optional search. */
+  async getGalleryImages(params?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+  }): Promise<GalleryListResponse> {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set("page", String(params.page));
+    if (params?.pageSize) searchParams.set("pageSize", String(params.pageSize));
+    if (params?.search) searchParams.set("search", params.search);
+    const qs = searchParams.toString();
+    const res = await this.request<GalleryListResponse>(
+      `/api/admin/images${qs ? `?${qs}` : ""}`
+    );
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Upload an image file to the gallery. */
+  async uploadGalleryImage(file: File): Promise<GalleryImage> {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await this.request<GalleryImage>("/api/admin/images", {
+      method: "POST",
+      body: formData,
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Rename a gallery image. */
+  async renameGalleryImage(id: string, name: string): Promise<GalleryImage> {
+    const res = await this.request<GalleryImage>(`/api/admin/images/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ name }),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Delete a gallery image by ID. */
+  async deleteGalleryImage(id: string): Promise<void> {
+    const res = await this.request<null>(`/api/admin/images/${id}`, {
       method: "DELETE",
     });
     if (res.code !== 0) throw new Error(res.message);

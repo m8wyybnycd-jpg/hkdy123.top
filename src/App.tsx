@@ -48,6 +48,7 @@ const BannersPage = lazy(() => import("./pages/admin/BannersPage"));
 const MessagesPage = lazy(() => import("./pages/admin/MessagesPage"));
 const LogsPage = lazy(() => import("./pages/admin/LogsPage"));
 const PageConfigsPage = lazy(() => import("./pages/admin/PageConfigsPage"));
+const GalleryPage = lazy(() => import("./pages/admin/GalleryPage"));
 const ForbiddenPage = lazy(() => import("./pages/admin/ForbiddenPage"));
 
 /** Loading fallback for lazy-loaded routes. */
@@ -317,6 +318,14 @@ export default function App() {
             element={
               <PermissionRoute permission="page:manage">
                 <PageConfigsPage />
+              </PermissionRoute>
+            }
+          />
+          <Route
+            path="gallery"
+            element={
+              <PermissionRoute permission="gallery:view">
+                <GalleryPage />
               </PermissionRoute>
             }
           />

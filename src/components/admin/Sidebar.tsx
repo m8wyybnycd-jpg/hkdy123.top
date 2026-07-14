@@ -14,6 +14,7 @@ import {
   Mail,
   ScrollText,
   Images,
+  Image,
   LayoutTemplate,
   MessageSquare,
 } from "lucide-react";
@@ -52,10 +53,11 @@ const contentNav: NavItem[] = [
   { label: "接码平台", to: "/admin/content/sms-platforms", icon: MessageSquare, permission: NAV_PERMISSIONS["/admin/content/sms-platforms"] },
 ];
 
-/** Communication sub-menu items (announcements + messages). */
+/** Communication sub-menu items (announcements + messages + media). */
 const communicationNav: NavItem[] = [
   { label: "公告管理", to: "/admin/announcements", icon: Megaphone, permission: NAV_PERMISSIONS["/admin/announcements"] },
   { label: "轮播图管理", to: "/admin/banners", icon: Images, permission: NAV_PERMISSIONS["/admin/banners"] },
+  { label: "图片库", to: "/admin/gallery", icon: Image, permission: NAV_PERMISSIONS["/admin/gallery"] },
   { label: "站内信", to: "/admin/messages", icon: Mail, permission: NAV_PERMISSIONS["/admin/messages"] },
 ];
 
