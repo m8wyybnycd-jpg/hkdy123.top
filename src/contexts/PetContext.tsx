@@ -39,13 +39,30 @@ export function PetProvider({ children }: { children: ReactNode }) {
   const isAuthenticated = authState.isAuthenticated;
   const currentPath = location.pathname;
 
-  // ── Fetch pet profile ──
+  // ── Fetch pet profile (auto-adopt if no pet) ──
   const fetchProfile = useCallback(async () => {
     try {
       const res = await fetch('/api/pet/profile', { credentials: 'include' });
       const data = await res.json() as { code: number; data?: { pet?: Pet; memoryCount?: number; todayExp?: number } };
       if (data.code === 0 && data.data?.pet) {
         setPet(data.data.pet as Pet);
+      } else if (data.code === 0 && !data.data?.pet) {
+        // No pet yet — auto-adopt
+        try {
+          const adoptRes = await fetch('/api/pet/adopt', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+          });
+          const adoptData = await adoptRes.json() as { code: number; data?: { pet?: Pet } };
+          if (adoptData.code === 0 && adoptData.data?.pet) {
+            setPet(adoptData.data.pet as Pet);
+          } else {
+            setPet(null);
+          }
+        } catch {
+          setPet(null);
+        }
       } else {
         setPet(null);
       }

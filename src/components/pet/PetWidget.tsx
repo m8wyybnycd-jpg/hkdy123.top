@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { PetCanvas } from "./PetCanvas";
 import { ChatPanel } from "./ChatPanel";
 import { usePetContext } from "../../contexts/PetContext";
-import { LEVEL_NAMES, LEVEL_EMOJIS, getLevelProgress } from "../../types/pet";
+import { LEVEL_EMOJIS, getLevelProgress } from "../../types/pet";
 
 /**
  * PetWidget — The floating pet widget.
@@ -88,8 +89,11 @@ export function PetWidget() {
   };
 
   // ── Don't render if loading, not authenticated, or on hidden routes ──
+  const location = useLocation();
+  const isHiddenRoute = ['/login', '/admin/login', '/admin'].some(r => location.pathname.startsWith(r));
   if (loading) return null;
   if (!pet) return null;
+  if (isHiddenRoute) return null;
 
   const progress = getLevelProgress(pet.exp);
   const petState = getPetState();
