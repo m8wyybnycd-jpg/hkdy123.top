@@ -252,10 +252,13 @@ export async function getCredentialByProvider(
       );
     }
   } catch (err) {
-    console.error(`Failed to fetch credential for provider ${provider}:`, err);
+    console.error(`[credential] Failed to fetch/decrypt credential for provider "${provider}", falling back to env var:`, err);
   }
 
   // Fallback to environment variable
+  if (fallbackEnv) {
+    console.warn(`[credential] Using fallback env var for provider "${provider}"`);
+  }
   return fallbackEnv ?? "";
 }
 

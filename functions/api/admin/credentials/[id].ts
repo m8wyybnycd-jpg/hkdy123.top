@@ -13,10 +13,10 @@ import {
   badRequest,
   serverError,
   notFound,
+  conflict,
 } from "../../../lib/response";
 import {
   encryptCredential,
-  maskCredential,
   CREDENTIAL_STATUSES,
 } from "../../../lib/credential";
 import { logOperation, getClientIP } from "../../../lib/logger";
@@ -29,7 +29,7 @@ function toCredentialDTO(row: Record<string, unknown>) {
     type: row.type as string,
     provider: row.provider as string,
     endpointUrl: (row.endpoint_url as string) || "",
-    maskedValue: row.encrypted_value ? maskCredential("[encrypted]") : "",
+    maskedValue: row.encrypted_value ? "******" : "",
     metadata: safeParseJSON(row.metadata as string),
     status: row.status as string,
     lastHealthCheck: (row.last_health_check as string) || null,
@@ -125,6 +125,13 @@ export const onRequestPut = async (context: PageContext): Promise<Response> => {
 
   if (body.name !== undefined) {
     if (!body.name.trim()) return badRequest("凭证名称不能为空");
+    // Check name uniqueness (exclude current record)
+    const dup = await DB.prepare(
+      "SELECT id FROM credentials WHERE name = ? AND id != ?"
+    )
+      .bind(body.name.trim(), id)
+      .first();
+    if (dup) return conflict("凭证名称已存在");
     updates.push("name = ?");
     binds.push(body.name.trim());
   }
@@ -145,7 +152,8 @@ export const onRequestPut = async (context: PageContext): Promise<Response> => {
     let encrypted;
     try {
       encrypted = await encryptCredential(body.value.trim(), JWT_SECRET);
-    } catch {
+    } catch (err) {
+      console.error("[credentials] Encryption failed on update:", err);
       return serverError("凭证加密失败");
     }
     updates.push("encrypted_value = ?, encryption_iv = ?");
@@ -205,7 +213,8 @@ export const onRequestPut = async (context: PageContext): Promise<Response> => {
       .first();
 
     return jsonResponse(toCredentialDTO(updated as Record<string, unknown>), "凭证更新成功");
-  } catch {
+  } catch (err) {
+    console.error("[credentials] Update failed:", err);
     return serverError("凭证更新失败");
   }
 };

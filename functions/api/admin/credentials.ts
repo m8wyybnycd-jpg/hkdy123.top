@@ -19,7 +19,6 @@ import {
 } from "../../lib/response";
 import {
   encryptCredential,
-  maskCredential,
   CREDENTIAL_TYPES,
   CREDENTIAL_STATUSES,
 } from "../../lib/credential";
@@ -56,8 +55,8 @@ function toCredentialDTO(row: Record<string, unknown>) {
     type: row.type as string,
     provider: row.provider as string,
     endpointUrl: (row.endpoint_url as string) || "",
-    // Never return encrypted_value / iv — only a masked preview if value exists
-    maskedValue: row.encrypted_value ? maskCredential("[encrypted]") : "",
+    // Never return encrypted_value / iv — show fixed mask to indicate value is stored
+    maskedValue: row.encrypted_value ? "******" : "",
     metadata: safeParseJSON(row.metadata as string),
     status: row.status as string,
     lastHealthCheck: (row.last_health_check as string) || null,
@@ -126,7 +125,8 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   let encrypted;
   try {
     encrypted = await encryptCredential(body.value.trim(), JWT_SECRET);
-  } catch {
+  } catch (err) {
+    console.error("[credentials] Encryption failed:", err);
     return serverError("凭证加密失败");
   }
 
@@ -181,12 +181,13 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
       .first();
 
     return jsonResponse(toCredentialDTO(created as Record<string, unknown>), "凭证创建成功", 0, 201);
-  } catch {
+  } catch (err) {
+    console.error("[credentials] Create failed:", err);
     return serverError("凭证创建失败");
   }
 };
 
-// ── GET: List all credentials (masked) ──
+// ── GET: List all credentials (masked, paginated) ──
 export const onRequestGet = async (context: PageContext): Promise<Response> => {
   const denied = await requirePermission(context, "credential:manage");
   if (denied) return denied;
@@ -194,17 +195,31 @@ export const onRequestGet = async (context: PageContext): Promise<Response> => {
   const { DB } = context.env;
   if (!DB) return serverError("数据库不可用");
 
+  // Parse pagination params
+  const url = new URL(context.request.url);
+  const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10));
+  const pageSize = Math.min(100, Math.max(1, parseInt(url.searchParams.get("pageSize") || "20", 10)));
+  const offset = (page - 1) * pageSize;
+
   try {
-    const result = await DB.prepare(
-      `SELECT * FROM credentials ORDER BY created_at DESC`
-    ).all();
+    const [result, countResult] = await Promise.all([
+      DB.prepare(
+        `SELECT * FROM credentials ORDER BY created_at DESC LIMIT ? OFFSET ?`
+      )
+        .bind(pageSize, offset)
+        .all(),
+      DB.prepare("SELECT COUNT(*) as total FROM credentials").first(),
+    ]);
 
     const list = (result.results || []).map((row) =>
       toCredentialDTO(row as Record<string, unknown>)
     );
 
-    return jsonResponse(list);
-  } catch {
+    const total = (countResult?.total as number) || 0;
+
+    return jsonResponse({ list, page, pageSize, total });
+  } catch (err) {
+    console.error("[credentials] List failed:", err);
     return serverError("凭证查询失败");
   }
 };
