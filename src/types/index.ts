@@ -406,3 +406,7 @@ export * from "./pageConfig";
 // ── Gallery Types (re-export) ────────────────────────────
 
 export * from "./gallery";
+
+// ── Pet Types (re-export) ────────────────────────────────
+
+export * from "./pet";

@@ -22,3 +22,7 @@ id = "cbb5f82c0b8c4e14ac871303ead6a1e4"
 # V3.1: Brevo API v3 used for email (API key managed as Cloudflare Pages Secret)
 # JWT_SECRET and BREVO_API_KEY are managed as Cloudflare Pages Secrets (not plaintext variables)
 # Set them via: wrangler pages secret put BREVO_API_KEY
+
+# V18: AI Memory Pet — 讯飞MaaS API Key (混元7B)
+# Set via: wrangler pages secret put XFMAAS_API_KEY
+# Format: APIKey:APISecret (used as Bearer token)

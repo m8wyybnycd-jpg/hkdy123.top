@@ -20,6 +20,8 @@ interface Env {
   CF_IMAGES_TOKEN?: string;
   /** KV namespace for JWT token revocation blacklist. */
   TOKEN_BLACKLIST?: KVNamespace;
+  /** 讯飞MaaS API key for AI pet chat (format: APIKey:APISecret). */
+  XFMAAS_API_KEY?: string;
 }
 
 /**

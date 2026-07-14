@@ -3,6 +3,7 @@ import { Suspense, lazy } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { PermissionProvider } from "./contexts/PermissionContext";
 import { UnreadProvider } from "./contexts/UnreadContext";
+import { PetProvider } from "./contexts/PetContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import PermissionRoute from "./components/PermissionRoute";
@@ -51,6 +52,9 @@ const LogsPage = lazy(() => import("./pages/admin/LogsPage"));
 const PageConfigsPage = lazy(() => import("./pages/admin/PageConfigsPage"));
 const GalleryPage = lazy(() => import("./pages/admin/GalleryPage"));
 const ForbiddenPage = lazy(() => import("./pages/admin/ForbiddenPage"));
+
+// ── Pet widget (eager loaded — always visible for authenticated users) ──
+import PetWidget from "./components/pet/PetWidget";
 
 /** Loading fallback for lazy-loaded routes. */
 function LoadingFallback() {
@@ -164,178 +168,183 @@ export default function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <RouteProgress />
-        <OfflineBanner />
-        <Routes>
-        {/* Public routes — content visible without login (SEO friendly) */}
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/cloud-games" element={<CloudGamesPage />} />
-          <Route path="/cloud-desktops" element={<CloudDesktopsPage />} />
-          <Route path="/deals" element={<DealsPage />} />
-          <Route path="/library" element={<LibraryPage />} />
-          <Route path="/free-games" element={<FreeGamesPage />} />
-          <Route path="/sms-platforms" element={<SmsPlatformsPage />} />
-          <Route path="/net-disk-search" element={<NetDiskSearchPage />} />
-        </Route>
+        <PetProvider>
+          <RouteProgress />
+          <OfflineBanner />
+          <Routes>
+          {/* Public routes — content visible without login (SEO friendly) */}
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/cloud-games" element={<CloudGamesPage />} />
+            <Route path="/cloud-desktops" element={<CloudDesktopsPage />} />
+            <Route path="/deals" element={<DealsPage />} />
+            <Route path="/library" element={<LibraryPage />} />
+            <Route path="/free-games" element={<FreeGamesPage />} />
+            <Route path="/sms-platforms" element={<SmsPlatformsPage />} />
+            <Route path="/net-disk-search" element={<NetDiskSearchPage />} />
+          </Route>
 
-        {/* Standalone public routes (no layout) */}
-        <Route path="/login" element={<AuthPage />} />
-        <Route path="/admin/login" element={<AdminLoginPage />} />
+          {/* Standalone public routes (no layout) */}
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
 
-        {/* Protected routes — require authentication */}
-        <Route element={<ProtectedLayout />}>
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/messages" element={<UserMessagesPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/announcements" element={<AnnouncementsListPage />} />
-        </Route>
+          {/* Protected routes — require authentication */}
+          <Route element={<ProtectedLayout />}>
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/messages" element={<UserMessagesPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/announcements" element={<AnnouncementsListPage />} />
+          </Route>
 
-        {/* Admin routes — require authentication + admin access */}
-        <Route path="/admin" element={<AdminProtectedLayout />}>
-          <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route
-            path="dashboard"
-            element={
-              <PermissionRoute permission="dashboard:view">
-                <DashboardPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="users"
-            element={
-              <PermissionRoute permission="user:view">
-                <UsersPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="content/platforms"
-            element={
-              <PermissionRoute permission="platform:view">
-                <PlatformsPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="content/desktops"
-            element={
-              <PermissionRoute permission="desktop:view">
-                <DesktopsPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="content/deals"
-            element={
-              <PermissionRoute permission="deal:view">
-                <DealsAdminPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="content/games"
-            element={
-              <PermissionRoute permission="game:view">
-                <GamesPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="content/free-games"
-            element={
-              <PermissionRoute permission="free_game:view">
-                <FreeGamesAdminPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="content/sms-platforms"
-            element={
-              <PermissionRoute permission="sms_platform:view">
-                <SmsPlatformsAdminPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="roles"
-            element={
-              <PermissionRoute permission="role:manage">
-                <RolesPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="settings"
-            element={
-              <PermissionRoute permission="settings:manage">
-                <SettingsPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="announcements"
-            element={
-              <PermissionRoute permission="announcement:view">
-                <AnnouncementsPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="banners"
-            element={
-              <PermissionRoute permission="banner:read">
-                <BannersPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="messages"
-            element={
-              <PermissionRoute permission="message:view">
-                <MessagesPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="logs/operation"
-            element={
-              <PermissionRoute permission="log:view">
-                <LogsPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="logs/login"
-            element={
-              <PermissionRoute permission="log:view">
-                <LogsPage />
-              </PermissionRoute>
-            }
-          />
-          <Route path="forbidden" element={<ForbiddenPage />} />
-          <Route
-            path="page-configs"
-            element={
-              <PermissionRoute permission="page:manage">
-                <PageConfigsPage />
-              </PermissionRoute>
-            }
-          />
-          <Route
-            path="gallery"
-            element={
-              <PermissionRoute permission="gallery:view">
-                <GalleryPage />
-              </PermissionRoute>
-            }
-          />
-        </Route>
+          {/* Admin routes — require authentication + admin access */}
+          <Route path="/admin" element={<AdminProtectedLayout />}>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route
+              path="dashboard"
+              element={
+                <PermissionRoute permission="dashboard:view">
+                  <DashboardPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="users"
+              element={
+                <PermissionRoute permission="user:view">
+                  <UsersPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="content/platforms"
+              element={
+                <PermissionRoute permission="platform:view">
+                  <PlatformsPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="content/desktops"
+              element={
+                <PermissionRoute permission="desktop:view">
+                  <DesktopsPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="content/deals"
+              element={
+                <PermissionRoute permission="deal:view">
+                  <DealsAdminPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="content/games"
+              element={
+                <PermissionRoute permission="game:view">
+                  <GamesPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="content/free-games"
+              element={
+                <PermissionRoute permission="free_game:view">
+                  <FreeGamesAdminPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="content/sms-platforms"
+              element={
+                <PermissionRoute permission="sms_platform:view">
+                  <SmsPlatformsAdminPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="roles"
+              element={
+                <PermissionRoute permission="role:manage">
+                  <RolesPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="settings"
+              element={
+                <PermissionRoute permission="settings:manage">
+                  <SettingsPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="announcements"
+              element={
+                <PermissionRoute permission="announcement:view">
+                  <AnnouncementsPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="banners"
+              element={
+                <PermissionRoute permission="banner:read">
+                  <BannersPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="messages"
+              element={
+                <PermissionRoute permission="message:view">
+                  <MessagesPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="logs/operation"
+              element={
+                <PermissionRoute permission="log:view">
+                  <LogsPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="logs/login"
+              element={
+                <PermissionRoute permission="log:view">
+                  <LogsPage />
+                </PermissionRoute>
+              }
+            />
+            <Route path="forbidden" element={<ForbiddenPage />} />
+            <Route
+              path="page-configs"
+              element={
+                <PermissionRoute permission="page:manage">
+                  <PageConfigsPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="gallery"
+              element={
+                <PermissionRoute permission="gallery:view">
+                  <GalleryPage />
+                </PermissionRoute>
+              }
+            />
+          </Route>
 
-        {/* 404 catch-all */}
-        <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+          {/* 404 catch-all */}
+          <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+
+          {/* AI Memory Pet Widget — visible for authenticated non-admin users */}
+          <PetWidget />
+        </PetProvider>
       </AuthProvider>
     </ErrorBoundary>
   );
