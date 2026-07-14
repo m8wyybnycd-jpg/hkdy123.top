@@ -36,6 +36,10 @@ import type {
   UpdatePageConfigPayload,
   GalleryImage,
   GalleryListResponse,
+  CredentialItem,
+  CreateCredentialPayload,
+  UpdateCredentialPayload,
+  CredentialTestResult,
 } from "../types";
 
 // ── Lazy-loaded static data (only loaded when API is unavailable) ──
@@ -1148,6 +1152,59 @@ export class ApiClient {
       method: "DELETE",
     });
     if (res.code !== 0) throw new Error(res.message);
+  }
+
+  // ── Credentials (凭证管理) ──────────────────────────────
+
+  /** Admin: Get all credentials (masked values). */
+  async getCredentials(): Promise<CredentialItem[]> {
+    const res = await this.request<CredentialItem[]>("/api/admin/credentials");
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Get a single credential by ID (masked value). */
+  async getCredential(id: number): Promise<CredentialItem> {
+    const res = await this.request<CredentialItem>(`/api/admin/credentials/${id}`);
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Create a new credential. */
+  async createCredential(data: CreateCredentialPayload): Promise<CredentialItem> {
+    const res = await this.request<CredentialItem>("/api/admin/credentials", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Update an existing credential. */
+  async updateCredential(id: number, data: UpdateCredentialPayload): Promise<CredentialItem> {
+    const res = await this.request<CredentialItem>(`/api/admin/credentials/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Delete a credential. */
+  async deleteCredential(id: number): Promise<void> {
+    const res = await this.request<null>(`/api/admin/credentials/${id}`, {
+      method: "DELETE",
+    });
+    if (res.code !== 0) throw new Error(res.message);
+  }
+
+  /** Admin: Test/health-check a credential connection (keepalive). */
+  async testCredential(id: number): Promise<CredentialTestResult> {
+    const res = await this.request<CredentialTestResult>(`/api/admin/credentials/${id}/test`, {
+      method: "POST",
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
   }
 }
 

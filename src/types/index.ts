@@ -407,6 +407,10 @@ export * from "./pageConfig";
 
 export * from "./gallery";
 
+// ── Credential Types (re-export) ─────────────────────────
+
+export * from "./credential";
+
 // ── Pet Types (re-export) ────────────────────────────────
 
 export * from "./pet";

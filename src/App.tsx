@@ -51,6 +51,7 @@ const MessagesPage = lazy(() => import("./pages/admin/MessagesPage"));
 const LogsPage = lazy(() => import("./pages/admin/LogsPage"));
 const PageConfigsPage = lazy(() => import("./pages/admin/PageConfigsPage"));
 const GalleryPage = lazy(() => import("./pages/admin/GalleryPage"));
+const CredentialsPage = lazy(() => import("./pages/admin/CredentialsPage"));
 const ForbiddenPage = lazy(() => import("./pages/admin/ForbiddenPage"));
 
 // ── Pet widget (eager loaded — always visible for authenticated users) ──
@@ -333,6 +334,14 @@ export default function App() {
               element={
                 <PermissionRoute permission="gallery:view">
                   <GalleryPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="credentials"
+              element={
+                <PermissionRoute permission="credential:view">
+                  <CredentialsPage />
                 </PermissionRoute>
               }
             />

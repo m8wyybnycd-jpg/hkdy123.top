@@ -7,9 +7,10 @@
  */
 
 import { checkDailyExpLimit, EXP_RULES, getLevelFromExp } from "../../lib/pet";
+import { getCredentialByProvider, getCredentialMetaByProvider } from "../../lib/credential";
 
 export const onRequestPost = async (context: PageContext): Promise<Response> => {
-  const { DB, XFMAAS_API_KEY } = context.env;
+  const { DB, JWT_SECRET, XFMAAS_API_KEY } = context.env;
   const user = context.data?.user;
 
   if (!user) {
@@ -121,8 +122,37 @@ ${historyText ? '近期对话：\n' + historyText : ''}
     expGained = EXP_RULES.chat;
   }
 
-  // ── 8. Call 讯飞MaaS API (OpenAI-compatible) ──
-  const apiKey = XFMAAS_API_KEY || '';
+  // ── 8. Resolve 讯飞MaaS API key from centralized credential store ──
+  // Primary: D1 credentials table (encrypted, managed by admin backend)
+  // Fallback: XFMAAS_API_KEY environment variable (legacy, for migration)
+  let apiKey = '';
+  let maasEndpoint = 'https://maas-api.cn-huabei-1.xf-yun.com/v2/chat/completions';
+  let maasModel = 'xophunyuan7bmt';
+
+  if (DB && JWT_SECRET) {
+    // Try fetching from D1 credential store
+    apiKey = await getCredentialByProvider(DB, JWT_SECRET, 'xfyun', XFMAAS_API_KEY || '');
+
+    // Also try to get endpoint/model from credential metadata
+    const credMeta = await getCredentialMetaByProvider(DB, 'xfyun');
+    if (credMeta) {
+      if (credMeta.endpointUrl) {
+        // endpoint_url stores the base URL, append /chat/completions if not already present
+        const baseUrl = credMeta.endpointUrl.replace(/\/+$/, '');
+        if (!baseUrl.endsWith('/chat/completions')) {
+          maasEndpoint = `${baseUrl}/chat/completions`;
+        } else {
+          maasEndpoint = baseUrl;
+        }
+      }
+      if (credMeta.metadata?.model_id && typeof credMeta.metadata.model_id === 'string') {
+        maasModel = credMeta.metadata.model_id as string;
+      }
+    }
+  } else {
+    apiKey = XFMAAS_API_KEY || '';
+  }
+
   if (!apiKey) {
     // Fallback: no AI backend, return tips-based response
     const fallbackReply = pageTips || '我是你的云玩精灵，有什么想了解的？';
@@ -145,14 +175,14 @@ ${historyText ? '近期对话：\n' + historyText : ''}
 
   // ── SSE Streaming via 讯飞MaaS ──
   try {
-    const maaSResponse = await fetch('https://maas-api.cn-huabei-1.xf-yun.com/v2/chat/completions', {
+    const maaSResponse = await fetch(maasEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'xophunyuan7bmt',
+        model: maasModel,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage },

@@ -17,6 +17,7 @@ import {
   Image,
   LayoutTemplate,
   MessageSquare,
+  KeyRound,
 } from "lucide-react";
 import { usePermission } from "../../contexts/PermissionContext";
 import { NAV_PERMISSIONS } from "../../constants/permissions";
@@ -64,6 +65,7 @@ const communicationNav: NavItem[] = [
 /** Secondary navigation items (system management). */
 const secondaryNav: NavItem[] = [
   { label: "页面配置", to: "/admin/page-configs", icon: LayoutTemplate, permission: NAV_PERMISSIONS["/admin/page-configs"] },
+  { label: "凭证管理", to: "/admin/credentials", icon: KeyRound, permission: NAV_PERMISSIONS["/admin/credentials"] },
   { label: "权限角色", to: "/admin/roles", icon: ShieldCheck, permission: NAV_PERMISSIONS["/admin/roles"] },
   { label: "日志查看", to: "/admin/logs/operation", icon: ScrollText, permission: NAV_PERMISSIONS["/admin/logs/operation"] },
   { label: "系统设置", to: "/admin/settings", icon: Settings, permission: NAV_PERMISSIONS["/admin/settings"] },
