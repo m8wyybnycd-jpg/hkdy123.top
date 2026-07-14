@@ -237,17 +237,17 @@ export async function getCredentialByProvider(
   try {
     const row = await db
       .prepare(
-        `SELECT encrypted_value, iv FROM credentials
+        `SELECT encrypted_value, encryption_iv FROM credentials
          WHERE provider = ? AND status = 'active'
          ORDER BY updated_at DESC LIMIT 1`
       )
       .bind(provider)
       .first();
 
-    if (row && row.encrypted_value && row.iv) {
+    if (row && row.encrypted_value && row.encryption_iv) {
       return await decryptCredential(
         row.encrypted_value as string,
-        row.iv as string,
+        row.encryption_iv as string,
         secret
       );
     }
@@ -277,17 +277,17 @@ export async function getCredentialByName(
   try {
     const row = await db
       .prepare(
-        `SELECT encrypted_value, iv FROM credentials
+        `SELECT encrypted_value, encryption_iv FROM credentials
          WHERE name = ? AND status = 'active'
          ORDER BY updated_at DESC LIMIT 1`
       )
       .bind(name)
       .first();
 
-    if (row && row.encrypted_value && row.iv) {
+    if (row && row.encrypted_value && row.encryption_iv) {
       return await decryptCredential(
         row.encrypted_value as string,
-        row.iv as string,
+        row.encryption_iv as string,
         secret
       );
     }

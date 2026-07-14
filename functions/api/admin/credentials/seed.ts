@@ -31,8 +31,15 @@ export const onRequestGet = async (context: PageContext): Promise<Response> => {
   // Idempotent: skip if xfyun already exists
   const existing = await getCredentialMetaByProvider(DB, "xfyun");
   if (existing) {
+    // Verify decryption works (proves column-name fix is live)
+    const roundtrip = await getCredentialByProvider(DB, JWT_SECRET, "xfyun", "");
     return jsonResponse(
-      { skipped: true, id: existing.id },
+      {
+        skipped: true,
+        id: existing.id,
+        roundtripMatch: roundtrip === XFMAAS_API_KEY,
+        decryptedLength: roundtrip.length,
+      },
       "xfyun 凭证已存在，跳过迁移"
     );
   }

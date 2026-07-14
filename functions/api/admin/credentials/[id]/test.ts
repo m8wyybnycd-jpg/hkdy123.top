@@ -89,7 +89,7 @@ async function healthCheck(
       if (endpoint) {
         const value = await decryptCredential(
           credential.encrypted_value as string,
-          credential.iv as string,
+          credential.encryption_iv as string,
           secret
         );
         const resp = await fetch(endpoint, {
