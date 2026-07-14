@@ -124,7 +124,7 @@ async function healthCheck(
 
     const value = await decryptCredential(
       credential.encrypted_value as string,
-      credential.iv as string,
+      credential.encryption_iv as string,
       secret
     );
 

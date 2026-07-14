@@ -1,0 +1,15 @@
+{
+  "name": "cloudgame-hub-keepalive",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Credential keepalive Worker with Cron Trigger for cloudgame-hub",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250101.0",
+    "wrangler": "^4.0.0"
+  }
+}

@@ -1,0 +1,24 @@
+name = "cloudgame-hub-keepalive"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# ── Cron Triggers ──
+# Runs every 30 minutes to check credential health
+# Cloudflare Workers Cron uses UTC time
+[triggers]
+crons = ["*/30 * * * *"]
+
+# ── D1 database binding (shared with main Pages project) ──
+[[d1_databases]]
+binding = "DB"
+database_name = "cloudgame-hub-db"
+database_id = "1e65f62f-e7a3-4a89-88eb-f34c95f4969c"
+
+# ── Environment Variables ──
+# JWT_SECRET is used for credential decryption (same as Pages project)
+# Set via: wrangler secret put JWT_SECRET --name cloudgame-hub-keepalive
+# XFMAAS_API_KEY is used as fallback if D1 credential is missing
+# Set via: wrangler secret put XFMAAS_API_KEY --name cloudgame-hub-keepalive
+
+[observability]
+enabled = true
