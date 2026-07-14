@@ -414,3 +414,7 @@ export * from "./credential";
 // ── Pet Types (re-export) ────────────────────────────────
 
 export * from "./pet";
+
+// ── Admin Pet Types (re-export) ──────────────────────────
+
+export * from "./adminPet";

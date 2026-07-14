@@ -36,6 +36,8 @@ export const ALL_PERMISSION_CODES = [
   "gallery:manage",
   "credential:view",
   "credential:manage",
+  "pet:view",
+  "pet:manage",
 ] as const;
 
 /** 权限按模块分组（用于权限分配视图渲染）。 */
@@ -167,6 +169,14 @@ export const PERMISSION_GROUPS: {
       { code: "credential:manage", name: "管理凭证" },
     ],
   },
+  {
+    module: "pet",
+    moduleLabel: "宠物管理",
+    permissions: [
+      { code: "pet:view", name: "查看宠物" },
+      { code: "pet:manage", name: "管理宠物" },
+    ],
+  },
 ];
 
 /** 侧边栏菜单项与权限码映射。 */
@@ -189,4 +199,5 @@ export const NAV_PERMISSIONS: Record<string, string> = {
   "/admin/page-configs": "page:manage",
   "/admin/gallery": "gallery:view",
   "/admin/credentials": "credential:view",
+  "/admin/pets": "pet:view",
 };

@@ -40,6 +40,11 @@ import type {
   CreateCredentialPayload,
   UpdateCredentialPayload,
   CredentialTestResult,
+  AdminPetItem,
+  AdminPetStats,
+  AdminPetConversation,
+  AdminPetMemory,
+  AdminPetListResponse,
 } from "../types";
 
 // ── Lazy-loaded static data (only loaded when API is unavailable) ──
@@ -1203,6 +1208,70 @@ export class ApiClient {
     const res = await this.request<CredentialTestResult>(`/api/admin/credentials/${id}/test`, {
       method: "POST",
     });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  // ── Pets (宠物管理) ─────────────────────────────────────
+
+  /** Admin: Get pet statistics overview. */
+  async getPetStats(): Promise<AdminPetStats> {
+    const res = await this.request<AdminPetStats>("/api/admin/pets/stats");
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: List all pets (paginated). */
+  async getAdminPets(params?: {
+    page?: number;
+    pageSize?: number;
+    level?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+  }): Promise<AdminPetListResponse> {
+    const query = new URLSearchParams();
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.pageSize) query.set("pageSize", String(params.pageSize));
+    if (params?.level) query.set("level", String(params.level));
+    if (params?.search) query.set("search", params.search);
+    if (params?.sortBy) query.set("sortBy", params.sortBy);
+    if (params?.sortOrder) query.set("sortOrder", params.sortOrder);
+    const qs = query.toString();
+    const res = await this.request<AdminPetListResponse>(`/api/admin/pets${qs ? `?${qs}` : ""}`);
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Get a single pet's full detail. */
+  async getAdminPet(id: number): Promise<AdminPetItem> {
+    const res = await this.request<AdminPetItem>(`/api/admin/pets/${id}`);
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Get pet conversations (paginated). */
+  async getPetConversations(
+    petId: number,
+    page: number = 1,
+    pageSize: number = 20
+  ): Promise<{ items: AdminPetConversation[]; total: number; page: number; pageSize: number; totalPages: number }> {
+    const res = await this.request<{ items: AdminPetConversation[]; total: number; page: number; pageSize: number; totalPages: number }>(
+      `/api/admin/pets/${petId}/conversations?page=${page}&pageSize=${pageSize}`
+    );
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Get pet memories (paginated). */
+  async getPetMemories(
+    petId: number,
+    page: number = 1,
+    pageSize: number = 20
+  ): Promise<{ items: AdminPetMemory[]; total: number; page: number; pageSize: number; totalPages: number }> {
+    const res = await this.request<{ items: AdminPetMemory[]; total: number; page: number; pageSize: number; totalPages: number }>(
+      `/api/admin/pets/${petId}/memories?page=${page}&pageSize=${pageSize}`
+    );
     if (res.code !== 0) throw new Error(res.message);
     return res.data;
   }
