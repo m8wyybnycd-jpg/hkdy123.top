@@ -58,7 +58,7 @@ export const onRequestGet = async (
 
     // Get paginated results
     const result = await DB.prepare(
-      `SELECT id, email, username, is_admin, created_at, updated_at
+      `SELECT id, email, username, is_admin, level, created_at, updated_at
        FROM users ${whereClause}
        ORDER BY id DESC LIMIT ? OFFSET ?`
     )
@@ -70,6 +70,7 @@ export const onRequestGet = async (
       email: row.email as string,
       username: (row.username as string) ?? "",
       isAdmin: row.is_admin === 1,
+      level: (row.level as number) ?? 1,
       createdAt: row.created_at as string,
       updatedAt: (row.updated_at as string) ?? "",
     }));

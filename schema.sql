@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT    NOT NULL,
   salt          TEXT    NOT NULL,
   created_at    TEXT    NOT NULL,
-  updated_at    TEXT    NOT NULL
+  updated_at    TEXT    NOT NULL,
+  level         INTEGER NOT NULL DEFAULT 1
 );
 
 -- ============================================

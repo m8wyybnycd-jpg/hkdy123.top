@@ -292,6 +292,8 @@ export interface AdminUserItem {
   username: string;
   /** Whether the user has admin privileges. */
   isAdmin: boolean;
+  /** Account level / membership tier (1-10). */
+  level?: number;
   /** Account creation timestamp (ISO 8601). */
   createdAt: string;
   /** Last update timestamp (ISO 8601). */

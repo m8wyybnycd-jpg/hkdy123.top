@@ -42,7 +42,7 @@ export const onRequestPut = async (
   let existing: Record<string, unknown> | null;
   try {
     existing = await DB.prepare(
-      "SELECT id, email, username, is_admin, created_at, updated_at FROM users WHERE id = ?"
+      "SELECT id, email, username, is_admin, level, created_at, updated_at FROM users WHERE id = ?"
     )
       .bind(id)
       .first();
@@ -92,7 +92,7 @@ export const onRequestPut = async (
 
   // Return updated user
   const updated = await DB.prepare(
-    "SELECT id, email, username, is_admin, created_at, updated_at FROM users WHERE id = ?"
+    "SELECT id, email, username, is_admin, level, created_at, updated_at FROM users WHERE id = ?"
   )
     .bind(id)
     .first();
@@ -102,6 +102,7 @@ export const onRequestPut = async (
     email: (updated?.email as string) ?? "",
     username: (updated?.username as string) ?? "",
     isAdmin: updated?.is_admin === 1,
+    level: (updated?.level as number) ?? 1,
     createdAt: (updated?.created_at as string) ?? "",
     updatedAt: (updated?.updated_at as string) ?? "",
   };
