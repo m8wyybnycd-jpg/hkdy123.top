@@ -9,13 +9,20 @@ import {
   AlertCircle,
   AlertTriangle,
   UserCog,
+  ArrowUpDown,
+  X,
 } from "lucide-react";
 import { apiClient } from "../../services/api";
 import { usePermission } from "../../contexts/PermissionContext";
+import { useAuthContext } from "../../contexts/AuthContext";
 import type { AdminUserItem, PaginatedResponse, RoleOption } from "../../types";
 import UserRoleModal from "../../components/admin/UserRoleModal";
 import HasPermission from "../../components/HasPermission";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
+
+/** Minimum and maximum user level values (must match backend validation). */
+const MIN_LEVEL = 1;
+const MAX_LEVEL = 10;
 
 /** Default page size for the user list. */
 const DEFAULT_PAGE_SIZE = 20;
@@ -52,8 +59,19 @@ export default function UsersPage() {
   const [roleModalOpen, setRoleModalOpen] = useState<boolean>(false);
   const [roleModalUser, setRoleModalUser] = useState<AdminUserItem | null>(null);
 
+  // Level modal state
+  const [levelTarget, setLevelTarget] = useState<AdminUserItem | null>(null);
+  const [levelValue, setLevelValue] = useState<number>(1);
+  const [levelSaving, setLevelSaving] = useState<boolean>(false);
+  const [levelError, setLevelError] = useState<string>("");
+  const levelModalRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(levelModalRef, !!levelTarget, () => setLevelTarget(null));
+
   const { hasPermission } = usePermission();
+  const { authState } = useAuthContext();
+  const currentUserId = authState.user?.id ?? null;
   const canManageUsers = hasPermission("user:manage");
+  const canManageLevel = hasPermission("user:manage_level");
 
   const fetchUsers = useCallback(
     async (search: string, pageNum: number): Promise<void> => {
@@ -146,6 +164,31 @@ export default function UsersPage() {
     }
   };
 
+  const handleOpenLevelModal = (user: AdminUserItem): void => {
+    setLevelTarget(user);
+    setLevelValue(user.level ?? MIN_LEVEL);
+    setLevelError("");
+  };
+
+  const handleSaveLevel = async (): Promise<void> => {
+    if (!levelTarget) return;
+    const target = levelTarget;
+    const newLevel = Math.min(MAX_LEVEL, Math.max(MIN_LEVEL, Math.round(levelValue)));
+    try {
+      setLevelSaving(true);
+      setLevelError("");
+      await apiClient.updateUserLevel(target.id, newLevel);
+      setLevelTarget(null);
+      await fetchUsers(searchTerm, page);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "操作失败";
+      setLevelError(msg);
+      setError(msg);
+    } finally {
+      setLevelSaving(false);
+    }
+  };
+
   const totalPages: number = data ? Math.ceil(data.total / data.pageSize) : 1;
 
   return (
@@ -197,6 +240,7 @@ export default function UsersPage() {
                 <th className="px-4 py-3 font-semibold text-slate-300">邮箱</th>
                 <th className="px-4 py-3 font-semibold text-slate-300">用户名</th>
                 <th className="px-4 py-3 font-semibold text-slate-300">角色</th>
+                <th className="px-4 py-3 font-semibold text-slate-300">等级</th>
                 <th className="px-4 py-3 font-semibold text-slate-300">注册时间</th>
                 <th className="px-4 py-3 text-right font-semibold text-slate-300">操作</th>
               </tr>
@@ -204,13 +248,13 @@ export default function UsersPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-slate-400">
+                  <td colSpan={7} className="px-4 py-12 text-center text-slate-400">
                     加载中…
                   </td>
                 </tr>
               ) : !data || data.list.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-slate-400">
+                  <td colSpan={7} className="px-4 py-12 text-center text-slate-400">
                     暂无数据
                   </td>
                 </tr>
@@ -251,6 +295,11 @@ export default function UsersPage() {
                       </td>
                       <td className="px-4 py-3 text-slate-400">{formatDate(user.createdAt)}</td>
                       <td className="px-4 py-3">
+                        <span className="inline-flex items-center rounded-full bg-aurora-cyan/15 px-2 py-0.5 text-xs font-medium text-aurora-cyan">
+                          Lv.{user.level ?? 1}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-2">
                           {canManageUsers && (
                             <button
@@ -264,6 +313,20 @@ export default function UsersPage() {
                               <span className="hidden sm:inline">分配角色</span>
                             </button>
                           )}
+                          <HasPermission code="user:manage_level">
+                            <button
+                              onClick={() => handleOpenLevelModal(user)}
+                              disabled={actionLoading === user.id || currentUserId === user.id}
+                              className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-[#2EA7FF] hover:bg-aurora-cyan/10 disabled:opacity-50"
+                              title={
+                                currentUserId === user.id ? "不能修改自己的等级" : "调整等级"
+                              }
+                              aria-label="调整等级"
+                            >
+                              <ArrowUpDown className="h-3.5 w-3.5" />
+                              <span className="hidden sm:inline">调整等级</span>
+                            </button>
+                          </HasPermission>
                           <button
                             onClick={() => handleToggleAdmin(user)}
                             disabled={actionLoading === user.id}
@@ -362,6 +425,127 @@ export default function UsersPage() {
                 className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
               >
                 {actionLoading === deleteTarget.id ? "删除中…" : "确认删除"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Adjust Level Modal */}
+      {levelTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div
+            ref={levelModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="调整用户等级"
+            className="w-full max-w-sm rounded-lg bg-white/[0.04] p-6 shadow-[0_20px_60px_rgba(2,6,23,0.6)]"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-slate-100">调整用户等级</h3>
+              <button
+                onClick={() => setLevelTarget(null)}
+                className="rounded-md p-1 text-slate-400 hover:bg-white/[0.08]"
+                aria-label="关闭"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="text-sm text-slate-400">
+              用户：<span className="font-medium text-slate-200">{levelTarget.email}</span>
+            </p>
+
+            <div className="mt-4 flex items-center justify-between rounded-md bg-white/[0.06] px-4 py-3">
+              <span className="text-sm text-slate-400">当前等级</span>
+              <span className="text-lg font-semibold text-aurora-cyan">
+                Lv.{levelTarget.level ?? 1}
+              </span>
+            </div>
+
+            {levelError && (
+              <div className="mt-3 flex items-start gap-2 rounded-md border border-red-500/50 bg-red-500/15 px-3 py-2 text-sm text-red-400">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{levelError}</span>
+              </div>
+            )}
+
+            <div className="mt-4">
+              <label htmlFor="level-input" className="mb-2 block text-sm text-slate-300">
+                新等级（{MIN_LEVEL}–{MAX_LEVEL}）
+              </label>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setLevelValue((v) => Math.max(MIN_LEVEL, v - 1))
+                  }
+                  disabled={levelValue <= MIN_LEVEL || levelSaving}
+                  className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-lg text-slate-300 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label="降低等级"
+                >
+                  −
+                </button>
+                <input
+                  id="level-input"
+                  type="number"
+                  min={MIN_LEVEL}
+                  max={MAX_LEVEL}
+                  value={levelValue}
+                  disabled={levelSaving}
+                  onChange={(e) => {
+                    const n = parseInt(e.target.value, 10);
+                    if (!Number.isNaN(n)) setLevelValue(n);
+                  }}
+                  className="h-9 w-16 rounded-md border border-white/10 bg-white/[0.06] text-center text-base text-slate-100 outline-none focus:border-[#2EA7FF] focus:ring-1 focus:ring-[#2EA7FF]"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setLevelValue((v) => Math.min(MAX_LEVEL, v + 1))
+                  }
+                  disabled={levelValue >= MAX_LEVEL || levelSaving}
+                  className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 text-lg text-slate-300 hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label="提高等级"
+                >
+                  +
+                </button>
+              </div>
+
+              <p className="mt-2 text-xs text-slate-400">
+                操作方向：
+                <span
+                  className={
+                    levelValue > (levelTarget.level ?? 1)
+                      ? "font-medium text-green-400"
+                      : levelValue < (levelTarget.level ?? 1)
+                      ? "font-medium text-amber-400"
+                      : "font-medium text-slate-300"
+                  }
+                >
+                  {levelValue > (levelTarget.level ?? 1)
+                    ? "升级"
+                    : levelValue < (levelTarget.level ?? 1)
+                    ? "降级"
+                    : "保持不变"}
+                </span>
+              </p>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setLevelTarget(null)}
+                disabled={levelSaving}
+                className="rounded-md border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/[0.08] disabled:opacity-50"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleSaveLevel}
+                disabled={levelSaving || levelValue === (levelTarget.level ?? 1)}
+                className="rounded-md bg-[#2EA7FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#1d8ad6] disabled:opacity-50"
+              >
+                {levelSaving ? "保存中…" : "确认调整"}
               </button>
             </div>
           </div>

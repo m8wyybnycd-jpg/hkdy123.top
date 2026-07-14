@@ -439,6 +439,19 @@ export class ApiClient {
     if (res.code !== 0) throw new Error(res.message);
   }
 
+  /** Admin: Update a user's level (1–10). Requires user:manage_level. */
+  async updateUserLevel(
+    id: number,
+    level: number
+  ): Promise<{ id: number; level: number; oldLevel: number }> {
+    const res = await this.request<{ id: number; level: number; oldLevel: number }>(
+      `/api/admin/users/${id}/level`,
+      { method: "POST", body: JSON.stringify({ level }) }
+    );
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
   /** Admin: Create a new platform. */
   async createPlatform(data: Record<string, unknown>): Promise<Platform> {
     const res = await this.request<Platform>("/api/admin/platforms", {
