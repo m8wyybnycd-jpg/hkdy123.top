@@ -18,7 +18,7 @@ export const onRequestGet = async (context: PageContext): Promise<Response> => {
   const userId = user.userId as number;
 
   const pet = await DB.prepare(
-    "SELECT id, user_id, name, level, exp, state, mood, total_chats, total_browses, total_likes, hatched_at, created_at, updated_at FROM pets WHERE user_id = ?"
+    "SELECT id, user_id, name, level, exp, state, mood, total_chats, total_browses, total_likes, streak_days, last_checkin_date, hatched_at, created_at, updated_at FROM pets WHERE user_id = ?"
   ).bind(userId).first();
 
   if (!pet) {

@@ -25,27 +25,32 @@ import type {
 // ── Constants ────────────────────────────────────────────
 
 const LEVEL_COLORS: Record<number, string> = {
-  1: "text-slate-400 bg-slate-500/10",
-  2: "text-green-400 bg-green-500/10",
-  3: "text-cyan-400 bg-cyan-500/10",
-  4: "text-blue-400 bg-blue-500/10",
-  5: "text-purple-400 bg-purple-500/10",
+  1: "text-cyan-400 bg-cyan-500/10",           // 蛋 → 青蓝
+  2: "text-amber-400 bg-amber-500/10",          // 幼崽 → 琥珀
+  3: "text-indigo-400 bg-indigo-500/10",        // 少年 → 靛蓝
+  4: "text-sky-400 bg-sky-500/10",              // 青年
+  5: "text-emerald-400 bg-emerald-500/10",      // 成年
+  6: "text-yellow-400 bg-yellow-500/10",        // 精英 → 金色
+  7: "text-white bg-white/10",                  // 传说 → 纯白
 };
 
 const STATE_LABELS: Record<string, string> = {
-  egg: "蛋形态",
-  baby: "幼体",
-  juvenile: "成长期",
-  adult: "成熟期",
-  elder: "长老期",
+  idle: "空闲",
+  waving: "挥手",
+  jumping: "跳跃",
+  running: "奔跑",
+  failed: "失败",
+  waiting: "等待",
+  review: "检查",
 };
 
 const MOOD_LABELS: Record<string, string> = {
   happy: "开心",
-  neutral: "平静",
-  sad: "低落",
-  excited: "兴奋",
-  sleepy: "困倦",
+  sad: "难过",
+  angry: "生气",
+  curious: "好奇",
+  thinking: "思考",
+  sleep: "睡眠",
 };
 
 const MEMORY_TYPE_LABELS: Record<string, string> = {
@@ -211,11 +216,13 @@ export default function PetsPage() {
             className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-slate-300 focus:border-aurora-cyan/50 focus:outline-none"
           >
             <option value="all">全部</option>
-            <option value="1">Lv.1</option>
-            <option value="2">Lv.2</option>
-            <option value="3">Lv.3</option>
-            <option value="4">Lv.4</option>
-            <option value="5">Lv.5</option>
+            <option value="1">Lv.1 蛋</option>
+            <option value="2">Lv.2 幼崽</option>
+            <option value="3">Lv.3 少年</option>
+            <option value="4">Lv.4 青年</option>
+            <option value="5">Lv.5 成年</option>
+            <option value="6">Lv.6 精英</option>
+            <option value="7">Lv.7 传说</option>
           </select>
         </div>
         <span className="ml-auto text-xs text-slate-500">共 {total} 只</span>

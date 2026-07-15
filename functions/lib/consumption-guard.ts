@@ -392,13 +392,14 @@ export async function consumptionGuard(
     }
   } catch (err) {
     console.error("[consumption-guard] Quota check failed:", err);
-    // Fail open: if quota check errors, allow the request (table may not exist yet)
-    quota = {
-      dailyLimit: DEFAULT_DAILY_LIMIT,
-      monthlyLimit: DEFAULT_MONTHLY_LIMIT,
-      currentDailyUsage: 0,
-      currentMonthlyUsage: 0,
-      isUnlimited: false,
+    // Fail CLOSED: if quota check errors, BLOCK the request.
+    // Allowing requests when the safety mechanism is broken creates an
+    // exploitable bypass (e.g. D1 outage → infinite free AI consumption).
+    return {
+      allowed: false,
+      statusCode: 503,
+      code: 50301,
+      reason: "配额检查服务异常，请稍后重试",
     };
   }
 
@@ -422,7 +423,17 @@ export async function consumptionGuard(
     }
   } catch (err) {
     console.error("[consumption-guard] Rate limit check failed:", err);
-    // Fail open: if rate-limit check errors, allow the request
+    // Fail CLOSED: if rate-limit check errors, BLOCK the request.
+    // This prevents attackers from exploiting D1 outages to bypass
+    // rate limits and drain AI quotas.
+    return {
+      allowed: false,
+      statusCode: 503,
+      code: 50302,
+      reason: "频率检查服务异常，请稍后重试",
+      quota,
+      rateLimitRule: rateLimitRule ?? undefined,
+    };
   }
 
   return {

@@ -26,6 +26,7 @@ const ALLOWED_ORIGINS = [
   "https://hkdy123.top",
   "http://localhost:5173",
   "http://localhost:4173",
+  "http://localhost:8787",
 ];
 
 /**
@@ -33,9 +34,23 @@ const ALLOWED_ORIGINS = [
  */
 function getAllowedOrigin(request: Request): string | null {
   const origin = request.headers.get("Origin");
-  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+  if (!origin) return null;
+  
+  if (ALLOWED_ORIGINS.includes(origin)) {
     return origin;
   }
+  
+  // Allow localhost origins for desktop apps (Neutralinojs/Tauri)
+  // These serve from random ports on localhost/127.0.0.1
+  try {
+    const url = new URL(origin);
+    if (url.hostname === "localhost" || url.hostname === "127.0.0.1" || url.hostname === "[::1]") {
+      return origin;
+    }
+  } catch {
+    // Malformed origin → not allowed
+  }
+  
   return null;
 }
 

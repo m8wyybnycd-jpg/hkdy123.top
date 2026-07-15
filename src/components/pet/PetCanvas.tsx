@@ -14,7 +14,7 @@ import type { PetState } from "../../types/pet";
 interface PetCanvasProps {
   state: PetState;
   size: number; // canvas size in px
-  level: number; // 1-5, affects appearance
+  level: number; // 1-7, affects appearance
   className?: string;
 }
 
@@ -30,10 +30,38 @@ const STATE_CONFIG: Record<PetState, { frames: number; fps: number }> = {
   review: { frames: 6, fps: 4 },
 };
 
-// ── Level colors ─────────────────────────────────────────
+// ── Level colors (7-level temperature-drift: cool→warm→legendary) ──
+// Designer spec: L1 青蓝 → L2 琥珀 → L3 靛蓝 → L4 天蓝 → L5 翠绿 → L6 金色 → L7 纯白
 
-const LEVEL_BODY_COLORS = ['#fbbf24', '#6366f1', '#818cf8', '#a78bfa', '#c084fc'];
-const LEVEL_GLOW_COLORS = ['rgba(251,191,36,0.3)', 'rgba(99,102,241,0.3)', 'rgba(129,140,248,0.3)', 'rgba(167,139,250,0.3)', 'rgba(192,132,252,0.4)'];
+const LEVEL_BODY_COLORS = [
+  '#06B6D4',  // L1 蛋    — 青蓝
+  '#F59E0B',  // L2 幼崽  — 琥珀
+  '#6366F1',  // L3 少年  — 靛蓝
+  '#38BDF8',  // L4 青年  — 天蓝
+  '#10B981',  // L5 成年  — 翠绿
+  '#EAB308',  // L6 精英  — 金色
+  '#FFFFFF',  // L7 传说  — 纯白
+];
+
+const LEVEL_GLOW_COLORS = [
+  'rgba(6,182,212,0.3)',    // L1
+  'rgba(245,158,11,0.3)',   // L2
+  'rgba(99,102,241,0.3)',   // L3
+  'rgba(56,189,248,0.35)',  // L4
+  'rgba(16,185,129,0.35)',  // L5
+  'rgba(234,179,8,0.4)',    // L6
+  'rgba(255,255,255,0.45)', // L7
+];
+
+const LEVEL_ACCENT_COLORS = [
+  null,        // L1 — no accent
+  '#06B6D4',   // L2 — 青蓝斑点（双色）
+  '#F59E0B',   // L3 — 琥珀点缀
+  '#FFFFFF',   // L4 — 白色高亮核
+  '#06B6D4',   // L5 — 青蓝光晕
+  '#F59E0B',   // L6 — 金色装甲
+  null,        // L7 — 全光谱（特殊处理）
+];
 
 export function PetCanvas({ state, size, level, className }: PetCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -45,8 +73,9 @@ export function PetCanvas({ state, size, level, className }: PetCanvasProps) {
     const s = size;
     ctx.clearRect(0, 0, s, s);
 
-    const bodyColor = LEVEL_BODY_COLORS[Math.min(currentLevel - 1, 4)];
-    const glowColor = LEVEL_GLOW_COLORS[Math.min(currentLevel - 1, 4)];
+    const bodyColor = LEVEL_BODY_COLORS[Math.min(currentLevel - 1, 6)];
+    const glowColor = LEVEL_GLOW_COLORS[Math.min(currentLevel - 1, 6)];
+    const accentColor = LEVEL_ACCENT_COLORS[Math.min(currentLevel - 1, 6)];
 
     // ── Level 1 (egg): draw an egg ──
     if (currentLevel === 1) {
@@ -224,16 +253,74 @@ export function PetCanvas({ state, size, level, className }: PetCanvasProps) {
       ctx.fill();
     }
 
-    // ── Level 5: add crown/sparkle ──
-    if (currentLevel >= 5) {
-      ctx.fillStyle = '#fde047';
+    // ── Level-specific decorations (7-level temperature-drift) ──
+    if (currentLevel >= 7) {
+      // L7 传说: multilayer stardust + pure white core
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      drawSparkle(ctx, 0, -s * 0.42, s * 0.06);
+      ctx.fillStyle = 'rgba(167,139,250,0.3)'; // low-sat purple ambient (< 0.12 opacity equivalent)
+      drawSparkle(ctx, -s * 0.35, -s * 0.18, s * 0.035);
+      drawSparkle(ctx, s * 0.35, -s * 0.18, s * 0.035);
+      // Orbiting micro-particles
+      for (let i = 0; i < 6; i++) {
+        const angle = (frame * 0.02 + i * Math.PI / 3) % (Math.PI * 2);
+        const r = s * 0.38;
+        ctx.fillStyle = `hsla(${(frame * 2 + i * 60) % 360}, 40%, 80%, 0.5)`;
+        ctx.beginPath();
+        ctx.arc(Math.cos(angle) * r, Math.sin(angle) * r * 0.6 - s * 0.05, s * 0.015, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (currentLevel >= 6) {
+      // L6 精英: golden armor particles + trailing sparks
+      ctx.fillStyle = '#EAB308';
       drawSparkle(ctx, 0, -s * 0.4, s * 0.05);
-      drawSparkle(ctx, -s * 0.3, -s * 0.15, s * 0.03);
-      drawSparkle(ctx, s * 0.3, -s * 0.15, s * 0.03);
+      // Angular armor particles
+      for (let i = 0; i < 4; i++) {
+        const angle = i * Math.PI / 2 + Math.PI / 4;
+        const r = s * 0.32;
+        ctx.fillStyle = 'rgba(234,179,8,0.5)';
+        ctx.beginPath();
+        ctx.arc(Math.cos(angle) * r, Math.sin(angle) * r - s * 0.05, s * 0.02, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (currentLevel >= 5) {
+      // L5 成年: green halo ring
+      ctx.strokeStyle = 'rgba(16,185,129,0.3)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.ellipse(0, -s * 0.05, s * 0.35, s * 0.08, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillStyle = '#10B981';
+      drawSparkle(ctx, 0, -s * 0.38, s * 0.04);
     } else if (currentLevel >= 4) {
-      // Level 4: small sparkle
-      ctx.fillStyle = '#fde047';
-      drawSparkle(ctx, s * 0.2, -s * 0.25, s * 0.025);
+      // L4 青年: white core highlight
+      if (accentColor) {
+        ctx.fillStyle = accentColor;
+        ctx.beginPath();
+        ctx.arc(0, -s * 0.08, s * 0.03, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = '#38BDF8';
+      drawSparkle(ctx, s * 0.22, -s * 0.25, s * 0.025);
+    } else if (currentLevel >= 3) {
+      // L3 少年: small accent sparkle
+      if (accentColor) {
+        ctx.fillStyle = accentColor;
+        drawSparkle(ctx, s * 0.18, -s * 0.28, s * 0.02);
+      }
+    } else if (currentLevel >= 2) {
+      // L2 幼崽: dual-color spots (青蓝 on 琥珀 body)
+      if (accentColor) {
+        ctx.fillStyle = accentColor;
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.arc(-s * 0.12, -s * 0.02, s * 0.035, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(s * 0.08, s * 0.08, s * 0.03, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
     }
 
     // ── Waving arm ──

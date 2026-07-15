@@ -6,7 +6,7 @@
  * Awards exp on each successful conversation turn.
  */
 
-import { checkDailyExpLimit, EXP_RULES, getLevelFromExp } from "../../lib/pet";
+import { checkDailyExpLimit, EXP_RULES, getLevelFromExp, LEVEL_NAMES, getDesignToken, getLevelUpEffect, LevelUpEffect } from "../../lib/pet";
 import { getCredentialByProvider, getCredentialMetaByProvider, resolveEncryptionSecret } from "../../lib/credential";
 import {
   consumptionGuard,
@@ -82,11 +82,27 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
     });
   }
 
-  // ── Bypass Detection: flag suspicious activity (non-blocking) ──
+  // ── Bypass Detection: block malicious patterns, flag desktop sources ──
   const tokenValidation = await validateTokenConsumption(context.request, context.env, userId);
-  if (tokenValidation.suspicious) {
-    // Log but don't block — the guard already passed quota + rate limit checks
-    console.warn("[pet/chat] Suspicious consumption detected:", {
+  if (tokenValidation.hardBlock) {
+    console.error("[pet/chat] BLOCKED suspicious consumption:", {
+      userId,
+      reasons: tokenValidation.suspicionReasons,
+      ip: tokenValidation.ip,
+    });
+    return new Response(JSON.stringify({
+      code: 403,
+      message: "请求被安全策略拦截",
+      reason: tokenValidation.suspicionReasons[0],
+      data: null,
+    }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+  if (tokenValidation.suspicious && !tokenValidation.hardBlock) {
+    // Log non-blocking suspicious activity (e.g. desktop apps without Referer)
+    console.warn("[pet/chat] Non-blocking suspicious consumption:", {
       userId,
       reasons: tokenValidation.suspicionReasons,
       ip: tokenValidation.ip,
@@ -108,7 +124,7 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   const petId = pet.id as number;
   const petName = pet.name as string;
   const petLevel = pet.level as number;
-  const levelName = ['蛋', '幼崽', '成长', '伙伴', '专家'][petLevel - 1];
+  const levelName = LEVEL_NAMES[petLevel - 1];
 
   // ── 2. Get page context from DB ──
   const routePath = pageUrl || '/';
@@ -334,8 +350,9 @@ ${historyText ? '近期对话：\n' + historyText : ''}
           ).bind(petId, fullReply, `${pageIcon} ${pageLabel}`, pageUrl, expGained, timestamp).run();
 
           // ── Award exp ──
+          let levelEffect: LevelUpEffect | null = null;
           if (expGained > 0) {
-            await applyExp(DB, petId, 'chat', expGained);
+            levelEffect = await applyExp(DB, petId, 'chat', expGained);
           }
 
           // ── Try to extract memory from conversation ──
@@ -357,9 +374,26 @@ ${historyText ? '近期对话：\n' + historyText : ''}
             status: "success",
           });
 
-          // ── Send completion signal ──
+          // ── Send completion signal with design tokens ──
+          const designToken = getDesignToken(levelEffect?.toLevel ?? petLevel);
           controller.enqueue(
-            encoder.encode(`data: ${JSON.stringify({ done: true, expGained, fullReply, pageLabel: `${pageIcon} ${pageLabel}` })}\n\n`)
+            encoder.encode(`data: ${JSON.stringify({
+              done: true,
+              expGained,
+              fullReply,
+              pageLabel: `${pageIcon} ${pageLabel}`,
+              designToken,
+              levelEffect: levelEffect
+                ? {
+                    leveledUp: levelEffect.leveledUp,
+                    fromLevel: levelEffect.fromLevel,
+                    toLevel: levelEffect.toLevel,
+                    isHatch: levelEffect.isHatch,
+                    isMaxLevel: levelEffect.isMaxLevel,
+                    toToken: levelEffect.toToken,
+                  }
+                : null,
+            })}\n\n`)
           );
         }
         controller.enqueue(encoder.encode('data: [DONE]\n\n'));
@@ -407,9 +441,9 @@ ${historyText ? '近期对话：\n' + historyText : ''}
 };
 
 // ── Helper: apply exp and check level up ──
-async function applyExp(db: D1Database, petId: number, action: string, expDelta: number): Promise<void> {
+async function applyExp(db: D1Database, petId: number, action: string, expDelta: number): Promise<LevelUpEffect> {
   const pet = await db.prepare("SELECT exp, level FROM pets WHERE id = ?").bind(petId).first();
-  if (!pet) return;
+  if (!pet) return getLevelUpEffect(1, 1); // no pet found, no change
 
   const currentExp = (pet.exp as number) + expDelta;
   const currentLevel = pet.level as number;
@@ -430,6 +464,8 @@ async function applyExp(db: D1Database, petId: number, action: string, expDelta:
     await db.prepare("UPDATE pets SET hatched_at = ? WHERE id = ?")
       .bind(new Date().toISOString(), petId).run();
   }
+
+  return getLevelUpEffect(currentLevel, newLevel);
 }
 
 // ── Helper: extract memory from conversation ──

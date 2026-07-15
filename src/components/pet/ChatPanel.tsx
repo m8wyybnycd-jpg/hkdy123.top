@@ -159,7 +159,7 @@ export function ChatPanel({ position, onClose }: ChatPanelProps) {
             color: '#64748b',
             marginTop: '2px',
           }}>
-            {pet.level >= 5 ? '✨ 已满级' : `${progress.current}/${progress.needed} → 下一级`}
+            {pet.level >= 7 ? '已满级' : `${progress.current}/${progress.needed} → 下一级`}
           </div>
         </div>
 

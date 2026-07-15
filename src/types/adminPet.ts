@@ -15,6 +15,8 @@ export interface AdminPetItem {
   totalChats: number;
   totalBrowses: number;
   totalLikes: number;
+  streakDays: number;
+  lastCheckinDate: string | null;
   hatchedAt: string | null;
   createdAt: string;
   updatedAt: string;

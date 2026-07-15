@@ -12,15 +12,26 @@ export default {
         // Aurora-tinted borders (lighter than pure dark for the glass look)
         "game-border": "#2a2358",
         "game-border-hover": "#3d3480",
-        // ── Aurora brand accents ──
+        // ── Aurora brand accents (V2: purple → indigo per designer) ──
         "neon-blue": "#2EA7FF", // aurora cyan
-        "neon-purple": "#9381FF", // aurora purple
+        "neon-purple": "#6366F1", // indigo (was #9381FF — BonziBuddy avoidance)
         "neon-green": "#13DDC4", // aurora teal
-        // Semantic aliases (match root landing CSS variables)
+        // Semantic aliases
         "aurora-cyan": "#2EA7FF",
-        "aurora-purple": "#9381FF",
+        "aurora-purple": "#6366F1",
         "aurora-teal": "#13DDC4",
         "canvas": "#030014",
+        // ── Pet Designer Tokens (Phase 2 温度漂移体系) ──
+        "growth-cool": "#06B6D4",  // cyan — L1 蛋
+        "growth-warm": "#F59E0B",  // amber — L5 成年
+        "growth-ground": "#10B981", // emerald — L5-L6
+        "growth-legend": "#FFFFFF", // white — L7 核心
+        "emotion-happy": "#F59E0B",
+        "emotion-sad": "#64748B",
+        "emotion-angry": "#F97316",
+        "emotion-curious": "#6366F1",
+        "emotion-thinking": "#06B6D4",
+        "emotion-sleep": "#475569",
       },
       fontFamily: {
         sans: [

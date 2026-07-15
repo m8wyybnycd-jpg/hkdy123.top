@@ -19,7 +19,7 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
 
   // Check if pet already exists
   const existingPet = await DB.prepare(
-    "SELECT id, user_id, name, level, exp, state, mood, total_chats, total_browses, total_likes, hatched_at, created_at, updated_at FROM pets WHERE user_id = ?"
+    "SELECT id, user_id, name, level, exp, state, mood, total_chats, total_browses, total_likes, streak_days, last_checkin_date, hatched_at, created_at, updated_at FROM pets WHERE user_id = ?"
   ).bind(userId).first();
 
   if (existingPet) {
@@ -39,7 +39,7 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   ).bind(userId, timestamp, timestamp).run();
 
   const newPet = await DB.prepare(
-    "SELECT id, user_id, name, level, exp, state, mood, total_chats, total_browses, total_likes, hatched_at, created_at, updated_at FROM pets WHERE user_id = ?"
+    "SELECT id, user_id, name, level, exp, state, mood, total_chats, total_browses, total_likes, streak_days, last_checkin_date, hatched_at, created_at, updated_at FROM pets WHERE user_id = ?"
   ).bind(userId).first();
 
   return new Response(JSON.stringify({

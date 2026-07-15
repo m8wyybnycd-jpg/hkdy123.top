@@ -20,10 +20,12 @@ import { getClientIP, getUserAgent, structuredLog } from "./logger";
 
 /** Result of a token consumption validation. */
 export interface TokenValidationResult {
-  /** Whether the request passed all validation checks. */
+  /** Whether the request passed all critical validation checks. */
   valid: boolean;
   /** Whether the request is suspicious (but not necessarily blocked). */
   suspicious: boolean;
+  /** Whether the request should be HARD BLOCKED (frequency anomaly / IP inconsistency). */
+  hardBlock: boolean;
   /** List of suspicion reasons detected. */
   suspicionReasons: string[];
   /** The client IP extracted from the request. */
@@ -40,11 +42,16 @@ export interface TokenValidationResult {
 
 /** Allowed platform domains for Referer/Origin validation. */
 const PLATFORM_DOMAINS = [
+  // Production domains
   "www.hkdy123.top",
   "hkdy123.top",
+  // Dev
   "localhost:5173",
   "localhost:4173",
   "localhost:8787",
+  // Desktop apps (Neutralinojs / Tauri)
+  "localhost",       // Neutralinojs serves from localhost
+  "127.0.0.1",
 ];
 
 /**
@@ -377,21 +384,33 @@ export async function validateTokenConsumption(
 
   const suspicious = suspicionReasons.length > 0;
 
+  // Determine if this should be hard-blocked.
+  // - Source invalid alone (no Referer) → suspicious but NOT blocked (desktop apps, curl, etc.)
+  // - Signature invalid → blocked (bypass attempt)
+  // - Frequency anomaly → blocked (abuse)
+  // - IP inconsistency → blocked (credential sharing/theft)
+  const hardBlock = suspicionReasons.some(
+    (r) => r.includes("签名异常") || r.includes("频率异常") || r.includes("IP异常")
+  );
+  const valid = !hardBlock; // valid=false means caller should 403
+
   // Log suspicious activity for audit trail
   if (suspicious) {
-    structuredLog("warn", "suspicious_consumption", {
+    structuredLog(hardBlock ? "error" : "warn", hardBlock ? "blocked_consumption" : "suspicious_consumption", {
       userId,
       ip,
       userAgent,
       reasons: suspicionReasons,
       sourceValid,
       signatureValid,
+      hardBlock,
     });
   }
 
   return {
-    valid: true, // Currently never hard-blocks; flags as suspicious instead
+    valid,
     suspicious,
+    hardBlock,
     suspicionReasons,
     ip,
     userAgent,

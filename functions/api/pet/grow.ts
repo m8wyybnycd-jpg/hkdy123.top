@@ -5,7 +5,7 @@
  * Used when user browses a new page or likes a pet reply.
  */
 
-import { checkDailyExpLimit, EXP_RULES, getLevelFromExp } from "../../lib/pet";
+import { checkDailyExpLimit, EXP_RULES, getLevelFromExp, getLevelUpEffect, LevelUpEffect } from "../../lib/pet";
 
 interface GrowRequest {
   action: 'browse' | 'like';
@@ -69,6 +69,7 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   const currentLevel = pet.level as number;
   const newLevel = getLevelFromExp(currentExp);
   const leveledUp = newLevel > currentLevel;
+  const levelEffect = getLevelUpEffect(currentLevel, newLevel);
 
   // Update pet
   const updateField = action === 'browse' ? 'total_browses' : 'total_likes';
@@ -79,7 +80,7 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   // Log growth
   await DB.prepare(
     "INSERT INTO pet_growth_logs (pet_id, action, exp_delta, exp_after, detail, created_at) VALUES (?, ?, ?, ?, ?, ?)"
-  ).bind(petId, action, expDelta, currentExp, body.detail || '', new Date().toISOString()).run();
+  ).bind(petId, action, expDelta, currentExp, leveledUp ? `升级到Lv.${newLevel}` : '', new Date().toISOString()).run();
 
   // Hatching
   if (newLevel >= 2 && currentLevel < 2) {
@@ -90,7 +91,22 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   return new Response(JSON.stringify({
     code: 0,
     message: leveledUp ? `恭喜！你的精灵升级到了Lv.${newLevel}！` : `获得${expDelta}经验值`,
-    data: { expGained: expDelta, leveledUp, currentExp, currentLevel: newLevel },
+    data: {
+      expGained: expDelta,
+      leveledUp,
+      currentExp,
+      currentLevel: newLevel,
+      levelEffect: leveledUp
+        ? {
+            leveledUp: true,
+            fromLevel: levelEffect.fromLevel,
+            toLevel: levelEffect.toLevel,
+            isHatch: levelEffect.isHatch,
+            isMaxLevel: levelEffect.isMaxLevel,
+            toToken: levelEffect.toToken,
+          }
+        : null,
+    },
   }), {
     headers: { "Content-Type": "application/json" },
   });
