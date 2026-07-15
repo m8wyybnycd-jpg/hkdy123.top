@@ -317,7 +317,7 @@ export interface AdminContentItem {
   [key: string]: unknown;
 }
 
-/** Admin dashboard statistics. */
+/** Admin dashboard statistics (legacy, kept for backwards compatibility). */
 export interface AdminDashboardStats {
   /** Total number of registered users. */
   totalUsers: number;
@@ -331,6 +331,146 @@ export interface AdminDashboardStats {
   totalDeals: number;
   /** Total number of games. */
   totalGames: number;
+}
+
+// ── Enhanced Dashboard Types (V4.0) ──────────────────────
+
+/** Time range filter for the dashboard. */
+export type DashboardTimeRange = "today" | "week" | "month" | "custom";
+
+/** Summary section of the dashboard response. */
+export interface DashboardSummary {
+  totalUsers: number;
+  todayNewUsers: number;
+  activeUsers: number;
+  bannedUsers: number;
+  totalPlatforms: number;
+  totalDesktops: number;
+  totalDeals: number;
+  totalGames: number;
+}
+
+/** Consumption section of the dashboard response. */
+export interface DashboardConsumption {
+  todayTokens: number;
+  todayCost: number;
+  todayRequests: number;
+  todayUniqueUsers: number;
+  monthTokens: number;
+  monthCost: number;
+  monthRequests: number;
+  monthUniqueUsers: number;
+  blockedRequests: number;
+}
+
+/** A single credential health status entry. */
+export interface CredentialStatusEntry {
+  id: number;
+  name: string;
+  provider: string;
+  type: string;
+  status: string;
+  lastHealthStatus: string;
+  lastHealthCheck: string | null;
+  expiresAt: string | null;
+  updatedAt: string;
+}
+
+/** Credentials section of the dashboard response. */
+export interface DashboardCredentials {
+  healthy: number;
+  unhealthy: number;
+  total: number;
+  activeCount: number;
+  expiredCount: number;
+  revokedCount: number;
+  errorCount: number;
+  statusList: CredentialStatusEntry[];
+}
+
+/** A single audit event (operation log or status change). */
+export interface AuditEvent {
+  id: number;
+  type: string;
+  userId?: number;
+  username?: string;
+  action: string;
+  module?: string;
+  target?: string;
+  ip?: string;
+  createdAt?: string;
+  oldValue?: string;
+  newValue?: string;
+  operatorId?: number;
+  operatorName?: string;
+  reason?: string;
+  [key: string]: unknown;
+}
+
+/** A security alert entry. */
+export interface SecurityAlert {
+  type: string;
+  severity: "critical" | "warning" | "info" | string;
+  [key: string]: unknown;
+}
+
+/** Security section of the dashboard response. */
+export interface DashboardSecurity {
+  recentAuditEvents: AuditEvent[];
+  alerts: SecurityAlert[];
+}
+
+/** Rate limits section of the dashboard response. */
+export interface DashboardRateLimits {
+  activeViolations: number;
+  quotaExhaustedUsers: number;
+}
+
+/** A point in a trend chart (user growth / token trend). */
+export interface TrendPoint {
+  date: string;
+  count?: number;
+  tokens?: number;
+  tokensIn?: number;
+  tokensOut?: number;
+  cost?: number;
+  requestCount?: number;
+  uniqueUsers?: number;
+}
+
+/** A point in the hourly trend chart. */
+export interface HourPoint {
+  hour: number;
+  count: number;
+  tokens: number;
+}
+
+/** A top consumer entry. */
+export interface Consumer {
+  userId: number;
+  username: string;
+  tokens: number;
+  cost: number;
+  requestCount: number;
+}
+
+/** Charts section of the dashboard response. */
+export interface DashboardCharts {
+  userGrowth: TrendPoint[];
+  tokenTrend: TrendPoint[];
+  hourlyTrend: HourPoint[];
+  topConsumers: Consumer[];
+}
+
+/** Complete enhanced dashboard API response. */
+export interface DashboardResponse {
+  range: string;
+  summary: DashboardSummary;
+  consumption: DashboardConsumption;
+  credentials: DashboardCredentials;
+  security: DashboardSecurity;
+  rateLimits: DashboardRateLimits;
+  charts: DashboardCharts;
 }
 
 /** Send-code API request body. */
@@ -420,3 +560,15 @@ export * from "./pet";
 // ── Admin Pet Types (re-export) ──────────────────────────
 
 export * from "./adminPet";
+
+// ── Token Usage Types (re-export) ────────────────────────
+
+export * from "./token";
+
+// ── Consumption Control Types (re-export) ────────────────
+
+export * from "./consumption";
+
+// ── Security Audit Types (re-export) ─────────────────────
+
+export * from "./audit";

@@ -38,6 +38,12 @@ export const ALL_PERMISSION_CODES = [
   "credential:manage",
   "pet:view",
   "pet:manage",
+  "token:view",
+  "token:manage",
+  "quota:view",
+  "quota:manage",
+  "audit:view",
+  "encryption:manage",
 ] as const;
 
 /** 权限按模块分组（用于权限分配视图渲染）。 */
@@ -177,6 +183,36 @@ export const PERMISSION_GROUPS: {
       { code: "pet:manage", name: "管理宠物" },
     ],
   },
+  {
+    module: "token",
+    moduleLabel: "Token管理",
+    permissions: [
+      { code: "token:view", name: "查看Token使用" },
+      { code: "token:manage", name: "管理Token" },
+    ],
+  },
+  {
+    module: "quota",
+    moduleLabel: "消费控制",
+    permissions: [
+      { code: "quota:view", name: "查看配额" },
+      { code: "quota:manage", name: "管理配额" },
+    ],
+  },
+  {
+    module: "audit",
+    moduleLabel: "安全审计",
+    permissions: [
+      { code: "audit:view", name: "查看审计日志" },
+    ],
+  },
+  {
+    module: "encryption",
+    moduleLabel: "加密管理",
+    permissions: [
+      { code: "encryption:manage", name: "管理加密密钥" },
+    ],
+  },
 ];
 
 /** 侧边栏菜单项与权限码映射。 */
@@ -200,4 +236,7 @@ export const NAV_PERMISSIONS: Record<string, string> = {
   "/admin/gallery": "gallery:view",
   "/admin/credentials": "credential:view",
   "/admin/pets": "pet:view",
+  "/admin/tokens": "token:view",
+  "/admin/consumption": "quota:view",
+  "/admin/audit": "audit:view",
 };

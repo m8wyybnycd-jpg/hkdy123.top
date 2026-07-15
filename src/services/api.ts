@@ -1,5 +1,6 @@
 import type {
-  AdminDashboardStats,
+  DashboardResponse,
+  DashboardTimeRange,
   AdminUserItem,
   ApiResponse,
   AuthResponse,
@@ -45,6 +46,21 @@ import type {
   AdminPetConversation,
   AdminPetMemory,
   AdminPetListResponse,
+  TokenStats,
+  TokenUsageLog,
+  TokenUsageQueryParams,
+  UserQuota,
+  CreateQuotaPayload,
+  UpdateQuotaPayload,
+  BatchQuotaPayload,
+  BatchQuotaResult,
+  RateLimit,
+  CreateRateLimitPayload,
+  UpdateRateLimitPayload,
+  UserStatusLog,
+  CredentialAuditLog,
+  CredentialDecryptLog,
+  AuditLogQueryParams,
 } from "../types";
 
 // ── Lazy-loaded static data (only loaded when API is unavailable) ──
@@ -388,11 +404,24 @@ export class ApiClient {
   // ── Admin Endpoints (V3.0) ─────────────────────────────
 
   /**
-   * Admin: Get dashboard statistics (total users, today's new users,
-   * and counts for each content table). Requires admin JWT.
+   * Admin: Get enhanced dashboard statistics with time range, consumption,
+   * credential health, security audit, and chart data.
+   * Requires admin JWT with `dashboard:view` permission.
    */
-  async getAdminDashboard(): Promise<AdminDashboardStats> {
-    const res = await this.request<AdminDashboardStats>("/api/admin/dashboard");
+  async getAdminDashboard(
+    range?: DashboardTimeRange,
+    from?: string,
+    to?: string
+  ): Promise<DashboardResponse> {
+    const params = new URLSearchParams();
+    params.set("range", range ?? "month");
+    if (range === "custom" && from && to) {
+      params.set("from", from);
+      params.set("to", to);
+    }
+    const res = await this.request<DashboardResponse>(
+      `/api/admin/dashboard?${params.toString()}`
+    );
     if (res.code !== 0) throw new Error(res.message);
     return res.data;
   }
@@ -1284,6 +1313,202 @@ export class ApiClient {
   ): Promise<{ items: AdminPetMemory[]; total: number; page: number; pageSize: number; totalPages: number }> {
     const res = await this.request<{ items: AdminPetMemory[]; total: number; page: number; pageSize: number; totalPages: number }>(
       `/api/admin/pets/${petId}/memories?page=${page}&pageSize=${pageSize}`
+    );
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  // ── Token Management ─────────────────────────────────────
+
+  /** Admin: Get token usage statistics overview. Requires `token:view`. */
+  async getTokenStats(): Promise<TokenStats> {
+    const res = await this.request<TokenStats>("/api/admin/tokens/stats");
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Get paginated token usage logs with filtering. Requires `token:view`. */
+  async getTokenUsage(
+    params?: TokenUsageQueryParams
+  ): Promise<PaginatedResponse<TokenUsageLog>> {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set("page", String(params.page));
+    if (params?.pageSize) qs.set("pageSize", String(params.pageSize));
+    if (params?.userId) qs.set("userId", String(params.userId));
+    if (params?.credentialId) qs.set("credentialId", String(params.credentialId));
+    if (params?.model) qs.set("model", params.model);
+    if (params?.status) qs.set("status", params.status);
+    if (params?.dateFrom) qs.set("dateFrom", params.dateFrom);
+    if (params?.dateTo) qs.set("dateTo", params.dateTo);
+    const query = qs.toString() ? `?${qs.toString()}` : "";
+    const res = await this.request<PaginatedResponse<TokenUsageLog>>(
+      `/api/admin/tokens/usage${query}`
+    );
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  // ── Quota Management ─────────────────────────────────────
+
+  /** Admin: Get paginated user quotas with real-time usage. Requires `quota:view`. */
+  async getQuotas(
+    params?: { page?: number; pageSize?: number; search?: string; realtime?: boolean }
+  ): Promise<PaginatedResponse<UserQuota>> {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set("page", String(params.page));
+    if (params?.pageSize) qs.set("pageSize", String(params.pageSize));
+    if (params?.search) qs.set("search", params.search);
+    if (params?.realtime === false) qs.set("realtime", "false");
+    const query = qs.toString() ? `?${qs.toString()}` : "";
+    const res = await this.request<PaginatedResponse<UserQuota>>(
+      `/api/admin/quotas${query}`
+    );
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Get a single user's quota. Requires `quota:view`. */
+  async getUserQuota(userId: number): Promise<UserQuota> {
+    const res = await this.request<UserQuota>(`/api/admin/quotas/${userId}`);
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Create a quota for a single user. Requires `quota:manage`. */
+  async createQuota(payload: CreateQuotaPayload): Promise<UserQuota> {
+    const res = await this.request<UserQuota>("/api/admin/quotas", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Update a user's quota. Requires `quota:manage`. */
+  async updateQuota(
+    userId: number,
+    payload: UpdateQuotaPayload
+  ): Promise<UserQuota> {
+    const res = await this.request<UserQuota>(`/api/admin/quotas/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Batch update quotas for multiple users. Requires `quota:manage`. */
+  async batchUpdateQuotas(payload: BatchQuotaPayload): Promise<BatchQuotaResult> {
+    const res = await this.request<BatchQuotaResult>("/api/admin/quotas", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  // ── Rate Limit Management ────────────────────────────────
+
+  /** Admin: Get all rate limit rules. Requires `settings:manage`. */
+  async getRateLimits(): Promise<{ list: RateLimit[]; total: number }> {
+    const res = await this.request<{ list: RateLimit[]; total: number }>(
+      "/api/admin/rate-limits"
+    );
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Create a new rate limit rule. Requires `settings:manage`. */
+  async createRateLimit(payload: CreateRateLimitPayload): Promise<RateLimit> {
+    const res = await this.request<RateLimit>("/api/admin/rate-limits", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Update a rate limit rule. Requires `settings:manage`. */
+  async updateRateLimit(
+    id: number,
+    payload: UpdateRateLimitPayload
+  ): Promise<RateLimit> {
+    const res = await this.request<RateLimit>(`/api/admin/rate-limits/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Delete a rate limit rule. Requires `settings:manage`. */
+  async deleteRateLimit(id: number): Promise<void> {
+    const res = await this.request<null>(`/api/admin/rate-limits/${id}`, {
+      method: "DELETE",
+    });
+    if (res.code !== 0) throw new Error(res.message);
+  }
+
+  // ── Audit Logs ───────────────────────────────────────────
+
+  /** Admin: Get global user status change logs. Requires `audit:view`. */
+  async getUserStatusLogs(
+    params?: AuditLogQueryParams
+  ): Promise<PaginatedResponse<UserStatusLog>> {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set("page", String(params.page));
+    if (params?.pageSize) qs.set("pageSize", String(params.pageSize));
+    if (params?.action) qs.set("action", params.action);
+    if (params?.operator) qs.set("operator", params.operator);
+    if (params?.dateFrom) qs.set("dateFrom", params.dateFrom);
+    if (params?.dateTo) qs.set("dateTo", params.dateTo);
+    const query = qs.toString() ? `?${qs.toString()}` : "";
+    const res = await this.request<PaginatedResponse<UserStatusLog>>(
+      `/api/admin/audit/status-logs${query}`
+    );
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Get credential audit logs. Requires `audit:view`. */
+  async getCredentialAuditLogs(
+    params?: AuditLogQueryParams & { credentialId?: number }
+  ): Promise<PaginatedResponse<CredentialAuditLog>> {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set("page", String(params.page));
+    if (params?.pageSize) qs.set("pageSize", String(params.pageSize));
+    if (params?.action) qs.set("action", params.action);
+    if (params?.operator) qs.set("operator", params.operator);
+    if (params?.credentialId) qs.set("credentialId", String(params.credentialId));
+    if (params?.dateFrom) qs.set("dateFrom", params.dateFrom);
+    if (params?.dateTo) qs.set("dateTo", params.dateTo);
+    const query = qs.toString() ? `?${qs.toString()}` : "";
+    const res = await this.request<PaginatedResponse<CredentialAuditLog>>(
+      `/api/admin/audit/credential-logs${query}`
+    );
+    if (res.code !== 0) throw new Error(res.message);
+    return res.data;
+  }
+
+  /** Admin: Get credential decryption logs. Requires `audit:view`. */
+  async getCredentialDecryptLogs(
+    params?: AuditLogQueryParams & {
+      success?: boolean;
+      credentialId?: number;
+      callerService?: string;
+    }
+  ): Promise<PaginatedResponse<CredentialDecryptLog>> {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set("page", String(params.page));
+    if (params?.pageSize) qs.set("pageSize", String(params.pageSize));
+    if (params?.success !== undefined) qs.set("success", String(params.success));
+    if (params?.credentialId) qs.set("credentialId", String(params.credentialId));
+    if (params?.callerService) qs.set("callerService", params.callerService);
+    if (params?.dateFrom) qs.set("dateFrom", params.dateFrom);
+    if (params?.dateTo) qs.set("dateTo", params.dateTo);
+    const query = qs.toString() ? `?${qs.toString()}` : "";
+    const res = await this.request<PaginatedResponse<CredentialDecryptLog>>(
+      `/api/admin/audit/decrypt-logs${query}`
     );
     if (res.code !== 0) throw new Error(res.message);
     return res.data;

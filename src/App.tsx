@@ -53,6 +53,9 @@ const PageConfigsPage = lazy(() => import("./pages/admin/PageConfigsPage"));
 const GalleryPage = lazy(() => import("./pages/admin/GalleryPage"));
 const CredentialsPage = lazy(() => import("./pages/admin/CredentialsPage"));
 const PetsPage = lazy(() => import("./pages/admin/PetsPage"));
+const TokensPage = lazy(() => import("./pages/admin/TokensPage"));
+const ConsumptionPage = lazy(() => import("./pages/admin/ConsumptionPage"));
+const AuditPage = lazy(() => import("./pages/admin/AuditPage"));
 const ForbiddenPage = lazy(() => import("./pages/admin/ForbiddenPage"));
 
 // ── Pet widget (eager loaded — always visible for authenticated users) ──
@@ -351,6 +354,30 @@ export default function App() {
               element={
                 <PermissionRoute permission="pet:view">
                   <PetsPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="tokens"
+              element={
+                <PermissionRoute permission="token:view">
+                  <TokensPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="consumption"
+              element={
+                <PermissionRoute permission="quota:view">
+                  <ConsumptionPage />
+                </PermissionRoute>
+              }
+            />
+            <Route
+              path="audit"
+              element={
+                <PermissionRoute permission="audit:view">
+                  <AuditPage />
                 </PermissionRoute>
               }
             />

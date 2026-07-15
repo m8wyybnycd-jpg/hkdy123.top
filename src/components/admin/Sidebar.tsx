@@ -19,6 +19,9 @@ import {
   MessageSquare,
   KeyRound,
   Cat,
+  Key,
+  Gauge,
+  Shield,
 } from "lucide-react";
 import { usePermission } from "../../contexts/PermissionContext";
 import { NAV_PERMISSIONS } from "../../constants/permissions";
@@ -63,6 +66,13 @@ const communicationNav: NavItem[] = [
   { label: "站内信", to: "/admin/messages", icon: Mail, permission: NAV_PERMISSIONS["/admin/messages"] },
 ];
 
+/** Security & consumption sub-menu items. */
+const securityNav: NavItem[] = [
+  { label: "Token管理", to: "/admin/tokens", icon: Key, permission: NAV_PERMISSIONS["/admin/tokens"] },
+  { label: "消费控制", to: "/admin/consumption", icon: Gauge, permission: NAV_PERMISSIONS["/admin/consumption"] },
+  { label: "安全审计", to: "/admin/audit", icon: Shield, permission: NAV_PERMISSIONS["/admin/audit"] },
+];
+
 /** Secondary navigation items (system management). */
 const secondaryNav: NavItem[] = [
   { label: "页面配置", to: "/admin/page-configs", icon: LayoutTemplate, permission: NAV_PERMISSIONS["/admin/page-configs"] },
@@ -103,6 +113,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const filteredMainNav = useFilteredNav(mainNav);
   const filteredContentNav = useFilteredNav(contentNav);
   const filteredCommunicationNav = useFilteredNav(communicationNav);
+  const filteredSecurityNav = useFilteredNav(securityNav);
   const filteredSecondaryNav = useFilteredNav(secondaryNav);
 
   return (
@@ -196,6 +207,30 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
               </div>
               <div className="space-y-1">
                 {filteredCommunicationNav.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    onClick={onClose}
+                    className={({ isActive }) =>
+                      `${linkBaseClass} ${isActive ? linkActiveClass : linkInactiveClass}`
+                    }
+                  >
+                    <item.icon className="h-[18px] w-[18px] shrink-0" />
+                    <span>{item.label}</span>
+                  </NavLink>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Security & consumption section */}
+          {filteredSecurityNav.length > 0 && (
+            <>
+              <div className="mb-1 mt-6 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                安全与消费
+              </div>
+              <div className="space-y-1">
+                {filteredSecurityNav.map((item) => (
                   <NavLink
                     key={item.to}
                     to={item.to}

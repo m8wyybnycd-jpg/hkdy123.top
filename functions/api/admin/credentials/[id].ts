@@ -18,6 +18,9 @@ import {
 import {
   encryptCredential,
   CREDENTIAL_STATUSES,
+  resolveEncryptionSecret,
+  setKeyCacheTTL,
+  getKeyCacheTTL,
 } from "../../../lib/credential";
 import { logOperation, getClientIP } from "../../../lib/logger";
 
@@ -30,6 +33,7 @@ function toCredentialDTO(row: Record<string, unknown>) {
     provider: row.provider as string,
     endpointUrl: (row.endpoint_url as string) || "",
     maskedValue: row.encrypted_value ? "******" : "",
+    keyVersion: (row.key_version as number) ?? null,
     metadata: safeParseJSON(row.metadata as string),
     status: row.status as string,
     lastHealthCheck: (row.last_health_check as string) || null,
@@ -83,9 +87,21 @@ export const onRequestPut = async (context: PageContext): Promise<Response> => {
   const denied = await requirePermission(context, "credential:manage");
   if (denied) return denied;
 
-  const { DB, JWT_SECRET } = context.env;
+  const { DB } = context.env;
   if (!DB) return serverError("数据库不可用");
-  if (!JWT_SECRET) return serverError("加密密钥未配置");
+
+  // V4: Resolve encryption secret
+  let secret: string;
+  try {
+    secret = resolveEncryptionSecret(context.env);
+  } catch (err) {
+    return serverError(
+      err instanceof Error ? err.message : "加密密钥未配置"
+    );
+  }
+
+  // V4: Configure cache TTL
+  setKeyCacheTTL(getKeyCacheTTL(context.env));
 
   const id = parseInt(context.params.id, 10);
   if (isNaN(id)) return badRequest("无效的凭证 ID");
@@ -151,13 +167,13 @@ export const onRequestPut = async (context: PageContext): Promise<Response> => {
     if (!body.value.trim()) return badRequest("凭证值不能为空");
     let encrypted;
     try {
-      encrypted = await encryptCredential(body.value.trim(), JWT_SECRET);
+      encrypted = await encryptCredential(body.value.trim(), secret, DB);
     } catch (err) {
       console.error("[credentials] Encryption failed on update:", err);
       return serverError("凭证加密失败");
     }
-    updates.push("encrypted_value = ?, encryption_iv = ?");
-    binds.push(encrypted.encryptedValue, encrypted.iv);
+    updates.push("encrypted_value = ?, encryption_iv = ?, key_version = ?");
+    binds.push(encrypted.encryptedValue, encrypted.iv, encrypted.keyVersion ?? null);
   }
   if (body.metadata !== undefined) {
     updates.push("metadata = ?");

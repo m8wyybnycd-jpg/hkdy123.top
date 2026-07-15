@@ -7,11 +7,27 @@
  */
 
 import { checkDailyExpLimit, EXP_RULES, getLevelFromExp } from "../../lib/pet";
-import { getCredentialByProvider, getCredentialMetaByProvider } from "../../lib/credential";
+import { getCredentialByProvider, getCredentialMetaByProvider, resolveEncryptionSecret } from "../../lib/credential";
+import {
+  consumptionGuard,
+  recordTokenUsage,
+  recordBlockedRequest,
+  estimateTokenCount,
+} from "../../lib/consumption-guard";
+import { validateTokenConsumption } from "../../lib/token-validator";
+import { getClientIP, getUserAgent } from "../../lib/logger";
 
 export const onRequestPost = async (context: PageContext): Promise<Response> => {
-  const { DB, JWT_SECRET, XFMAAS_API_KEY } = context.env;
+  const { DB, XFMAAS_API_KEY } = context.env;
   const user = context.data?.user;
+
+  // V4: Resolve encryption secret for credential decryption
+  let secret: string;
+  try {
+    secret = resolveEncryptionSecret(context.env);
+  } catch {
+    secret = context.env.JWT_SECRET || ""; // ultimate fallback
+  }
 
   if (!user) {
     return new Response(JSON.stringify({ code: 401, message: "请先登录", data: null }), {
@@ -43,6 +59,39 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
 
   const pageUrl = body.pageUrl || '';
   const pageContextLabel = body.pageContextLabel || '首页';
+
+  // ── Consumption Guard: check quota + rate limit before any AI work ──
+  const guard = await consumptionGuard(context.request, context.env, userId);
+  if (!guard.allowed) {
+    // Record the blocked request for audit trail
+    await recordBlockedRequest(DB, {
+      userId,
+      endpoint: "/api/pet/chat",
+      reason: guard.reason ?? "消费限制",
+      ip: getClientIP(context.request),
+      userAgent: getUserAgent(context.request),
+    });
+
+    return new Response(JSON.stringify({
+      code: guard.code,
+      message: guard.reason ?? "请求被消费控制拦截",
+      data: null,
+    }), {
+      status: guard.statusCode,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  // ── Bypass Detection: flag suspicious activity (non-blocking) ──
+  const tokenValidation = await validateTokenConsumption(context.request, context.env, userId);
+  if (tokenValidation.suspicious) {
+    // Log but don't block — the guard already passed quota + rate limit checks
+    console.warn("[pet/chat] Suspicious consumption detected:", {
+      userId,
+      reasons: tokenValidation.suspicionReasons,
+      ip: tokenValidation.ip,
+    });
+  }
 
   // ── 1. Get pet info ──
   const pet = await DB.prepare(
@@ -128,14 +177,16 @@ ${historyText ? '近期对话：\n' + historyText : ''}
   let apiKey = '';
   let maasEndpoint = 'https://maas-api.cn-huabei-1.xf-yun.com/v2/chat/completions';
   let maasModel = 'xophunyuan7bmt';
+  let credentialId: number | null = null;
 
-  if (DB && JWT_SECRET) {
+  if (DB) {
     // Try fetching from D1 credential store
-    apiKey = await getCredentialByProvider(DB, JWT_SECRET, 'xfyun', XFMAAS_API_KEY || '');
+    apiKey = await getCredentialByProvider(DB, secret, 'xfyun', XFMAAS_API_KEY || '');
 
     // Also try to get endpoint/model from credential metadata
     const credMeta = await getCredentialMetaByProvider(DB, 'xfyun');
     if (credMeta) {
+      credentialId = credMeta.id;
       if (credMeta.endpointUrl) {
         // endpoint_url stores the base URL, append /chat/completions if not already present
         const baseUrl = credMeta.endpointUrl.replace(/\/+$/, '');
@@ -163,6 +214,21 @@ ${historyText ? '近期对话：\n' + historyText : ''}
     if (expGained > 0) {
       await applyExp(DB, petId, 'chat', expGained);
     }
+
+    // Record usage: 0 tokens (no AI call was made)
+    await recordTokenUsage(DB, {
+      userId,
+      credentialId,
+      model: maasModel,
+      endpoint: "/api/pet/chat",
+      tokensIn: 0,
+      tokensOut: 0,
+      totalTokens: 0,
+      cost: 0,
+      ip: getClientIP(context.request),
+      userAgent: getUserAgent(context.request),
+      status: "success",
+    });
 
     return new Response(JSON.stringify({
       code: 0,
@@ -202,6 +268,22 @@ ${historyText ? '近期对话：\n' + historyText : ''}
       await DB.prepare(
         "INSERT INTO pet_conversations (pet_id, role, content, page_context, page_url, exp_gained, created_at) VALUES (?, 'assistant', ?, ?, ?, ?, ?)"
       ).bind(petId, fallbackReply, `${pageIcon} ${pageLabel}`, pageUrl, 0, timestamp).run();
+
+      // Record usage: error status (AI call failed)
+      await recordTokenUsage(DB, {
+        userId,
+        credentialId,
+        model: maasModel,
+        endpoint: "/api/pet/chat",
+        tokensIn: estimateTokenCount(systemPrompt) + estimateTokenCount(userMessage),
+        tokensOut: 0,
+        totalTokens: 0,
+        cost: 0,
+        ip: getClientIP(context.request),
+        userAgent: getUserAgent(context.request),
+        status: "error",
+        blockReason: `MaaS error: ${maaSResponse.status}`,
+      });
 
       return new Response(JSON.stringify({
         code: 0,
@@ -259,6 +341,22 @@ ${historyText ? '近期对话：\n' + historyText : ''}
           // ── Try to extract memory from conversation ──
           await extractMemory(DB, petId, userMessage, fullReply);
 
+          // ── Record actual token usage ──
+          const tokensIn = estimateTokenCount(systemPrompt) + estimateTokenCount(userMessage);
+          const tokensOut = estimateTokenCount(fullReply);
+          await recordTokenUsage(DB, {
+            userId,
+            credentialId,
+            model: maasModel,
+            endpoint: "/api/pet/chat",
+            tokensIn,
+            tokensOut,
+            totalTokens: tokensIn + tokensOut,
+            ip: getClientIP(context.request),
+            userAgent: getUserAgent(context.request),
+            status: "success",
+          });
+
           // ── Send completion signal ──
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ done: true, expGained, fullReply, pageLabel: `${pageIcon} ${pageLabel}` })}\n\n`)
@@ -281,6 +379,23 @@ ${historyText ? '近期对话：\n' + historyText : ''}
   } catch (err) {
     console.error('讯飞MaaS fetch failed:', err);
     const fallbackReply = pageTips || '我现在有点累，稍后再聊~';
+
+    // Record usage: error status (fetch failed)
+    await recordTokenUsage(DB, {
+      userId,
+      credentialId,
+      model: maasModel,
+      endpoint: "/api/pet/chat",
+      tokensIn: estimateTokenCount(systemPrompt) + estimateTokenCount(userMessage),
+      tokensOut: 0,
+      totalTokens: 0,
+      cost: 0,
+      ip: getClientIP(context.request),
+      userAgent: getUserAgent(context.request),
+      status: "error",
+      blockReason: err instanceof Error ? err.message : "fetch failed",
+    });
+
     return new Response(JSON.stringify({
       code: 0,
       message: "AI暂时不可用",

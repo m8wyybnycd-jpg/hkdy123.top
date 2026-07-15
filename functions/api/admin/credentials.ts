@@ -21,6 +21,9 @@ import {
   encryptCredential,
   CREDENTIAL_TYPES,
   CREDENTIAL_STATUSES,
+  resolveEncryptionSecret,
+  setKeyCacheTTL,
+  getKeyCacheTTL,
 } from "../../lib/credential";
 import { logOperation, getClientIP, getUserAgent } from "../../lib/logger";
 
@@ -57,6 +60,7 @@ function toCredentialDTO(row: Record<string, unknown>) {
     endpointUrl: (row.endpoint_url as string) || "",
     // Never return encrypted_value / iv — show fixed mask to indicate value is stored
     maskedValue: row.encrypted_value ? "******" : "",
+    keyVersion: (row.key_version as number) ?? null,
     metadata: safeParseJSON(row.metadata as string),
     status: row.status as string,
     lastHealthCheck: (row.last_health_check as string) || null,
@@ -82,9 +86,21 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   const denied = await requirePermission(context, "credential:manage");
   if (denied) return denied;
 
-  const { DB, JWT_SECRET } = context.env;
+  const { DB } = context.env;
   if (!DB) return serverError("数据库不可用");
-  if (!JWT_SECRET) return serverError("加密密钥未配置");
+
+  // V4: Resolve encryption secret (ENCRYPTION_MASTER_KEY or JWT_SECRET fallback)
+  let secret: string;
+  try {
+    secret = resolveEncryptionSecret(context.env);
+  } catch (err) {
+    return serverError(
+      err instanceof Error ? err.message : "加密密钥未配置"
+    );
+  }
+
+  // V4: Configure cache TTL
+  setKeyCacheTTL(getKeyCacheTTL(context.env));
 
   let body: {
     name?: string;
@@ -121,10 +137,10 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
     .first();
   if (existing) return conflict("凭证名称已存在");
 
-  // Encrypt value
+  // Encrypt value — pass DB for D1-backed active key lookup
   let encrypted;
   try {
-    encrypted = await encryptCredential(body.value.trim(), JWT_SECRET);
+    encrypted = await encryptCredential(body.value.trim(), secret, DB);
   } catch (err) {
     console.error("[credentials] Encryption failed:", err);
     return serverError("凭证加密失败");
@@ -133,13 +149,14 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   const now = new Date().toISOString();
   const status = body.status || "active";
   const metadataStr = body.metadata ? JSON.stringify(body.metadata) : "{}";
+  const keyVersion = encrypted.keyVersion ?? null;
 
   try {
     const result = await DB.prepare(
       `INSERT INTO credentials
         (name, type, provider, endpoint_url, encrypted_value, encryption_iv,
-         metadata, status, auto_renew, expires_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         key_version, metadata, status, auto_renew, expires_at, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
       .bind(
         body.name.trim(),
@@ -148,6 +165,7 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
         body.endpointUrl?.trim() || "",
         encrypted.encryptedValue,
         encrypted.iv,
+        keyVersion,
         metadataStr,
         status,
         body.autoRenew ? 1 : 0,

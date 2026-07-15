@@ -23,6 +23,9 @@ import {
 import {
   decryptCredential,
   CREDENTIAL_TYPE_LABELS,
+  resolveEncryptionSecret,
+  setKeyCacheTTL,
+  getKeyCacheTTL,
 } from "../../../../lib/credential";
 import { logOperation, getClientIP } from "../../../../lib/logger";
 
@@ -90,7 +93,14 @@ async function healthCheck(
         const value = await decryptCredential(
           credential.encrypted_value as string,
           credential.encryption_iv as string,
-          secret
+          secret,
+          db,
+          (credential.key_version as number) ?? null,
+          {
+            credentialId: credential.id as number,
+            credentialName: (credential.name as string) || "",
+            callerService: "health_check:oauth",
+          }
         );
         const resp = await fetch(endpoint, {
           method: "POST",
@@ -125,7 +135,14 @@ async function healthCheck(
     const value = await decryptCredential(
       credential.encrypted_value as string,
       credential.encryption_iv as string,
-      secret
+      secret,
+      db,
+      (credential.key_version as number) ?? null,
+      {
+        credentialId: credential.id as number,
+        credentialName: (credential.name as string) || "",
+        callerService: `health_check:${type}`,
+      }
     );
 
     const headers: Record<string, string> = {
@@ -174,9 +191,21 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
   const denied = await requirePermission(context, "credential:manage");
   if (denied) return denied;
 
-  const { DB, JWT_SECRET } = context.env;
+  const { DB } = context.env;
   if (!DB) return serverError("数据库不可用");
-  if (!JWT_SECRET) return serverError("加密密钥未配置");
+
+  // V4: Resolve encryption secret
+  let secret: string;
+  try {
+    secret = resolveEncryptionSecret(context.env);
+  } catch (err) {
+    return serverError(
+      err instanceof Error ? err.message : "加密密钥未配置"
+    );
+  }
+
+  // V4: Configure cache TTL
+  setKeyCacheTTL(getKeyCacheTTL(context.env));
 
   const id = parseInt(context.params.id, 10);
   if (isNaN(id)) return badRequest("无效的凭证 ID");
@@ -190,7 +219,7 @@ export const onRequestPost = async (context: PageContext): Promise<Response> => 
     if (!credential) return notFound("凭证不存在");
 
     // Run health check
-    const result = await healthCheck(DB, JWT_SECRET, credential as Record<string, unknown>);
+    const result = await healthCheck(DB, secret, credential as Record<string, unknown>);
 
     const now = new Date().toISOString();
     const newStatus = result.healthy ? "active" : "error";

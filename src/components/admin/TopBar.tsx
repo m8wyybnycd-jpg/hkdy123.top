@@ -16,6 +16,9 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/content/games": "游戏库",
   "/admin/roles": "权限角色",
   "/admin/settings": "系统设置",
+  "/admin/tokens": "Token管理",
+  "/admin/consumption": "消费控制",
+  "/admin/audit": "安全审计",
 };
 
 /**
