@@ -2,10 +2,16 @@
  * Consumption Guard — Unified gatekeeper for all AI/Token consumption APIs.
  *
  * This module is the single enforcement point for:
- *   1. Quota checking (daily + monthly limits from user_quotas)
+ *   1. Quota checking (daily + monthly limits from user_quotas, enhanced by user level)
  *   2. Rate limiting (sliding-window via D1, rules from rate_limits)
  *   3. Usage recording (token_usage_logs + user_quotas update)
  *   4. Quota auto-reset (daily/monthly)
+ *
+ * Level integration:
+ *   - User's level (users.level) determines a baseline quota via user_level_definitions
+ *   - Effective limit = max(user_quotas limit, level-based limit)
+ *   - Admin can always grant more via user_quotas; level guarantees a minimum
+ *   - is_unlimited in user_quotas bypasses all checks
  *
  * Designed for Cloudflare Workers / Pages Functions (D1 only, no Redis).
  *
@@ -24,6 +30,8 @@
  * await recordTokenUsage(env.DB, { userId, model, endpoint, tokensIn, tokensOut, ... });
  * ```
  */
+
+import { getEffectiveQuota } from "./user-level";
 
 // ── Types ────────────────────────────────────────────────
 
@@ -50,6 +58,12 @@ export interface QuotaSnapshot {
   currentDailyUsage: number;
   currentMonthlyUsage: number;
   isUnlimited: boolean;
+  /** User's level (1-10). 0 if unknown. */
+  level: number;
+  /** Level name (e.g., "青铜"). Empty if level definition not found. */
+  levelName: string;
+  /** Quota multiplier from level definition. 1.0 if unknown. */
+  quotaMultiplier: number;
 }
 
 /** Matched rate-limit rule metadata. */
@@ -210,11 +224,20 @@ async function resetQuotaIfNeeded(
     currentDailyUsage,
     currentMonthlyUsage,
     isUnlimited: (quotaRow.is_unlimited as number) === 1,
+    level: 0,
+    levelName: "",
+    quotaMultiplier: 1.0,
   };
 }
 
 /**
  * Check if the user has remaining quota (daily + monthly).
+ *
+ * Level integration:
+ *   - Queries user's level from `users` table
+ *   - Computes level-based effective quota via `getEffectiveQuota`
+ *   - Effective limit = max(user_quotas limit, level-based limit)
+ *   - If level definition table doesn't exist (pre-migration), gracefully degrades
  *
  * @returns null if allowed, or a block reason string if quota exceeded.
  */
@@ -225,6 +248,31 @@ async function checkQuota(
   const quotaRow = await ensureQuotaExists(db, userId);
   const snapshot = await resetQuotaIfNeeded(db, quotaRow);
 
+  // ── Level-based quota enhancement ──
+  // Query user's level and compute effective quota.
+  // If level definitions table is missing (pre-migration), gracefully degrade.
+  try {
+    const userRow = await db
+      .prepare("SELECT COALESCE(level, 1) AS level FROM users WHERE id = ?")
+      .bind(userId)
+      .first<{ level: number }>();
+
+    const userLevel = userRow?.level ?? 1;
+
+    const effective = await getEffectiveQuota(db, userLevel);
+
+    // Effective limit = max(user_quotas limit, level-based limit)
+    // This means the level guarantees a minimum quota, and admin can grant more.
+    snapshot.level = effective.level;
+    snapshot.levelName = effective.levelName;
+    snapshot.quotaMultiplier = effective.quotaMultiplier;
+    snapshot.dailyLimit = Math.max(snapshot.dailyLimit, effective.dailyLimit);
+    snapshot.monthlyLimit = Math.max(snapshot.monthlyLimit, effective.monthlyLimit);
+  } catch (err) {
+    // Level table might not be migrated yet — degrade gracefully
+    console.warn("[consumption-guard] Level-based quota enhancement skipped:", err);
+  }
+
   if (snapshot.isUnlimited) {
     return { snapshot, blockReason: null };
   }
@@ -232,14 +280,14 @@ async function checkQuota(
   if (snapshot.currentDailyUsage >= snapshot.dailyLimit) {
     return {
       snapshot,
-      blockReason: `日配额已用尽（${snapshot.currentDailyUsage}/${snapshot.dailyLimit}）`,
+      blockReason: `日配额已用尽（${snapshot.currentDailyUsage}/${snapshot.dailyLimit}${snapshot.levelName ? `, ${snapshot.levelName}` : ""}）`,
     };
   }
 
   if (snapshot.currentMonthlyUsage >= snapshot.monthlyLimit) {
     return {
       snapshot,
-      blockReason: `月配额已用尽（${snapshot.currentMonthlyUsage}/${snapshot.monthlyLimit}）`,
+      blockReason: `月配额已用尽（${snapshot.currentMonthlyUsage}/${snapshot.monthlyLimit}${snapshot.levelName ? `, ${snapshot.levelName}` : ""}）`,
     };
   }
 
