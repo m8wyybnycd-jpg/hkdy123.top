@@ -19,7 +19,7 @@
  *   { access_token: "...", refresh_token: "...", expires_in: 3600 }
  */
 
-import { getClientIP, getUserAgent, structuredLog } from "../lib/logger";
+import { getClientIP, getUserAgent, structuredLog } from "../../lib/logger";
 
 // ── JWT Helpers ──
 
@@ -63,7 +63,7 @@ async function verifyJWT(token: string, secret: string): Promise<Record<string, 
   const valid = await crypto.subtle.verify(
     "HMAC",
     key,
-    fromBase64url(sigB64),
+    fromBase64url(sigB64) as BufferSource,
     encoder.encode(signingInput)
   );
   if (!valid) throw new Error("Invalid JWT signature");

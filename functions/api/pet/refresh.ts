@@ -12,7 +12,7 @@
  *   { access_token: "...", refresh_token: "...", expires_in: 3600 }
  */
 
-import { getClientIP, structuredLog } from "../lib/logger";
+import { getClientIP, structuredLog } from "../../lib/logger";
 
 // ── JWT Helpers (duplicated from device-auth.ts for Pages Functions isolation) ──
 
@@ -47,7 +47,7 @@ async function verifyJWT(token: string, secret: string): Promise<Record<string, 
     "raw", encoder.encode(secret),
     { name: "HMAC", hash: "SHA-256" }, false, ["verify"]
   );
-  const valid = await crypto.subtle.verify("HMAC", key, fromBase64url(sigB64), encoder.encode(signingInput));
+  const valid = await crypto.subtle.verify("HMAC", key, fromBase64url(sigB64) as BufferSource, encoder.encode(signingInput));
   if (!valid) throw new Error("Invalid JWT signature");
   const payload = JSON.parse(new TextDecoder().decode(fromBase64url(payloadB64)));
   const now = Math.floor(Date.now() / 1000);
