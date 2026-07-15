@@ -54,10 +54,15 @@ describe("schema.sql", () => {
     assert.ok(usersSection, "users table definition not found");
     const columns = usersSection[1];
     assert.match(columns, /id\s+INTEGER PRIMARY KEY/, "users.id should be INTEGER PRIMARY KEY");
-    assert.match(columns, /username\s+TEXT\s+UNIQUE NOT NULL/, "users.username should be UNIQUE NOT NULL");
+    assert.match(columns, /email\s+TEXT\s+UNIQUE NOT NULL/, "users.email should be UNIQUE NOT NULL");
+    assert.match(columns, /username\s+TEXT/, "users.username should exist (nullable)");
     assert.match(columns, /password_hash\s+TEXT\s+NOT NULL/, "users.password_hash should be NOT NULL");
     assert.match(columns, /salt\s+TEXT\s+NOT NULL/, "users.salt should be NOT NULL");
-    assert.match(columns, /created_at/, "users should have created_at");
+    assert.match(columns, /created_at\s+TEXT\s+NOT NULL/, "users.created_at should be NOT NULL");
+    assert.match(columns, /updated_at\s+TEXT\s+NOT NULL/, "users.updated_at should be NOT NULL");
+    assert.match(columns, /level\s+INTEGER NOT NULL DEFAULT 1/, "users.level should default to 1");
+    // is_admin is added via ALTER TABLE in the same migration file
+    assert.match(schemaSql, /ALTER TABLE users ADD COLUMN is_admin/, "users.is_admin should be added via ALTER");
   });
 
   it("platforms table should have required columns", () => {
@@ -85,7 +90,7 @@ describe("schema.sql", () => {
   it("should create indexes", () => {
     assert.match(schemaSql, /CREATE INDEX IF NOT EXISTS idx_deals_category/, "deals category index");
     assert.match(schemaSql, /CREATE INDEX IF NOT EXISTS idx_favorites_user/, "favorites user index");
-    assert.match(schemaSql, /CREATE INDEX IF NOT EXISTS idx_users_username/, "users username index");
+    assert.match(schemaSql, /CREATE INDEX IF NOT EXISTS idx_users_email/, "users email index");
   });
 });
 

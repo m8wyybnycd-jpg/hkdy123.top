@@ -96,17 +96,19 @@ describe("Auth Module Code Validation (functions/lib/auth.ts)", () => {
     assert.ok(authContent.includes("SHA-256"), "should use SHA-256 hash");
   });
 
-  it("should use jose library for JWT", () => {
-    assert.ok(authContent.includes('SignJWT'), "should import SignJWT from jose");
-    assert.ok(authContent.includes('jwtVerify'), "should import jwtVerify from jose");
+  it("should use Web Crypto HMAC (not the jose library) for JWT", () => {
+    assert.ok(!/from\s+["']jose["']/.test(authContent), "should NOT depend on the jose library");
+    assert.ok(authContent.includes("crypto.subtle.sign"), "should use crypto.subtle.sign for HMAC");
+    assert.ok(authContent.includes("crypto.subtle.verify"), "should use crypto.subtle.verify for HMAC");
   });
 
   it("should use HS256 algorithm", () => {
     assert.ok(authContent.includes("HS256"), "should use HS256 algorithm");
   });
 
-  it("should set 7d expiration for JWT", () => {
-    assert.ok(authContent.includes('"7d"'), "should set 7d expiration");
+  it("should set ~7d expiration for JWT", () => {
+    assert.ok(authContent.includes("7 * 24 * 60 * 60"), "should compute 7-day expiry in seconds");
+    assert.ok(authContent.includes("JWT_EXPIRY_SECONDS"), "should define JWT_EXPIRY_SECONDS");
   });
 
   it("should export hashPassword, verifyPassword, signJWT, verifyJWT", () => {
@@ -133,20 +135,24 @@ describe("Auth Module Code Validation (functions/lib/auth.ts)", () => {
 describe("Register API Code Validation (functions/api/register.ts)", () => {
   const content = readSrc("functions/api/register.ts");
 
-  it("should check username uniqueness (409 conflict)", () => {
-    assert.ok(content.includes("conflict"), "should use conflict() for duplicate username");
-    assert.ok(content.includes("SELECT id FROM users WHERE username"), "should query users table");
+  it("should check email uniqueness (409 conflict)", () => {
+    assert.ok(content.includes("conflict"), "should use conflict() for duplicate email");
+    assert.ok(content.includes("SELECT id FROM users WHERE email"), "should query users table by email");
   });
 
-  it("should validate password length >= 6", () => {
-    assert.ok(content.includes("password.length < 6"), "should check password length < 6");
-    assert.ok(content.includes("badRequest"), "should return badRequest for short password");
+  it("should validate password length against a configurable minimum", () => {
+    assert.ok(content.includes("passwordMinLength"), "should read the password_min_length setting");
+    assert.ok(content.includes("密码至少"), "should return a 'password too short' message");
   });
 
-  it("should return token and user on success", () => {
+  it("should return the user (not a token) on success", () => {
     assert.ok(content.includes("jsonResponse"), "should use jsonResponse for success");
-    assert.ok(content.includes("token"), "should return token");
     assert.ok(content.includes("user"), "should return user object");
+  });
+
+  it("should set an HttpOnly cookie with the JWT", () => {
+    assert.ok(content.includes("__Host-auth_token"), "should set the __Host- prefixed auth cookie");
+    assert.ok(content.includes("Set-Cookie"), "should set the Set-Cookie header");
   });
 
   it("should use JWT_SECRET from environment", () => {
@@ -159,18 +165,22 @@ describe("Register API Code Validation (functions/api/register.ts)", () => {
 describe("Login API Code Validation (functions/api/login.ts)", () => {
   const content = readSrc("functions/api/login.ts");
 
-  it("should return 401 for non-existent user", () => {
+  it("should return 401 for non-existent user or wrong password", () => {
     assert.ok(content.includes("unauthorized"), "should use unauthorized() for auth failure");
-    assert.ok(content.includes("用户名或密码错误"), "should return '用户名或密码错误' message");
+    assert.ok(content.includes("账号或密码错误"), "should return '账号或密码错误' message");
   });
 
   it("should verify password using verifyPassword", () => {
     assert.ok(content.includes("verifyPassword"), "should call verifyPassword");
   });
 
-  it("should return JWT token on success", () => {
+  it("should sign a JWT on success", () => {
     assert.ok(content.includes("signJWT"), "should call signJWT");
-    assert.ok(content.includes("token"), "should return token");
+  });
+
+  it("should set an HttpOnly cookie with the JWT", () => {
+    assert.ok(content.includes("__Host-auth_token"), "should set the __Host- prefixed auth cookie");
+    assert.ok(content.includes("Set-Cookie"), "should set the Set-Cookie header");
   });
 });
 
@@ -255,31 +265,39 @@ describe("DB Fallback Code Validation (functions/lib/db.ts)", () => {
 // ── Frontend Code Validation ───────────────────────────────
 
 describe("Frontend Code Validation", () => {
-  it("AuthContext should manage token lifecycle", () => {
+  it("AuthContext should manage auth state via HttpOnly cookie", () => {
     const content = readSrc("src/contexts/AuthContext.tsx");
-    assert.ok(content.includes("localStorage"), "should use localStorage");
-    assert.ok(content.includes("TOKEN_KEY"), "should define TOKEN_KEY");
-    assert.ok(content.includes("isTokenExpired"), "should check token expiration");
+    assert.ok(content.includes("useAuthContext"), "should export useAuthContext hook");
     assert.ok(content.includes("login"), "should have login method");
     assert.ok(content.includes("register"), "should have register method");
     assert.ok(content.includes("logout"), "should have logout method");
+    assert.ok(content.includes("HttpOnly"), "should document HttpOnly cookie auth");
+    assert.ok(content.includes("/api/me"), "should call /api/me to restore session from cookie");
+    // Token is NOT held in JS — it lives in the HttpOnly cookie.
+    assert.ok(!content.includes("TOKEN_KEY"), "should NOT use a localStorage TOKEN_KEY (cookie-based)");
+    assert.ok(content.includes("token: null"), "auth state token should be null (cookie-only)");
   });
 
-  it("ApiClient should inject JWT automatically", () => {
+  it("ApiClient should send credentials via cookie (no manual token injection)", () => {
     const content = readSrc("src/services/api.ts");
-    assert.ok(content.includes("Authorization"), "should set Authorization header");
-    assert.ok(content.includes("Bearer"), "should use Bearer token format");
-    assert.ok(content.includes("TOKEN_KEY"), "should use same TOKEN_KEY as AuthContext");
+    assert.ok(content.includes("credentials"), "should set credentials on fetch");
+    assert.ok(content.includes("credentials: \"include\""), "should use credentials: 'include'");
+    assert.ok(content.includes("login"), "should have login method");
+    assert.ok(content.includes("register"), "should have register method");
+    assert.ok(!content.includes("Bearer"), "should NOT manually inject a Bearer token (cookie-based)");
   });
 
-  it("TOKEN_KEY should be consistent between AuthContext and ApiClient", () => {
+  it("AuthContext and ApiClient should both rely on cookie auth", () => {
     const authContent = readSrc("src/contexts/AuthContext.tsx");
     const apiContent = readSrc("src/services/api.ts");
-    const authKey = authContent.match(/TOKEN_KEY\s*=\s*["']([^"']+)["']/);
-    const apiKey = apiContent.match(/TOKEN_KEY\s*=\s*["']([^"']+)["']/);
-    assert.ok(authKey, "AuthContext should define TOKEN_KEY");
-    assert.ok(apiKey, "ApiClient should define TOKEN_KEY");
-    assert.equal(authKey[1], apiKey[1], "TOKEN_KEY values should match");
+    assert.ok(
+      authContent.includes("credentials: \"include\""),
+      "AuthContext should use credentials: 'include'"
+    );
+    assert.ok(
+      apiContent.includes("credentials: \"include\""),
+      "ApiClient should use credentials: 'include'"
+    );
   });
 
   it("ProtectedRoute should redirect to /login when not authenticated", () => {
