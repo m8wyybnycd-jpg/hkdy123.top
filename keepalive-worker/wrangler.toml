@@ -15,7 +15,9 @@ database_name = "cloudgame-hub-db"
 database_id = "1e65f62f-e7a3-4a89-88eb-f34c95f4969c"
 
 # ── Environment Variables ──
-# JWT_SECRET is used for credential decryption (same as Pages project)
+# ENCRYPTION_MASTER_KEY is used for credential decryption (same as Pages project)
+# Set via: wrangler secret put ENCRYPTION_MASTER_KEY --name cloudgame-hub-keepalive
+# JWT_SECRET is used as fallback decryption key
 # Set via: wrangler secret put JWT_SECRET --name cloudgame-hub-keepalive
 # XFMAAS_API_KEY is used as fallback if D1 credential is missing
 # Set via: wrangler secret put XFMAAS_API_KEY --name cloudgame-hub-keepalive

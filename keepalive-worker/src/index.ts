@@ -480,10 +480,11 @@ let _triggerHistory: number[] = [];
 // ── Core health check logic (shared by scheduled and /trigger) ──
 
 async function runHealthChecks(env: Env): Promise<void> {
-  const { DB, JWT_SECRET } = env;
+  const { DB, ENCRYPTION_MASTER_KEY, JWT_SECRET } = env;
+  const encryptionSecret = ENCRYPTION_MASTER_KEY || JWT_SECRET;
 
-  if (!DB || !JWT_SECRET) {
-    console.error("[keepalive] Missing DB or JWT_SECRET binding");
+  if (!DB || !encryptionSecret) {
+    console.error("[keepalive] Missing DB or encryption secret binding");
     return;
   }
 
@@ -520,7 +521,7 @@ async function runHealthChecks(env: Env): Promise<void> {
     const results = await Promise.allSettled(
       batch.map(async (credential) => {
         try {
-          const healthResult = await healthCheckWithRetry(credential, JWT_SECRET, env.DB, 2);
+          const healthResult = await healthCheckWithRetry(credential, encryptionSecret, env.DB, 2);
 
           const now = new Date().toISOString();
           const newStatus = healthResult.healthy ? "active" : "error";

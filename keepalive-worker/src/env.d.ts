@@ -7,7 +7,10 @@ interface Env {
   /** D1 database binding (shared with main Pages project) */
   DB: D1Database;
 
-  /** JWT_SECRET for credential decryption */
+  /** ENCRYPTION_MASTER_KEY for credential decryption (primary) */
+  ENCRYPTION_MASTER_KEY?: string;
+
+  /** JWT_SECRET for credential decryption (fallback) */
   JWT_SECRET: string;
 
   /** 讯飞MaaS API Key (fallback if D1 credential is missing) */
