@@ -72,7 +72,8 @@ describe("File Structure Completeness", () => {
     "tsconfig.json",
     "package.json",
     "worker-configuration.d.ts",
-    ".dev.vars",
+    // NOTE: .dev.vars is gitignored (local secrets only) and absent in CI's
+    // clean checkout, so it must NOT be required here — see issue #80.
   ];
 
   for (const file of requiredFiles) {
