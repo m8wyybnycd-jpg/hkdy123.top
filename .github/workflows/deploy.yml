@@ -36,8 +36,13 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint
-        run: npx eslint src/ --max-warnings=0
-        continue-on-error: true
+        # Real flat config (eslint.config.js) added this round. Previously this step
+        # errored on "no config found" and was masked by continue-on-error — a vacuous
+        # green, the same root cause as the old vitest test gate. Now lint actually runs.
+        # unused-vars are reported as warnings (correctness is covered by tsc --noEmit);
+        # promote them to "error" after a dead-code cleanup pass. eslint exits 0 on
+        # warnings-only, so this is a real (non-masked) gate that stays green.
+        run: npx eslint src/ functions/
 
       - name: Test
         # Tests are authored with Node's native `node:test` runner (see headers in
