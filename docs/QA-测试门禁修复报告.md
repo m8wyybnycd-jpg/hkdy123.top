@@ -46,8 +46,21 @@ CI 的 Test 步骤原命令为 `npx vitest run`，但仓库内 7 个测试文件
 - `tsc --noEmit` 硬门禁：0 错误 ✅
 - 部署：CI `continue-on-error` 保证测试失败不阻断部署 ✅
 
-## 6. 建议 follow-up
+## 6. 修复状态（后续更新）
 
-1. 现代化 15 个过时测试，使其匹配 Cookie + WebCrypto 认证架构
-2. 为需要 DB 的测试接入 D1 测试库或加 mock，消除环境依赖
-3. 收紧 CI 中 Test/Lint 的 `continue-on-error`（当前为安全网，待测试现代化后关闭）
+- ✅ **follow-up #1 已完成**（commit `285c4cb`）：15 个过时断言全部现代化，匹配当前 Cookie + WebCrypto 架构。
+  - `api-logic.test.ts`：Register/Login 改为 email+验证码+Cookie 流程，mock D1 补全 settings/verification_codes/users/insert/login_logs SQL；"Token Key 一致性"改为"Cookie 鉴权一致性"。
+  - `js-validation.test.mjs`：Auth 模块断言 WebCrypto HMAC（非 jose）、HS256、7d；Register/Login 断言 HttpOnly `__Host-auth_token` Cookie（不再要求 body 返回 token）；前端断言 `credentials:'include'`、无 `TOKEN_KEY`/localStorage。
+  - `sql-validation.test.ts`：`users` 列匹配当前 schema（`username TEXT`、`is_admin` 经 ALTER 添加、`level DEFAULT 1`）；索引 `idx_users_username` → `idx_users_email`。
+  - **本地结果：192/192 通过（原 174/189，含 15 个过时失败）。**
+- ✅ **follow-up #3（Test 部分）已完成**：`deploy.yml` 的 Test 步骤已移除 `continue-on-error`，成为硬门禁——测试失败将阻断部署。
+- ⏳ **follow-up #2 待做**：D1 强依赖测试（如接入 D1 测试库/mock）仍需环境支持；当前 register/login 已用内存 mock D1 覆盖核心逻辑。
+- ⚠️ **Lint 门禁仍为 `continue-on-error`**：CI 的 Lint 步骤本身已损坏——项目用旧 `.eslintrc`，但装的是 ESLint 9（只认 `eslint.config.js`），步骤报错被掩盖。修复需补 flat config 或降级 ESLint，属独立任务，切勿盲目收紧以免弄挂部署。
+
+**当前 CI 门禁总览**：
+| 门禁 | 状态 |
+|------|------|
+| `tsc --noEmit` | 硬门禁，0 错误 ✅ |
+| Test（tsx，192 用例） | 硬门禁，0 失败 ✅（已收紧） |
+| Lint（eslint） | 已损坏 + continue-on-error（待独立修复） |
+| 部署 | 成功 ✅ |
