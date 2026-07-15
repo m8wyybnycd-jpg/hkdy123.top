@@ -40,7 +40,10 @@ jobs:
         continue-on-error: true
 
       - name: Test
-        run: npx vitest run --reporter=verbose
+        # Tests are authored with Node's native `node:test` runner (see headers in
+        # tests/*.test.ts). vitest cannot collect them, so previously this step was a
+        # vacuous green ("No test suite found"). Run them with tsx so the gate is real.
+        run: npx tsx --test "tests/**/*.test.ts" "tests/**/*.test.mjs"
         continue-on-error: true
 
       - name: Build
