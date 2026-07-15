@@ -55,12 +55,29 @@ CI 的 Test 步骤原命令为 `npx vitest run`，但仓库内 7 个测试文件
   - **本地结果：192/192 通过（原 174/189，含 15 个过时失败）。**
 - ✅ **follow-up #3（Test 部分）已完成**：`deploy.yml` 的 Test 步骤已移除 `continue-on-error`，成为硬门禁——测试失败将阻断部署。
 - ⏳ **follow-up #2 待做**：D1 强依赖测试（如接入 D1 测试库/mock）仍需环境支持；当前 register/login 已用内存 mock D1 覆盖核心逻辑。
-- ⚠️ **Lint 门禁仍为 `continue-on-error`**：CI 的 Lint 步骤本身已损坏——项目用旧 `.eslintrc`，但装的是 ESLint 9（只认 `eslint.config.js`），步骤报错被掩盖。修复需补 flat config 或降级 ESLint，属独立任务，切勿盲目收紧以免弄挂部署。
+
+## 7. Lint 门禁修复（同款假绿，commit `a62564d`）
+
+与测试门禁完全同款的根因：CI 的 Lint 步骤一直"报错 + 被 `continue-on-error` 掩盖"的假绿。
+
+**根因**：项目**没有任何 ESLint 配置文件**（无 `.eslintrc`、无 `eslint.config.js`、package.json 也无 `eslintConfig`），且**连 `@typescript-eslint` 解析器都没装**（只有裸 `eslint ^9`）。`scripts.lint` 还带着 ESLint 9 已删除的 `--ext` 参数。ESLint 9 找不到配置直接抛错 → `continue-on-error` 吞掉 → 每次假绿。
+
+**修复**：
+- 新增 `eslint.config.js`（ESLint 9 flat config）：`@typescript-eslint/parser` + plugin、`eslint:recommended` + `@typescript-eslint/recommended`、注册 `eslint-plugin-react-hooks`（`rules-of-hooks: error` / `exhaustive-deps: warn`）
+- 关闭纯 style 噪音规则（`no-explicit-any` / `no-non-null-assertion` / `ban-ts-comment`），正确性已由 `tsc --noEmit` 硬门禁兜底
+- `no-unused-vars`: **warn**（死代码质量信号；后续清理可升 error）
+- `no-empty-object-type`: off（type-only cosmetic，不碰类型定义）
+- `scripts.lint` 去掉 `--ext`；`deploy.yml` Lint 步骤改为 lint `src/ functions/`、去掉 `--max-warnings=0` 与 `continue-on-error`
+- devDeps: `+@typescript-eslint/parser@^8` `+@typescript-eslint/eslint-plugin@^8` `+eslint-plugin-react-hooks@^5`
+
+**结果**：Lint 现在**真正运行并以 0 error / 54 warning / exit 0 通过**（原：找不到配置报错 + 被掩盖）。`react-hooks/exhaustive-deps` rule-not-found 错误消失（插件已加载）。
+
+**后续 follow-up**：54 个 warning 均为未使用变量（死 import / 死局部），建议做一次死代码清理后把 `no-unused-vars` 升为 `error`，让 Lint 门禁达到与测试门禁同级的"真绿"。
 
 **当前 CI 门禁总览**：
 | 门禁 | 状态 |
 |------|------|
 | `tsc --noEmit` | 硬门禁，0 错误 ✅ |
 | Test（tsx，192 用例） | 硬门禁，0 失败 ✅（已收紧） |
-| Lint（eslint） | 已损坏 + continue-on-error（待独立修复） |
+| Lint（eslint，flat config） | 硬门禁，0 error / 54 warning ✅（已修复，可运行） |
 | 部署 | 成功 ✅ |
